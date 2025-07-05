@@ -23,15 +23,19 @@ function toggleNav() {
 
 </script>
 <template>
-    <nav :class="['bg-white border-b border-gray-100', ClassNav]">
+    <nav :class="['bg-white border-b border-gray-100 w-full h-[4rem]', ClassNav, IsRow ?'':'sm:h-full sm:w-[5rem]' ]">
         <div :class="[
-            'flex h-full bg-[#176cb3] rounded-md  justify-center sm:justify-between max-w-full relative ',
-            IsRow ? 'flex-nowrap items-center mb-2' : 'flex-wrap items-between sm:justify-start me-2'
+            'flex h-full bg-[#176cb3] rounded-md flex-row items-center justify-center sm:justify-between max-w-full relative ',
+            IsRow ? 'mb-2' : 'sm:flex-col sm:me-2 sm:mb-0'
             ]">
-        <LogoSistema ClassName="h-12 pl-2"  @click="toggleNav"/>
+
+            <div>
+
+                <LogoSistema ClassName="h-12 pl-2 flex-grow-0"  @click="toggleNav"/>
+            </div>
         
-        <div class=" flex-row flex-grow items-start hidden sm:flex">
-            <NavLink :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house"/>&nbsp;Inicio</NavLink>
+        <div class=" flex-wrap flex-grow items-start hidden sm:flex">
+            <NavLink :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
         </div>
         <div class="ms-3 relative hidden sm:block">
             <Dropdown align="right" width="48">
