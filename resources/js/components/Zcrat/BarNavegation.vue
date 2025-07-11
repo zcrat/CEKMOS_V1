@@ -15,37 +15,41 @@ const props = defineProps({
         required: true, 
     }
 });
-const emit = defineEmits(['toggle']);
+const emit = defineEmits(['toggle','toggle_smartphone_active']);
 function toggleNav() {
-    console.log('Toggle Navigation');
   emit('toggle');
 }
-
+function toggleNavsmartphone() {
+    emit('toggle_smartphone_active');
+}
 </script>
 <template>
-    <nav :class="['bg-white border-b border-gray-100 w-full h-[4rem]', ClassNav, IsRow ?'':'sm:h-full sm:w-[5rem]' ]">
+    <nav :class="['border-b border-gray-100 w-full h-[4rem]', ClassNav, IsRow ?'':'sm:h-full sm:w-[5rem]' ]">
         <div :class="[
-            'flex h-full bg-[#176cb3] rounded-md flex-row items-center justify-center sm:justify-between max-w-full relative ',
-            IsRow ? 'mb-2' : 'sm:flex-col sm:me-2 sm:mb-0'
+            'flex h-full bg-[#176cb3] rounded-md flex-row items-center mb-2 justify-center sm:justify-between max-w-full relative ',
+            IsRow ? '' : 'sm:flex-col sm:me-2 sm:mb-0'
             ]">
 
             <div>
 
-                <LogoSistema ClassName="h-12 pl-2 flex-grow-0"  @click="toggleNav"/>
+                <LogoSistema :ClassName="'h-12 flex-grow-0 '+(IsRow?'mx-2':'sm:my-2')"  @click="toggleNav"/>
             </div>
         
-        <div class=" flex-wrap flex-grow items-start hidden sm:flex">
+        <div :class="'flex-grow justify-start gap-x-2 gap-y-4 hidden sm:flex '+(IsRow?'flex-row':'flex-col')">
             <NavLink :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
+            <NavLink :href="route('users')" :active="route().current('users')"><font-awesome-icon icon="fa-solid fa-users ":class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
         </div>
         <div class="ms-3 relative hidden sm:block">
-            <Dropdown align="right" width="48">
+            <Dropdown :align="IsRow?'right':'left-up' " width="48">
             <template #trigger>
                     <span class="inline-flex rounded-md mr-2">
-                        <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
-                            {{ $page.props.auth.user.name }}
-                            <font-awesome-icon icon="fa-solid fa-gear"  class="ms-2"/>
-                    </button>
-                </span>
+                        <button type="button" :class="IsRow?'inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150':''">
+                            <template v-if="IsRow">
+                                {{ $page.props.auth.user.name }}
+                            </template>
+                            <font-awesome-icon icon="fa-solid fa-gear" :class="IsRow?'ms-2':'sm:text-[1.5rem] mb-2 text-white'"/>
+                        </button>
+                    </span>
             </template>
             
             <template #content>
@@ -69,7 +73,7 @@ function toggleNav() {
             </template>
         </Dropdown>
         </div>
-        <font-awesome-icon icon="fa-solid fa-bars"  class="absolute right-5 text-lg font-bold text-white sm:hidden"/>
+        <font-awesome-icon icon="fa-solid fa-bars" @click="toggleNavsmartphone" class="absolute right-5 text-lg font-bold text-white sm:hidden"/>
         </div>
     </nav>
 </template>

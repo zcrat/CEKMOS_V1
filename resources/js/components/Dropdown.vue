@@ -34,8 +34,12 @@ const widthClass = computed(() => {
 });
 
 const alignmentClasses = computed(() => {
+    if (props.align === 'left-up') {
+        return 'ltr:origin-top-left rtl:origin-top-right start-[100%] top-[100%]  transform  translate-x-[0] -translate-y-[100%] sm:ms-4';
+    }
+
     if (props.align === 'left') {
-        return 'ltr:origin-top-left rtl:origin-top-right start-0';
+        return 'ltr:origin-top-left rtl:origin-top-right start-0 mt-2';
     }
 
     if (props.align === 'right') {
@@ -65,7 +69,7 @@ const alignmentClasses = computed(() => {
         >
             <div
                 v-show="open"
-                class="absolute z-50 mt-2 rounded-md shadow-lg"
+                class="absolute z-50 rounded-md shadow-lg"
                 :class="[widthClass, alignmentClasses]"
                 style="display: none;"
                 @click="open = false"
