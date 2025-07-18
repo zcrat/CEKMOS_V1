@@ -5,4 +5,11 @@
 [x-cloak] {
     display: none;
 }
+:root {
+  --micolor: #176cb3;
+  --btnprimary: #0479d8;
+}
 
+.focus-input {
+  @apply focus:shadow-[0px_0px_1rem] focus:shadow-red-700 focus:ring-red-700 focus:border-red-700;
+}
