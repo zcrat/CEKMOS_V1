@@ -38,6 +38,7 @@ function toggleNavsmartphone() {
         <div :class="'flex-grow justify-start gap-x-2 gap-y-4 hidden sm:flex '+(IsRow?'flex-row':'flex-col')">
             <NavLink :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
             <NavLink :href="route('users')" :active="route().current('users')"><font-awesome-icon icon="fa-solid fa-users ":class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
+            <NavLink :href="route('employees')" :active="route().current('employees')"><font-awesome-icon icon="fa-solid fa-address-book ":class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Empleados</span></NavLink>
         </div>
         <div class="ms-3 relative hidden sm:block">
             <Dropdown :align="IsRow?'right':'left-up' " width="48">

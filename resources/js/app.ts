@@ -1,27 +1,41 @@
-import '../css/app.css';
+import '../css/app.css'
 
-import { createInertiaApp } from '@inertiajs/vue3';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import type { DefineComponent } from 'vue';
-import { createApp, h } from 'vue';
-import { ZiggyVue } from 'ziggy-js';
-import { initializeTheme } from './composables/useAppearance';
+import { createApp, h, DefineComponent } from 'vue'
+import { createInertiaApp } from '@inertiajs/vue3'
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
+import { ZiggyVue } from '../../vendor/tightenco/ziggy'
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+
+import Toast, { PluginOptions } from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+
+library.add(far, fab, fas)
+
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')),
-    setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
-            .use(plugin)
-            .use(ZiggyVue)
-            .mount(el);
-    },
-    progress: {
-        color: '#4B5563',
-    },
-});
+  title: (title) => `${title} - ${appName}`,
+  resolve: (name) =>
+    resolvePageComponent(
+      `./pages/${name}.vue`,
+      import.meta.glob<DefineComponent>('./pages/**/*.vue')
+    ),
+  setup({ el, App, props, plugin }) {
+    const vueApp = createApp({ render: () => h(App, props) })
+      .use(plugin)
+      .use(ZiggyVue)
+      .use(Toast)
+      .component('font-awesome-icon', FontAwesomeIcon)
 
-// This will set light / dark mode on page load...
-initializeTheme();
+    vueApp.mount(el)
+    return vueApp
+  },
+  progress: {
+    color: '#4B5563',
+  },
+})

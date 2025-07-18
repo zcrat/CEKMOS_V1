@@ -5,9 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class EmpleadosController extends Controller
 {
+    public function View(Request $request){
+        
+        return Inertia::render('Admin/Employees');
+    }
     public function Create(Request $request){
        
         $request->validate([
