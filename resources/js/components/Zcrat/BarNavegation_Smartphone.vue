@@ -19,18 +19,18 @@ const props = defineProps({
 
 </script>
 <template>
-    <nav :class="['border-b border-gray-100 w-[8rem] h-[calc(100vh-4.5rem)] top-[4.5rem]  absolute transform transition duration-300 ease-in-out',barnav_active ? 'translate-x-0 left-2':'-translate-x-full left-0'] ">
+    <nav :class="['z-[2] border-b border-gray-100 w-[8rem] h-[calc(100vh-4.5rem)] top-[4.5rem]  absolute transform transition duration-300 ease-in-out',barnav_active ? 'translate-x-0 left-2':'-translate-x-full left-0'] ">
         <div :class="[
             'flex h-full bg-[#176cb3] rounded-md flex-col items-start justify-between max-w-full relative ',
-            IsRow ? 'mb-2' : 'sm:flex-col sm:me-2 sm:mb-0'
+             'sm:flex-col sm:me-2 sm:mb-0'
             ]">
         
         <div class=" flex-col flex-grow items-start justify-start gap-2 p-2 flex">
-            <NavLink :href="route('dashboard')" :active="route().current('dashboard')" class="ms-2 gap-x-1 w-full"><font-awesome-icon icon="fa-solid fa-house"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
-            <NavLink :href="route('users')" :active="route().current('users')" class="ms-2 gap-x-1 w-full"><font-awesome-icon icon="fa-solid fa-users"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
+            <NavLink :href="route('dashboard')" :active="route().current('dashboard')" class="ms-2 gap-x-1 w-full"><font-awesome-icon icon="fa-solid fa-house"/><span :class="'sm:hidden'">&nbsp;Inicio</span></NavLink>
+            <NavLink :href="route('users')" :active="route().current('users')" class="ms-2 gap-x-1 w-full"><font-awesome-icon icon="fa-solid fa-users"/><span :class="'sm:hidden'">&nbsp;Usuarios</span></NavLink>
         </div>
         <div class="ms-2 relative block p-2">
-            <Dropdown :align="IsRow?'right':'left-up' " width="48">
+            <Dropdown :align="'left-up' " width="48">
             <template #trigger>
                     <span class="inline-flex rounded-md mr-2">
                         <button type="button" class="'inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">

@@ -11,27 +11,29 @@ return new class extends Migration
      */
     public function up(): void
    {
-        Schema::create('regimes_fiscales', function (Blueprint $table) {
-            $table->id();
-            $table->integer('clave');
+       Schema::create('regimes_fiscales', function (Blueprint $table) {
+            $table->string('clave', 3)->primary(); // clave es la PK, ya no es necesario unique() también
             $table->string('descripcion');
-            $table->string('regimen_fiscal');
+            $table->boolean('persona_fisica')->default(false);
+            $table->boolean('persona_moral')->default(false);
             $table->timestamps();
-            $table->timestamp('deleted_at')->nullable();
+            $table->softDeletes();
         });
+
         Schema::create('employes', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
             $table->string('paterno');
             $table->string('materno');
-            $table->string('curp',18);
-            $table->string('rfc',13);
-            $table->foreignId('regimen_fiscal_id')->references('id')->on('regimes_fiscales');
-            $table->string('uso_cfdi',6);
+            $table->string('curp', 18);
+            $table->string('rfc', 13);
+            $table->string('regimen_fiscal_id', 3); // ⚠️ importante que coincida con el tipo
+            $table->foreign('regimen_fiscal_id')->references('clave')->on('regimes_fiscales');
             $table->integer('domicilio_fiscal');
             $table->timestamps();
-            $table->timestamp('deleted_at')->nullable();
+            $table->softDeletes();
         });
+
     }
     public function down(): void
     {

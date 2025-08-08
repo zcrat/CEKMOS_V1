@@ -21,7 +21,8 @@ return new class extends Migration
             $table->dropColumn('regimen_fiscal');
         });
         Schema::table('cfdis_avaliables', function (Blueprint $table) {
-            $table->foreignId('regimen_fiscal_id')->references('id')->on('regimes_fiscales');
+            $table->string('regimen_fiscal_id', 3); // ⚠️ importante que coincida con el tipo
+            $table->foreign('regimen_fiscal_id')->references('clave')->on('regimes_fiscales');
         });
     }
 

@@ -31,6 +31,8 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+protected $dateFormat = 'Y-m-d H:i:s.v'; // Formato compatible con SQL Server
+ // formato compatible con SQL Server
 
     /**
      * The attributes that should be hidden for serialization.

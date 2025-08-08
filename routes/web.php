@@ -15,5 +15,6 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
 
     Route::get('/users', function () {return Inertia::render('users');})->name('users');
     
-    Route::get('/employees',[EmpleadosController::class,'View'])->name('employees');;
+    Route::get('/employees',[EmpleadosController::class,'View'])->name('employees');
+    Route::post('/employees/create',[EmpleadosController::class,'create'])->name('employees.create');
 });

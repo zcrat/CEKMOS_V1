@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use App\Models\EmpleadosModel;
+use Illuminate\Support\Facades\Log;
 
 class EmpleadosController extends Controller
 {
@@ -15,6 +17,8 @@ class EmpleadosController extends Controller
     }
     public function Create(Request $request){
        
+        return response()->json(['message' => 'server is working']);
+    
         $request->validate([
             'nombre' => ['required', 'string'],
             'peterno' => ['required', 'string'],
@@ -22,7 +26,6 @@ class EmpleadosController extends Controller
             'curp' => ['required', 'string','unique', 'size:18'],
             'rfc' => ['required', 'string', 'unique','size:13'],
             'regimen_fiscal_id' => ['required', 'exists:regimes_fiscales,id'],
-            'uso_cfdi_id' => ['required', 'exists:cfdis,id'],
             'domicilio_fiscal' => ['required', 'string', 'size:13'],
         ], [
             'nombre.required' => 'El nombre es obligatorio.',
@@ -46,9 +49,6 @@ class EmpleadosController extends Controller
             'regimen_fiscal_id.required' => 'Debes seleccionar un régimen fiscal.',
             'regimen_fiscal_id.exists' => 'El régimen fiscal seleccionado no es válido.',
 
-            'uso_cfdi_id.required' => 'Debes seleccionar un uso de CFDI.',
-            'uso_cfdi_id.exists' => 'El uso de CFDI seleccionado no es válido.',
-
             'domicilio_fiscal.required' => 'El domicilio fiscal es obligatorio.',
             'domicilio_fiscal.string' => 'El domicilio fiscal debe ser una cadena de texto.',
             'domicilio_fiscal.size' => 'El domicilio fiscal debe tener exactamente 13 caracteres.',
@@ -61,7 +61,6 @@ class EmpleadosController extends Controller
                 'curp' =>  $request->curp,
                 'rfc' =>  $request->rfc,
                 'regimen_fiscal_id' =>  $request->regimen_fiscal_id,
-                'uso_cfdi_id' =>  $request->uso_cfdi_id,
                 'domicilio_fiscal' =>  $request->domicilio_fiscal,
             ]);
             $message='Creado Exitosamente';
@@ -121,7 +120,6 @@ class EmpleadosController extends Controller
                 'curp' =>  $request->curp,
                 'rfc' =>  $request->rfc,
                 'regimen_fiscal_id' =>  $request->regimen_fiscal_id,
-                'uso_cfdi_id' =>  $request->uso_cfdi_id,
                 'domicilio_fiscal' =>  $request->domicilio_fiscal,
             ]);
             $message='Actualizado Exitosamente';
