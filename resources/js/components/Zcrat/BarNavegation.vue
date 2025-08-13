@@ -2,6 +2,7 @@
 import NavLink from '@/Components/NavLink.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
+import ButtonLink from '@/components/Zcrat/Inputs/ButtonLink.vue';
 import LogoSistema from '@/components/Zcrat/LogoSistema.vue';
 import { defineEmits } from 'vue';
 
@@ -39,6 +40,23 @@ function toggleNavsmartphone() {
             <NavLink :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
             <NavLink :href="route('users')" :active="route().current('users')"><font-awesome-icon icon="fa-solid fa-users ":class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
             <NavLink :href="route('employees')" :active="route().current('employees')"><font-awesome-icon icon="fa-solid fa-address-book ":class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Empleados</span></NavLink>
+                <Dropdown :align="IsRow?'right':'left-up' " width="48">
+                    <template #trigger>
+                        <ButtonLink :active="route().current('Cortana.Presupuesto.Vista')"><font-awesome-icon icon="fa-solid fa-address-book ":class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Cortana</span></ButtonLink>
+                    </template>
+                    
+                    <template #content>
+                        <DropdownLink :href="route('Cortana.Presupuesto.Vista',{'modulo':'CFE'})">
+                            CFE
+                        </DropdownLink>
+                        <DropdownLink :href="route('Cortana.Presupuesto.Vista',{'modulo':'CFB'})">
+                            CFB
+                        </DropdownLink>
+                        <DropdownLink :href="route('Cortana.Presupuesto.Vista',{'modulo':'ECO'})">
+                            ECO
+                        </DropdownLink>
+                    </template>
+                </Dropdown>
         </div>
         <div class="ms-3 relative hidden sm:block">
             <Dropdown :align="IsRow?'right':'left-up' " width="48">
@@ -72,7 +90,7 @@ function toggleNavsmartphone() {
                     </DropdownLink>
                 </form>
             </template>
-        </Dropdown>
+            </Dropdown>
         </div>
         <font-awesome-icon icon="fa-solid fa-bars" @click="toggleNavsmartphone" class="absolute right-5 text-lg font-bold text-white sm:hidden"/>
         </div>
