@@ -25,7 +25,7 @@
         <DialogTitle v-if="modaltitle" class="text-lg font-semibold mb-2">{{modaltitle}}</DialogTitle>
         <slot />
         <div class="mt-4 flex justify-end gap-4">
-          <button v-if="buttonconfirm" :class="['px-4 py-2 rounded-md capitalize', buttonconfirm.classname ??'bg-gray-200']" @click="buttonconfirm.onClick">{{buttonconfirm.text}}</button>
+          <button v-if="buttonconfirm" :class="['px-4 py-2 rounded-md capitalize', buttonconfirm.classname ??'bg-gray-200']" :disabled="buttonconfirm.disabled" @click="buttonconfirm.onClick">{{buttonconfirm.text}}</button>
           <button class="px-4 py-2 bg-gray-200 rounded-md" @click="close">Cerrar</button>
         </div>
       </DialogPanel>
