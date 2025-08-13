@@ -39,7 +39,7 @@ onMounted(() => {
             <BarNavegation :IsRow="showingNavigationtop" @toggle="toggleshowingNavigationtop()" @toggle_smartphone_active="Barnav_smartphone_active = !Barnav_smartphone_active"/>
             <BarNavegation_Smartphone v-if="!isSmOrLarger" :barnav_active="Barnav_smartphone_active"/>
 
-            <main class="h-full w-full">
+            <main class="h-full w-full z-0 relative flex flex-col">
                 <slot />
             </main>
         </div>

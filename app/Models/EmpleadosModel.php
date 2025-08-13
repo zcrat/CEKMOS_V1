@@ -15,7 +15,6 @@ class EmpleadosModel extends Model
         'curp',
         'rfc',
         'regimen_fiscal_id',
-        'uso_cfdi_id',
         'domicilio_fiscal'
     ];
     protected $casts = [];
@@ -23,9 +22,5 @@ class EmpleadosModel extends Model
     public function regimenfiscal()
     {
         return $this->belongsTo(RegimenesFiscalesModel::class, 'regimen_fiscal_id');
-    }
-    public function usocfdi()
-    {
-        return $this->belongsTo(CFDIModel::class, 'uso_cfdi_id');
     }
 }

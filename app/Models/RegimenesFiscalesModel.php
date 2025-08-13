@@ -8,10 +8,14 @@ class RegimenesFiscalesModel extends Model
 {
     use SoftDeletes;
     protected $table = 'regimes_fiscales';
+    protected $primaryKey = 'clave';
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
         'clave',
         'descripcion',
-        'regimen_fiscal',
+        'persona_fisica',
+        'persona_moral',
     ];
     protected $casts = [];
 

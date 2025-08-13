@@ -1,11 +1,11 @@
 <!-- ModalExample.vue -->
 <script setup lang="ts">
 import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
-import TextSimple from '@/components/Zcrat/Inputs/form/TextSimple.vue'
-import NumberSimple from '@/components/Zcrat/Inputs/form/NumberSimple.vue'
+import Inputbasic from '@/components/Zcrat/Inputs/form/InputBasic.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
 import {buttonconfirmed} from '@/utils/interfaces/modals'
-import { reactive, computed } from 'vue' 
+import { reactive, computed, watchEffect } from 'vue' 
+
 interface NewEmployee {
   nombre: string | null,
   paterno: string | null,
@@ -14,7 +14,6 @@ interface NewEmployee {
   rfc: string | null,
   domicilio_fiscal: number | null,
   regimen_fiscal_id: number | null,
-  uso_cfdi_id: number | null,
 }
 const props = defineProps<{ show: boolean }>()
 const emit = defineEmits(['update:show'])
@@ -23,33 +22,31 @@ const updateVisibility = (val: boolean) => {
   emit('update:show', val)
 }
 
-const newEmployee: NewEmployee = reactive({ // Use reactive to make newEmployee reactive
+const newEmployee = reactive<NewEmployee>({ // Use reactive to make newEmployee reactive
   nombre: null,
   paterno: null,
   materno: null,
   curp: null,
   rfc: null,
   domicilio_fiscal: null,
-  regimen_fiscal_id: null,
-  uso_cfdi_id: null,
+  regimen_fiscal_id: null
 })
 
-const isFormValid:boolean = computed(() => { // Create a computed property for validation
+const isFormValid = computed(() => { 
   return (
-    newEmployee.nombre &&
-    newEmployee.paterno &&
-    newEmployee.materno &&
-    newEmployee.curp &&
-    newEmployee.rfc &&
-    newEmployee.domicilio_fiscal &&
-    newEmployee.regimen_fiscal_id &&
-    newEmployee.uso_cfdi_id
+    newEmployee.nombre != null &&
+    newEmployee.paterno != null &&
+    newEmployee.materno != null &&
+    newEmployee.curp != null &&
+    newEmployee.rfc != null &&
+    newEmployee.domicilio_fiscal != null &&
+    newEmployee.regimen_fiscal_id != null
   )
 })
 
 
 const functionexample = async ()=>{
-  if (isFormValid.value === false) {
+  if (!isFormValid.value) {
     MyBasicToast.error('Todos los campos son obligatorios')
     return
   }
@@ -58,30 +55,30 @@ const functionexample = async ()=>{
   MyBasicToast.success('Empleado registrado exitosamente')
   updateVisibility(false)
 }
-const buttonconfirm:buttonconfirmed ={
-  text:'aceptar',
-  classname:'bg-[--btnprimary] text-white',
-  onClick:functionexample,
-  disabled: (!newEmployee.nombre || !newEmployee.paterno || !newEmployee.materno || !newEmployee.curp || !newEmployee.rfc || !newEmployee.domicilio_fiscal || !newEmployee.regimen_fiscal_id || !newEmployee.uso_cfdi_id), // Puedes cambiar esto según la lógica de tu aplicación
-}
+const buttonconfirm = computed((): buttonconfirmed => ({
+  text: 'aceptar',
+  classname: 'bg-[--btnprimary] text-white',
+  onClick: functionexample,
+  disabled: !isFormValid.value, // o !isFormValid.value si cambias nombre
+}))
+
 </script>
 
 <template>
   <BaseModal modaltitle="Registrar Nuevo Empleado" :modelValue="props.show" @update:modelValue="updateVisibility" :buttonconfirm="buttonconfirm">
     <form action="">
       <div class="flex flex-col sm:flex-row gap-1 sm:w-[40rem]">
-        <TextSimple label="Nombre(s)" id="nombre" v-model="newEmployee.nombre" icon="fa-solid fa-user" classdiv="flex-grow"/> 
-        <TextSimple label="Apellido Paterno" v-model="newEmployee.paterno" id="paterno" />
-        <TextSimple label="Apellido Materno" v-model="newEmployee.materno" id="materno"/>
+        <Inputbasic label="Nombre(s)" id="nombre" type="text" v-model="newEmployee.nombre" icon="fa-solid fa-user" classdiv="flex-grow"/> 
+        <Inputbasic label="Apellido Paterno" type="text" v-model="newEmployee.paterno" id="paterno" />
+        <Inputbasic label="Apellido Materno" type="text" v-model="newEmployee.materno" id="materno"/>
       </div>
       <div class="flex flex-col sm:flex-row gap-1 sm:w-[40rem]">
-        <TextSimple label="CURP" id="curp" v-model="newEmployee.curp" classdiv="flex-grow"/>
-        <TextSimple label="RFC" id="rfc" v-model="newEmployee.rfc" classdiv="flex-grow"/>
+        <Inputbasic label="CURP" id="curp" type="text" v-model="newEmployee.curp" classdiv="flex-grow"/>
+        <Inputbasic label="RFC" id="rfc" type="text" v-model="newEmployee.rfc" classdiv="flex-grow"/>
       </div>
       <div class="flex flex-col sm:flex-row gap-1 sm:w-[40rem]">
-        <NumberSimple label="Domicilio Fiscal" id="domicilio_fiscal" v-model="newEmployee.domicilio_fiscal" classdiv="flex-grow"/>
-        <NumberSimple label="Regimen Fiscal" id="regimen_fiscal_id" v-model="newEmployee.regimen_fiscal_id" classdiv="flex-grow"/>
-        <NumberSimple label="Uso CFDI" id="uso_cfdi_id" v-model="newEmployee.uso_cfdi_id" classdiv="flex-grow"/>
+        <Inputbasic label="Domicilio Fiscal" id="domicilio_fiscal" type="number" v-model="newEmployee.domicilio_fiscal" classdiv="flex-grow"/>
+        <Inputbasic label="Regimen Fiscal" id="regimen_fiscal_id" type="number" v-model="newEmployee.regimen_fiscal_id" classdiv="flex-grow"/>
       </div>
     </form>
   </BaseModal>

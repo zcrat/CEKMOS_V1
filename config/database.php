@@ -107,6 +107,10 @@ return [
             'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
+            'options'   => [
+                PDO::ATTR_STRINGIFY_FETCHES => true,
+                PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE => true,
+            ],
             'prefix_indexes' => true,
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),

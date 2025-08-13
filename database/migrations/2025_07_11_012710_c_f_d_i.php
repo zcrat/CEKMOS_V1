@@ -28,13 +28,6 @@ return new class extends Migration
             $table->timestamp('deleted_at')->nullable();
         });
 
-        Schema::table('employes', function (Blueprint $table) {
-            $table->dropColumn('uso_cfdi');
-        });
-        Schema::table('employes', function (Blueprint $table) {
-            $table->foreignId('uso_cfdi_id')->references('id')->on('cfdis');
-        });
-
 
     }
 
@@ -45,8 +38,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('cfdis');
         Schema::dropIfExists('cfdis_avaliables');
-         Schema::table('employes', function (Blueprint $table) {
-            $table->dropColumn('uso_cfdi_id');
-        });
     }
 };
