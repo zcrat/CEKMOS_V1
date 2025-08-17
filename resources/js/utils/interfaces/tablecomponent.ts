@@ -1,4 +1,4 @@
-import { VNode } from 'vue'
+import { Component, VNode } from 'vue'
 
 export interface TitleColumn {
   title: string
@@ -6,7 +6,8 @@ export interface TitleColumn {
 }
 
 export interface DataColumn {
-  element: string | VNode
+  element: string | Component
+  props?: Record<string, any>
   classname?: string
 }
 

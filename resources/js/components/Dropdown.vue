@@ -8,7 +8,7 @@ const props = defineProps({
     },
     width: {
         type: String,
-        default: '48',
+        default: 'auto',
     },
     contentClasses: {
         type: Array,
@@ -30,6 +30,7 @@ onUnmounted(() => document.removeEventListener('keydown', closeOnEscape));
 const widthClass = computed(() => {
     return {
         '48': 'w-48',
+        'auto':'w-auto'
     }[props.width.toString()];
 });
 

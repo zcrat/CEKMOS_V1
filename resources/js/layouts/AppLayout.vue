@@ -35,11 +35,15 @@ onMounted(() => {
 <template>
     <div>
         <Head :title="title" />
+        
         <div :class="['min-h-screen relative h-screen bg-gray-100 pt-2 px-2 flex flex-col',showingNavigationtop ? '' : 'sm:flex-row']">
             <BarNavegation :IsRow="showingNavigationtop" @toggle="toggleshowingNavigationtop()" @toggle_smartphone_active="Barnav_smartphone_active = !Barnav_smartphone_active"/>
             <BarNavegation_Smartphone v-if="!isSmOrLarger" :barnav_active="Barnav_smartphone_active"/>
 
             <main class="h-full w-full z-0 relative flex flex-col">
+            <header class="p-4 bg-white shadow">
+              <slot name="header"/>
+            </header>
                 <slot />
             </main>
         </div>

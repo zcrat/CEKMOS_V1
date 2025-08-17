@@ -1,32 +1,33 @@
-<script setup>
-import Search from '@/components/Zcrat/Inputs/Search.vue';
+<script setup lang="ts">
+import Search from '@/Components/Zcrat/Inputs/Search.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Table from '@/Components/Zcrat/Elements/Table.vue'
+import Dropdown from '@/Components/Zcrat/Elements/DropdownWraper.vue'
+import axios from 'axios'
+import { ref } from 'vue'
+import { UsersTable} from '@/utils/interfaces/users';
+import Button  from "@/Components/Zcrat/Inputs/Button.vue";
 
-const titlestable=[
-    {title:'Opciones',classname:''},
-    {title:'Nombre',classname:''},
-    {title:'Fecha',classname:''}
-]
-const rowstable=[
-    {columns:[{
-        html:'<div><h2>holis</h2></div>',
-        classname:''
-    },{
-        html:'holis',
-        classname:''
-    },{
-        html:'holis',
-        classname:''
-    }],classname:''},
-     {columns:[{
-        html:'holis',
-        classname:''
-    }],classname:''},
-     {columns:[{
-        html:'holis',
-        classname:''
-    }],classname:''},
-]
+const rows = ref<UsersTable[]>([])
+const loanding = ref<boolean>(true)
+
+const GetElements=async ()=>{
+    try {
+        loanding.value=true;
+        const response = await axios.get(route('getusers'))
+        rows.value=response.data.elements;
+    } catch (error) {
+        if (error.response?.status === 500) {
+        alert('Error del servidor')
+        } else {
+        console.error('Error:', error)
+        }
+    }finally{
+        loanding.value=false
+    }
+
+}
+GetElements();
 </script>
 
 <template>
@@ -34,27 +35,48 @@ const rowstable=[
         <template #header>
         </template>
 
-        <div class="h-full flex flex-col items-center justify-center sm:px-4">
+        <div class="h-full flex flex-col items-center justify-start sm:px-4">
             <div class="flex flex-row justify-start py-4  w-full">
                 <Search Classdiv="sm:w-[20rem] w-full"/>
             </div>
-            <div class="flex h-full w-full p-8">
-                <table class="w-full">
-                    <thead>
-                        <tr>
-                            <th v-for="(col, index) in titlestable" :key="index" :class="col.classname">
-                            {{ col.title }}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(row, index) in rowstable" :key="'row_'+index" :class="row.classname">
-                            <td v-for="(col, colnum) in row.columns" :key="'col_'+index+'_'+colnum" :class="col.classname" v-html="col.html">
-
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="flex w-full ">
+                <Table :titles="[
+                        {title:'nombre',classname:'uppercase'},
+                        {title:'correo',classname:'uppercase'},
+                        {title:'verificado',classname:'uppercase'},
+                        {title:'creado',classname:'uppercase'},
+                        {title:'opciones',classname:'uppercase'}
+                    ]"
+                    :rows="rows.map(function(row){return {
+                        classname:'',
+                        columns:[
+                            {element:row.name},
+                            {element:row.email},
+                            {element:row.verified ? 'Verificado':'Sin Verificar'},
+                            {element:row.date+''},
+                            {element: Dropdown,
+                            props: {
+                                father: {
+                                    element: Button,
+                                    props: {text:'Opciones'},
+                                },
+                                children: [
+                                    {
+                                    element: Button,
+                                    props: {text:'Editar', onClick:GetElements,hiddenclases:true, classname:'w-full text-center p-2 '}
+                                    },
+                                    {
+                                    element: Button,
+                                    props: {text:'Eliminar', onClick:GetElements,hiddenclases:true,classname:'w-full text-center p-2 '}
+                                    },
+                                    
+                                ]
+                                }
+                            }
+                                                ]
+                    }})" 
+                    
+                    classname="border-solid border-[1rem]"></Table>
             </div>
         </div>
     </AppLayout>

@@ -34,8 +34,13 @@ defineProps<{
           :key="'col_' + index + '_' + colnum"
           :class="col.classname"
         >
-        <span v-if="typeof col.element === 'string'" v-html="col.element" />
-        <component v-else :is="col.element" />
+        <span v-if="typeof col.element === 'string'" v-html="col.element"></span>
+
+        <component
+            v-else
+            :is="col.element"
+            v-bind="col.props || {}"
+          />
         </td>
       </tr>
     </tbody>

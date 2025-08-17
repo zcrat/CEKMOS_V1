@@ -2,7 +2,7 @@
 import { computed, useSlots } from 'vue';
 import SectionTitle from './SectionTitle.vue';
 
-defineEmits(['submitted']);
+const emit = defineEmits(['submitted']);
 
 const hasActions = computed(() => !! useSlots().actions);
 </script>
