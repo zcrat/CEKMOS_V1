@@ -7,16 +7,37 @@ import axios from 'axios'
 import { ref } from 'vue'
 import { UsersTable} from '@/utils/interfaces/users';
 import Button  from "@/Components/Zcrat/Inputs/Button.vue";
+import Loanding from '@/Components/Zcrat/Elements/Loanding.vue';
+import ChangePermissionsUser from '@/Components/Zcrat/modals/ChangePermissionsUser.vue'
 
 const rows = ref<UsersTable[]>([])
 const loanding = ref<boolean>(true)
+const ModalExampleShoW = ref(false)
 
 const GetElements=async ()=>{
     try {
         loanding.value=true;
         const response = await axios.get(route('getusers'))
         rows.value=response.data.elements;
-    } catch (error) {
+    } catch (error : any) {
+        if (error.response?.status === 500) {
+        alert('Error del servidor')
+        } else {
+        console.error('Error:', error)
+        }
+    }finally{
+        loanding.value=false
+    }
+
+}
+const GetPermisos=async (id:number)=>{
+    try {
+        loanding.value=true;
+        const response = await axios.get(route('getpermisosuser'),
+         { params: { id } }
+        )
+        console.log(response.data);
+    } catch (error : any) {
         if (error.response?.status === 500) {
         alert('Error del servidor')
         } else {
@@ -40,7 +61,8 @@ GetElements();
                 <Search Classdiv="sm:w-[20rem] w-full"/>
             </div>
             <div class="flex w-full ">
-                <Table :titles="[
+                <Loanding v-if="loanding" text="Cargando Usuarios"/>
+                <Table v-else :titles="[
                         {title:'nombre',classname:'uppercase'},
                         {title:'correo',classname:'uppercase'},
                         {title:'verificado',classname:'uppercase'},
@@ -63,11 +85,11 @@ GetElements();
                                 children: [
                                     {
                                     element: Button,
-                                    props: {text:'Editar', onClick:GetElements,hiddenclases:true, classname:'w-full text-center p-2 '}
+                                    props: {text:'Eliminsr', onClick:GetElements,hiddenclases:true, classname:'w-full text-center p-2 '}
                                     },
                                     {
                                     element: Button,
-                                    props: {text:'Eliminar', onClick:GetElements,hiddenclases:true,classname:'w-full text-center p-2 '}
+                                    props: {text:'Editar', onClick:()=>{ModalExampleShoW = true},hiddenclases:true,classname:'w-full text-center p-2 '}
                                     },
                                     
                                 ]
@@ -80,4 +102,5 @@ GetElements();
             </div>
         </div>
     </AppLayout>
+    <ChangePermissionsUser v-model:show="ModalExampleShoW" />
 </template>

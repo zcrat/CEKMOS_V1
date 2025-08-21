@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { defineProps } from 'vue'
 
-const props=defineProps<{
+const props=withDefaults(defineProps<{
   classname?: string
-  hiddenclases:{
-    type:boolean
-    default:false
-  }
+  hiddenclases?:boolean
   text: string
   icon?: string
   onClick?: (event: MouseEvent) => void
-}>()
+}>(),{
+  hiddenclases: false
+})
 
 </script>
 <template>

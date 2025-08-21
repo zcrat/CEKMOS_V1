@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
-use function Termwind\parse;
-
+use \Spatie\Permission\Models\Permission;
 class UsersController extends Controller
 {
     public  function ReadUsers(Request $request){
@@ -25,5 +23,44 @@ class UsersController extends Controller
             ];
         });
         return response()->json(compact('elements'));
+    }
+    public function GetPermisos(Request $request){
+        $id=$request->id;
+        $user=User::find($id);
+        if(!$user){
+            return response()->json(['message'=>'Usuario no encontrado'],404);
+        }
+        $permisos=$user->getAllPermissions();
+        $permisos=$permisos->map(function ($item){
+            return $item->namel;
+        });
+        $allpermisos=Permission::all();
+        $allpermisos=$allpermisos->map(function ($item){
+            return $item->name;
+        });
+
+        $permisosporasignar=$allpermisos->diff($permisos);
+        return response()->json(compact('permisos', 'permisosporasignar'));
+    }
+    public function UpdatePermisos(Request $request){
+        $request->validate([
+            'id' => ['required','exists:users,id'],
+            'permisos' => ['required','array'],
+            'permisos.*' => ['string','exists:permissions,name'],
+        ],
+        [
+            'id.required' => 'El ID del usuario es obligatorio.',
+            'id.exists' => 'El usuario no existe.',
+            'permisos.required' => 'Los permisos son obligatorios.',
+            'permisos.array' => 'Los permisos deben ser un arreglo.',
+            'permisos.*.string' => 'Cada permiso debe ser una cadena de texto.',
+            'permisos.*.exists' => 'Uno o más permisos no existen.',
+        ]);
+
+        $id=$request->id;
+        $permisos=$request->permisos;
+        $user=User::find($id);
+        $user->givePermissionTo($permisos);
+        return response()->json(['message'=>'Permisos actualizados correctamente']);
     }
 }

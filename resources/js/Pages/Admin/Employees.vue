@@ -1,10 +1,10 @@
 <!-- Vista que usa ModalExample.vue -->
 <script setup lang="ts">
 import AppLayout from '@/Layouts/AppLayout.vue'
-import Search from '@/components/Zcrat/Inputs/Search.vue'
-import ButtonComponent from '@/components/Zcrat/Inputs/Button.vue'
+import Search from '@/Components/Zcrat/Inputs/Search.vue'
+import ButtonComponent from '@/Components/Zcrat/Inputs/Button.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
-import ModalExample from '@/components/Zcrat/modals/ModalExample.vue'
+import ModalExample from '@/Components/Zcrat/modals/ModalExample.vue'
 import { ref } from 'vue'
 
 const ModalExampleShoW = ref(false)

@@ -11,7 +11,7 @@ import { fas } from '@fortawesome/free-solid-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 
-import Toast, { PluginOptions } from 'vue-toastification'
+import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 
 library.add(far, fab, fas)
@@ -21,10 +21,10 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,
   resolve: (name) =>
-   resolvePageComponent(
-    `./Pages/${name}.vue`,
-    import.meta.glob<DefineComponent>('./Pages/**/*.vue')
-  ),
+    resolvePageComponent(
+      `./Pages/${name}.vue`,
+      import.meta.glob<DefineComponent>('./Pages/**/*.vue')
+    ),
   setup({ el, App, props, plugin }) {
     const vueApp = createApp({ render: () => h(App, props) })
       .use(plugin)
@@ -32,10 +32,11 @@ createInertiaApp({
       .use(Toast)
       .component('font-awesome-icon', FontAwesomeIcon)
 
+
     vueApp.mount(el)
     return vueApp
   },
   progress: {
-    color: '#4B5563',
+    color: '#4b556357',
   },
 })

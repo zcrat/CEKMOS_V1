@@ -8,8 +8,72 @@
 :root {
   --micolor: #176cb3;
   --btnprimary: #0479d8;
+  --color1: #000000;
+  --color2: #ffffff;
+  --color3: #ffc3d0;
+  --color3a: #fda7b9;
 }
 
 .focus-input {
   @apply focus:shadow-[0px_0px_1rem] focus:shadow-red-700 focus:ring-red-700 focus:border-red-700;
+}
+
+.barra{
+    margin: 0;
+    height: 3rem;
+    width: 80%;
+    overflow: hidden;
+    border-radius: 3rem;
+    border-color: var(--color1);
+    border-width: 2px;
+}
+.progreso p{
+    display: flex;
+    height: 100%;
+    align-items: center;
+    padding-left: 0.25rem;
+    font-weight: bold;
+}
+.progreso{
+    display: block;
+    height: 100%;
+    border-radius: 3rem;
+    background-image: linear-gradient(
+        -45deg,
+        var(--color3a)25%,
+        var(--color3)25%,
+        var(--color3)50%,
+        var(--color3a)50%,
+        var(--color3a)75%,
+        var(--color3)75%,
+        var(--color3)
+    );
+    background-size:50px 50px;
+    animation: load 1s infinite linear;
+  }
+  @keyframes load {
+    0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position:50px 50px;
+      }
+}
+.spinnerp {
+  border: 0.5rem solid #f3f3f3; /* Light grey */
+  border-top: 0.5rem solid var(--color1); /* Blue */
+  border-radius: 50%;
+  width: 5rem;
+  height: 5rem;
+  animation: spin 1s linear infinite;
+}
+.spinner-inline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 6rem; /* altura reducida */
+  }
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg);}
 }
