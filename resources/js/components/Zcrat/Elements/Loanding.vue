@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ProgresBar from '@/Components/Zcrat/Elements/ProgresBar.vue';
+import ProgresBar from '@/components/Zcrat/Elements/ProgresBar.vue';
 
 
 const props = defineProps<{
@@ -11,8 +11,8 @@ console.log('refrescada');
 
 <template>
     <div id="loadingdata" className="flex flex-col justify-center items-center min-w-full">
-        <h3 className="m-[3rem] text-[1.5rem] font-bold">{{ text }}</h3>
-        <ProgresBar v-if="porcentage"  :width="porcentage"/>
+        <h3 className="m-[3rem] text-[1.5rem] font-bold">{{ props.text }}</h3>
+        <ProgresBar v-if="props.porcentage"  :width="props.porcentage"/>
         <div v-else className="spinnerp"></div>
     </div>
 </template>

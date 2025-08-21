@@ -1,5 +1,5 @@
 <script setup>
-import LogoInicio from '@/Components/Zcrat/LogoInicio.vue';
+import LogoInicio from '@/components/Zcrat/LogoInicio.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 </script>
 

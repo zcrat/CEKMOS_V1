@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, type Component } from 'vue';
-import Dropdown from '@/Components/Dropdown.vue';
+import Dropdown from '@/components/Dropdown.vue';
 
 interface ComponentInterface {
   element: Component;
@@ -16,7 +16,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <Dropdown :align="align || 'right'" :width="width ?? '48'">
+  <Dropdown :align="align || 'center'" :width="width ?? '48'">
     <template #trigger>
       <component
         :is="props.father.element"

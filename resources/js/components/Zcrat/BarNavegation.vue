@@ -1,7 +1,7 @@
 <script setup>
-import NavLink from '@/Components/NavLink.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
+import NavLink from '@/components/NavLink.vue';
+import Dropdown from '@/components/Dropdown.vue';
+import DropdownLink from '@/components/DropdownLink.vue';
 import ButtonLink from '@/components/Zcrat/Inputs/ButtonLink.vue';
 import LogoSistema from '@/components/Zcrat/LogoSistema.vue';
 import { defineEmits } from 'vue';

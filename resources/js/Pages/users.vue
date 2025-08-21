@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import Search from '@/Components/Zcrat/Inputs/Search.vue';
+import Search from '@/components/Zcrat/Inputs/Search.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Table from '@/Components/Zcrat/Elements/Table.vue'
-import Dropdown from '@/Components/Zcrat/Elements/DropdownWraper.vue'
+import Table from '@/components/Zcrat/Elements/Table.vue'
+import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
 import axios from 'axios'
 import { ref } from 'vue'
 import { UsersTable} from '@/utils/interfaces/users';
-import Button  from "@/Components/Zcrat/Inputs/Button.vue";
-import Loanding from '@/Components/Zcrat/Elements/Loanding.vue';
-import ChangePermissionsUser from '@/Components/Zcrat/modals/ChangePermissionsUser.vue'
+import Button  from "@/components/Zcrat/Inputs/Button.vue";
+import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
+import ChangePermissionsUser from '@/components/Zcrat/modals/ChangePermissionsUser.vue'
 
 const rows = ref<UsersTable[]>([])
 const loanding = ref<boolean>(true)
 const ModalExampleShoW = ref(false)
+const iduser = ref<number | null>(null)
 
 const GetElements=async ()=>{
     try {
@@ -30,24 +31,7 @@ const GetElements=async ()=>{
     }
 
 }
-const GetPermisos=async (id:number)=>{
-    try {
-        loanding.value=true;
-        const response = await axios.get(route('getpermisosuser'),
-         { params: { id } }
-        )
-        console.log(response.data);
-    } catch (error : any) {
-        if (error.response?.status === 500) {
-        alert('Error del servidor')
-        } else {
-        console.error('Error:', error)
-        }
-    }finally{
-        loanding.value=false
-    }
 
-}
 GetElements();
 </script>
 
@@ -85,13 +69,12 @@ GetElements();
                                 children: [
                                     {
                                     element: Button,
-                                    props: {text:'Eliminsr', onClick:GetElements,hiddenclases:true, classname:'w-full text-center p-2 '}
+                                    props: {text:'Editar', onClick:()=>{iduser = row.id; ModalExampleShoW = true},hiddenclases:true,classname:'w-full text-center p-2 '}
                                     },
                                     {
                                     element: Button,
-                                    props: {text:'Editar', onClick:()=>{ModalExampleShoW = true},hiddenclases:true,classname:'w-full text-center p-2 '}
+                                    props: {text:'Eliminar', onClick:GetElements,hiddenclases:true, classname:'w-full text-center p-2 '}
                                     },
-                                    
                                 ]
                                 }
                             }
@@ -102,5 +85,5 @@ GetElements();
             </div>
         </div>
     </AppLayout>
-    <ChangePermissionsUser v-model:show="ModalExampleShoW" />
+    <ChangePermissionsUser v-model:show="ModalExampleShoW"  :id="iduser" />
 </template>

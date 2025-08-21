@@ -1,9 +1,9 @@
 <script setup>
 import { ref,watch,onMounted } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
-import Topbar from '@/Components/Zcrat/Topbar.vue';
-import BarNavegation from '@/Components/Zcrat/BarNavegation.vue';
-import BarNavegation_Smartphone from '@/Components/Zcrat/BarNavegation_Smartphone.vue';
+import Topbar from '@/components/Zcrat/Topbar.vue';
+import BarNavegation from '@/components/Zcrat/BarNavegation.vue';
+import BarNavegation_Smartphone from '@/components/Zcrat/BarNavegation_Smartphone.vue';
 
 defineProps({
     title: String,
