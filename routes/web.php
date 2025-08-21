@@ -15,8 +15,12 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('/dashboard', function () { return Inertia::render('Dashboard');})->name('dashboard');
 
     Route::get('/users', function () {return Inertia::render('users');})->name('users');
+
     Route::get('/Get/Users',[UsersController::class,"ReadUsers"])->name('getusers');
     Route::get('/Get/Permisos/User',[UsersController::class,"GetPermisos"])->name('getpermisosuser');
+    Route::post('/Toggle/Roles/User',[UsersController::class,"ToggleRole"])->name('toggle.role');
+    Route::post('/Toggle/Permisos/User',[UsersController::class,"TogglePermiso"])->name('toggle.permiso');
+
     Route::get('/employees',[EmpleadosController::class,'View'])->name('employees');
     Route::post('/employees/create',[EmpleadosController::class,'create'])->name('employees.create');
 

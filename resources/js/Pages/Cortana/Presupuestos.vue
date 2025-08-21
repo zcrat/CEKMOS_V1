@@ -1,10 +1,10 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3'
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
+import Dropdown from '@/components/Dropdown.vue';
+import DropdownLink from '@/components/DropdownLink.vue';
 import { ImageOff, Import } from 'lucide-vue-next';
-import Button  from "@/Components/Zcrat/Inputs/Button.vue";
+import Button  from "@/components/Zcrat/Inputs/Button.vue";
 import { text } from '@fortawesome/fontawesome-svg-core';
 const { props } = usePage()
 const modulo = props.modulo

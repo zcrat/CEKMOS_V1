@@ -1,86 +1,106 @@
 <!-- ModalExample.vue -->
 <script setup lang="ts">
-import BaseModal from '@/Components/Zcrat/modals/BasicModal.vue'
-import Inputbasic from '@/Components/Zcrat/Inputs/form/InputBasic.vue'
+import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
+import ButtonTogglePYR from '@/components/Zcrat/Inputs/ButtonTogglePYR.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
-import {buttonconfirmed} from '@/utils/interfaces/modals'
-import { reactive, computed, watchEffect } from 'vue' 
+import axios from 'axios'
+import { ref, watch } from 'vue' 
+import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
 
-interface NewEmployee {
-  nombre: string | null,
-  paterno: string | null,
-  materno: string | null,
-  curp: string | null,
-  rfc: string | null,
-  domicilio_fiscal: number | null,
-  regimen_fiscal_id: number | null,
-}
-const props = defineProps<{ show: boolean }>()
+
+const props = defineProps<{ show: boolean , id: number | null }>()
+const loanding = ref<boolean>(true)
+
+const allroles =  ref<string[]>([])
+const allpermisos = ref<string[]>([])
+const userroles =  ref<string[]>([])
+const userpermisos =  ref<string[]>([])
+const accion =  ref<string>("Obteniendo Roles Y Permisos")
+
 const emit = defineEmits(['update:show'])
 
 const updateVisibility = (val: boolean) => {
   emit('update:show', val)
 }
-
-const newEmployee = reactive<NewEmployee>({ // Use reactive to make newEmployee reactive
-  nombre: null,
-  paterno: null,
-  materno: null,
-  curp: null,
-  rfc: null,
-  domicilio_fiscal: null,
-  regimen_fiscal_id: null
-})
-
-const isFormValid = computed(() => { 
-  return (
-    newEmployee.nombre != null &&
-    newEmployee.paterno != null &&
-    newEmployee.materno != null &&
-    newEmployee.curp != null &&
-    newEmployee.rfc != null &&
-    newEmployee.domicilio_fiscal != null &&
-    newEmployee.regimen_fiscal_id != null
-  )
-})
-
-
-const functionexample = async ()=>{
-  if (!isFormValid.value) {
-    MyBasicToast.error('Todos los campos son obligatorios')
-    return
-  }
-  
-
-  MyBasicToast.success('Empleado registrado exitosamente')
-  updateVisibility(false)
+console.log(props.id);
+const GetPermisosAndRoles=async ()=>{
+    try {
+        loanding.value=true;
+        accion.value="Obteniendo Roles Y Permisos";
+        const response = await axios.get(route('getpermisosuser'),
+         { params: { id: props.id } }
+        )
+        allroles.value=response.data.allroles;
+        allpermisos.value=response.data.allpermisos;
+        userroles.value=response.data.userroles;
+        userpermisos.value=response.data.userpermisos;
+    } catch (error : any) {
+        if (error.response?.status === 500) {
+            MyBasicToast.error(error.response.data.message || 'Error del servidor')
+        } else {
+            console.error('Error:', error)
+        }
+    }finally{
+        loanding.value=false
+    }
 }
-const buttonconfirm = computed((): buttonconfirmed => ({
-  text: 'aceptar',
-  classname: 'bg-[--btnprimary] text-white',
-  onClick: functionexample,
-  disabled: !isFormValid.value, // o !isFormValid.value si cambias nombre
-}))
+const ToggleRolesOrPermission=async(rol:string, isRole:boolean)=>{
+    try {
+        loanding.value=true;
+        accion.value=isRole?"Actualizando Roles Y Permisos":"Actualizando Permisos";
+        const response = await axios.post(isRole ? route('toggle.role') : route('toggle.permiso'),
+         {id: props.id, [isRole ? 'role' : 'permiso']: rol }
+        )
+        allroles.value = [...response.data.allroles]
+        allpermisos.value = [...response.data.allpermisos]
+        userroles.value = [...response.data.userroles]
+        userpermisos.value = [...response.data.userpermisos]
+
+    } catch (error : any) {
+        if (error.response?.status) {
+            MyBasicToast.error(error.response.data.message || 'Error del servidor')
+        } else {
+            console.error('Error:', error)
+        }
+    }finally{
+        loanding.value=false
+    }
+}
+watch(
+  () => props.show,
+  (newVal) => {
+    if (newVal) {
+      GetPermisosAndRoles()
+    }
+  }
+)
+
 
 </script>
 
 <template>
-  <BaseModal modaltitle="Administrar Permisos" :modelValue="props.show" @update:modelValue="updateVisibility" :buttonconfirm="buttonconfirm">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <h3 class="text-center">Permisos Asignados</h3>
-        <div class="gap-2 flex flex-row">
-          <button class="bg-red-400 px-1 rounded"><font-awesome-icon icon="fa-solid fa-trash-can"/></button>
-          <label for="">Empleado</label>
-        </div>
-
+  <BaseModal modaltitle="Administrar Permisos Y Roles" :position="'center'" :modelValue="props.show" @update:modelValue="updateVisibility" >
+    <Loanding v-if="loanding" :text="accion"/>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 divide-x-2 divide-dashed divide-indigo-500">
+     <div class="p-2 flex flex-col w-full sm:w-[auto] gap-1">
+        <h3 class="text-center font-semibold text-[1.3rem] mb-4">Roles</h3>
+        <template v-for="role in allroles" :key="role">
+          <ButtonTogglePYR 
+            :isnew="!userroles.includes(role)" 
+            :text="role"  
+            :onClick="()=>{ToggleRolesOrPermission(role, true)}"
+          />
+        </template>
       </div>
-      <div>
-        <h3 class="text-center">Permisos Disponibles</h3>
-        <div class="gap-2 flex flex-row">
-          <button class="bg-green-500 px-1 rounded"><font-awesome-icon icon="fa-solid fa-plus"/></button>
-          <label for="">Empleado</label>
-        </div>
+      <div class="p-2 flex flex-col w-full sm:w-[auto]">
+        <h3 class="text-center font-semibold text-[1.3rem] mb-4">Permisos</h3>
+        <template v-for="permiso in allpermisos" :key="permiso">
+          <ButtonTogglePYR 
+            :isnew="!userpermisos.includes(permiso)" 
+            :text="permiso"  
+            :onClick="()=>{ToggleRolesOrPermission(permiso, false)}" 
+          />
+        </template>
       </div>
     </div>
   </BaseModal>
