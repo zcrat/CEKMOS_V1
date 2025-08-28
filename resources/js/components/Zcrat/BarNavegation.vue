@@ -4,6 +4,7 @@ import Dropdown from '@/components/Dropdown.vue';
 import DropdownLink from '@/components/DropdownLink.vue';
 import ButtonLink from '@/components/Zcrat/Inputs/ButtonLink.vue';
 import LogoSistema from '@/components/Zcrat/LogoSistema.vue';
+import Notification from '@/components/Zcrat/Notification.vue';
 import { defineEmits } from 'vue';
 
 const props = defineProps({
@@ -58,6 +59,7 @@ function toggleNavsmartphone() {
                     </template>
                 </Dropdown>
         </div>
+        <Notification :classname="[IsRow?'sm:ms-2':'sm:mb-2']" :IsRow="IsRow"></Notification>
         <div class="ms-3 relative hidden sm:block">
             <Dropdown :align="IsRow?'right':'left-up' " width="48">
             <template #trigger>
@@ -92,7 +94,7 @@ function toggleNavsmartphone() {
             </template>
             </Dropdown>
         </div>
-        <font-awesome-icon icon="fa-solid fa-bars" @click="toggleNavsmartphone" class="absolute right-5 text-lg font-bold text-white sm:hidden"/>
+        <font-awesome-icon icon="fa-solid fa-bars" @click="toggleNavsmartphone" class="absolute left-5 text-lg font-bold text-white sm:hidden"/>
         </div>
     </nav>
 </template>

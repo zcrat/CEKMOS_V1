@@ -17,6 +17,29 @@
 .focus-input {
   @apply focus:shadow-[0px_0px_1rem] focus:shadow-red-700 focus:ring-red-700 focus:border-red-700;
 }
+.tabla {
+  @apply w-full table-auto border-2 border-solid border-gray-500 text-sm text-left;
+}
+
+.tabla thead {
+  @apply text-gray-700 uppercase;
+}
+
+.tabla th {
+  @apply px-4 py-2 border-b-2 border-e-2 border-gray-500 text-center bg-blue-100 even:bg-blue-200;
+}
+
+.tabla td {
+  @apply px-4 py-2 border-b;
+}
+
+.tabla tbody tr:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+.tabla tbody tr {
+  @apply bg-blue-50 even:bg-blue-100;
+}
 
 .barra{
     margin: 0;

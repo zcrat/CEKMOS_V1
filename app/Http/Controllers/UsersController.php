@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use \Spatie\Permission\Models\Permission;
 use \Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
+use App\Models\Notificaciones;
+use \App\Notifications\SeendNotification;
 class UsersController extends Controller
 {
     public  function ReadUsers(Request $request){
@@ -106,11 +108,13 @@ class UsersController extends Controller
             }
             if($user->permissions()->where('name', $permiso)->exists()){
                 $user->revokePermissionTo($permiso);
+                $this->Notificate($user->id,'Permiso Eliminado', 'El permiso '.$permiso.' ha sido eliminado de tu cuenta','warning',2);
             }else{
                 return response()->json(['message'=>'No se puede revocar este permiso porque está asignado a través de un rol'],404);
             }
         }else{
             $user->givePermissionTo($permiso);
+            $this->Notificate($user->id,'Permiso Agregado', 'El permiso '.$permiso.' ha sido Agregado de tu cuenta','info',2);
         }
         if(!$user){
             return response()->json(['message'=>'Usuario no encontrado'],404);
@@ -135,5 +139,61 @@ class UsersController extends Controller
         });
 
         return response()->json(compact('userpermisos', 'allpermisos', 'userroles', 'allroles'));
+    }
+    public function GetNotificaciones(Request $request){
+        $user=$request->user();
+        $shownotifications=$request->shownotifications ?? 5; 
+        $notificaciones=Notificaciones::where('user_id',$user->id)->orderBy('prioridad','asc')->orderBy('created_at','desc')->orderBy('read_at','desc')->take($shownotifications)->get()->map(function($item){
+            return[
+                'id'=>$item->id,
+                'title'=>$item->title,
+                'body'=>$item->message,
+                'type'=>$item->tipo,
+                'created_at'=>Carbon::parse($item->created_at)->format('Y-m-d H:i:s'),
+                'read'=>$item->read_at ? true:false
+            ];
+        });
+        $countnotificaciones=Notificaciones::where('user_id',$user->id)->whereNull('read_at')->count();
+        $hasmore=Notificaciones::where('user_id',$user->id)->count() > $shownotifications;
+        return response()->json(compact('notificaciones','countnotificaciones','hasmore'));
+    }
+    public function ReadNotification(Request $request){
+        $user=$request->user();
+        $id=$request->id;
+        $notificacion=Notificaciones::where('user_id',$user->id)->where('id',$id)->first();
+        if(!$notificacion){
+            return response()->json(['message'=>'Notificación no encontrada'],404);
+        }
+        if(!$notificacion->read_at){
+            $notificacion->read_at=Carbon::now();
+            $notificacion->save();
+        }
+        return response()->json(['message'=>'Notificación marcada como leída']);
+    }
+    private function Notificate($user_id, $title, $message, $tipo='info', $prioridad=1){
+        try{
+            $notificacion=new Notificaciones();
+            $notificacion->user_id=$user_id;
+            $notificacion->title=$title;
+            $notificacion->message=$message;
+            $notificacion->tipo=$tipo;
+            $notificacion->prioridad=$prioridad;
+            $notificacion->save();
+            $user=User::find($user_id);
+
+            if($user){
+                $noti=[
+                'id'=>$notificacion->id,
+                'title'=>$notificacion->title,
+                'body'=>$notificacion->message,
+                'type'=>$notificacion->tipo,
+                'created_at'=>Carbon::parse($notificacion->created_at)->format('Y-m-d H:i:s'),
+                'read'=>$notificacion->read_at ? true:false
+            ];
+                $user->notify(new SeendNotification($user_id,$noti) );
+            }
+        }catch(\Exception $e){
+            Log::error('Error al enviar notificación: '.$e->getMessage());
+        }
     }
 }

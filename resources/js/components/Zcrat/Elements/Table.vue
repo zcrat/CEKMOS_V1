@@ -11,7 +11,9 @@ defineProps<{
 </script>
 
 <template>
-  <table :class="['w-full', classname]">
+  <div class="rounded w-content w-full">
+
+  <table :class="['w-auto sm:w-full', classname]">
     <thead>
       <tr>
         <th
@@ -45,4 +47,6 @@ defineProps<{
       </tr>
     </tbody>
   </table>
+  
+  </div>
 </template>

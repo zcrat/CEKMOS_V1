@@ -18,6 +18,6 @@ const icon   = computed(() => props.isnew ? 'fa-solid fa-plus' : 'fa-solid fa-tr
           <button :class="[clases, 'px-1 rounded']" @click="props.onClick">
                <font-awesome-icon :icon="icon"/>
           </button>
-          <label class="text  break-words">{{props.text}}</label>
+          <label class="text  break-words uppercase">{{props.text}}</label>
     </div>
 </template>

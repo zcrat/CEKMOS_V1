@@ -81,8 +81,8 @@ watch(
 <template>
   <BaseModal modaltitle="Administrar Permisos Y Roles" :position="'center'" :modelValue="props.show" @update:modelValue="updateVisibility" >
     <Loanding v-if="loanding" :text="accion"/>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 divide-x-2 divide-dashed divide-indigo-500">
-     <div class="p-2 flex flex-col w-full sm:w-[auto] gap-1">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+     <div class="p-2 flex flex-col w-full sm:w-[auto] gap-1 border-solid border-4 rounded border-blue-300">
         <h3 class="text-center font-semibold text-[1.3rem] mb-4">Roles</h3>
         <template v-for="role in allroles" :key="role">
           <ButtonTogglePYR 
@@ -92,7 +92,7 @@ watch(
           />
         </template>
       </div>
-      <div class="p-2 flex flex-col w-full sm:w-[auto]">
+      <div class="p-2 flex flex-col w-full sm:w-[auto] gap-1 border-solid border-4 rounded border-blue-300">
         <h3 class="text-center font-semibold text-[1.3rem] mb-4">Permisos</h3>
         <template v-for="permiso in allpermisos" :key="permiso">
           <ButtonTogglePYR 

@@ -4,16 +4,20 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
 import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
 import axios from 'axios'
-import { ref } from 'vue'
+import { ref, onMounted,getCurrentInstance} from 'vue'
 import { UsersTable} from '@/utils/interfaces/users';
 import Button  from "@/components/Zcrat/Inputs/Button.vue";
 import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
 import ChangePermissionsUser from '@/components/Zcrat/modals/ChangePermissionsUser.vue'
 
+
 const rows = ref<UsersTable[]>([])
 const loanding = ref<boolean>(true)
 const ModalExampleShoW = ref(false)
 const iduser = ref<number | null>(null)
+
+console.log("Componente cargado");
+
 
 const GetElements=async ()=>{
     try {
@@ -56,10 +60,10 @@ GetElements();
                     :rows="rows.map(function(row){return {
                         classname:'',
                         columns:[
-                            {element:row.name},
-                            {element:row.email},
-                            {element:row.verified ? 'Verificado':'Sin Verificar'},
-                            {element:row.date+''},
+                            {element:row.name, classname:'capitalize'},
+                            {element:row.email, classname:'lowercase'},
+                            {element:row.verified ? 'Verificado':'Sin Verificar',classname:'uppercase'},
+                            {element:row.date+'', classname:'uppercase'},
                             {element: Dropdown,
                             props: {
                                 father: {
@@ -76,12 +80,12 @@ GetElements();
                                     props: {text:'Eliminar', onClick:GetElements,hiddenclases:true, classname:'w-full text-center p-2 '}
                                     },
                                 ]
-                                }
+                            },classname:'items-center flex justify-center'
                             }
                                                 ]
                     }})" 
                     
-                    classname="border-solid border-[1rem]"></Table>
+                    classname="tabla"></Table>
             </div>
         </div>
     </AppLayout>

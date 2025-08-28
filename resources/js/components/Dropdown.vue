@@ -36,18 +36,24 @@ const widthClass = computed(() => {
 
 const alignmentClasses = computed(() => {
     if (props.align === 'left-up') {
-        return 'ltr:origin-top-left rtl:origin-top-right start-[100%] top-[100%]  transform  translate-x-[0] -translate-y-[100%] sm:ms-4';
+        return 'absolute ltr:origin-top-left rtl:origin-top-right start-[100%] top-[100%]  transform  translate-x-[0] -translate-y-[100%] sm:ms-4';
+    }
+    if (props.align === 'noti-left-up') {
+        return 'fixed right-2 top-[4.5rem] sm:right-auto sm:top-auto sm:absolute sm:ltr:origin-top-left sm:rtl:origin-top-right sm:start-[100%] sm:top-[100%]  transform  sm:translate-x-[0] sm:-translate-y-[100%] sm:ms-4';
     }
 
     if (props.align === 'left') {
-        return 'ltr:origin-top-left rtl:origin-top-right start-0 mt-2';
+        return 'absolute ltr:origin-top-left rtl:origin-top-right start-0 mt-2';
     }
     if (props.align === 'center') {
-        return 'ltr:origin-top-left rtl:origin-top-right start-[50%] transform -translate-x-[50%] ';
+        return 'absolute ltr:origin-top-left rtl:origin-top-right start-[50%] transform -translate-x-[50%] ';
     }
 
     if (props.align === 'right') {
-        return 'ltr:origin-top-right rtl:origin-top-left end-0';
+        return 'absolute ltr:origin-top-right rtl:origin-top-left end-0';
+    }
+    if (props.align === 'noti-right') {
+        return 'fixed right-2 top-[4.5rem] sm:right-auto sm:top-auto sm:absolute sm:ltr:origin-top-right sm:rtl:origin-top-left sm:end-0';
     }
 
     return 'origin-top';
@@ -73,7 +79,7 @@ const alignmentClasses = computed(() => {
         >
             <div
                 v-show="open"
-                class="absolute z-50 rounded-md shadow-lg"
+                class=" z-50 rounded-md shadow-lg"
                 :class="[widthClass, alignmentClasses]"
                 style="display: none;"
                 @click="open = false"

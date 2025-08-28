@@ -41,10 +41,15 @@ onMounted(() => {
             <BarNavegation_Smartphone v-if="!isSmOrLarger" :barnav_active="Barnav_smartphone_active"/>
 
             <main class="h-full w-full z-0 relative flex flex-col">
-            <header class="p-4 bg-white shadow">
-              <slot name="header"/>
-            </header>
-                <slot />
+              <slot />
+              <footer class="h-12 p-4 justify-center rounded-md bg-blue-100 border border-black relative bottom-0 overflow-hidden">
+                <span class="flex flex-nowrap justify-between w-full text-xs">
+                  <p>
+                  <strong>Copyright © 2025-2026</strong> Zcrat Developer. <p>All rights reserved.</p>
+                  </p>
+                  <strong>Version 1</strong>
+                </span>
+              </footer>
             </main>
         </div>
     </div>
