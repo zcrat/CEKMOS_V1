@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import NavLink from '@/components/NavLink.vue';
 import Dropdown from '@/components/Dropdown.vue';
 import DropdownLink from '@/components/DropdownLink.vue';
@@ -7,16 +7,13 @@ import LogoSistema from '@/components/Zcrat/LogoSistema.vue';
 import Notification from '@/components/Zcrat/Notification.vue';
 import { defineEmits } from 'vue';
 
-const props = defineProps({
-    ClassNav: {
-    type: String,
-    default: '', 
-  },
-    IsRow: {
-        type: Boolean,
-        required: true, 
-    }
-});
+interface Props {
+  ClassNav?: string;
+  IsRow: boolean;
+}
+
+const props = defineProps<Props>();
+
 const emit = defineEmits(['toggle','toggle_smartphone_active']);
 function toggleNav() {
   emit('toggle');
@@ -26,7 +23,7 @@ function toggleNavsmartphone() {
 }
 </script>
 <template>
-    <nav :class="['border-b border-gray-100 w-full h-[4rem]', ClassNav, IsRow ?'':'sm:h-full sm:w-[5rem]' ]">
+    <nav :class="['border-b border-gray-100 w-full h-[4rem]', props.ClassNav, IsRow ?'':'sm:h-full sm:w-[5rem]' ]">
         <div :class="[
             'flex h-full bg-[#176cb3] rounded-md flex-row items-center mb-2 justify-center sm:justify-between max-w-full relative ',
             IsRow ? '' : 'sm:flex-col sm:me-2 sm:mb-0'
@@ -39,11 +36,11 @@ function toggleNavsmartphone() {
         
         <div :class="'flex-grow justify-start gap-x-2 gap-y-4 hidden sm:flex '+(IsRow?'flex-row':'flex-col')">
             <NavLink :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
-            <NavLink :href="route('users')" :active="route().current('users')"><font-awesome-icon icon="fa-solid fa-users ":class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
-            <NavLink :href="route('employees')" :active="route().current('employees')"><font-awesome-icon icon="fa-solid fa-address-book ":class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Empleados</span></NavLink>
+            <NavLink :href="route('users')" :active="route().current('users')"><font-awesome-icon icon="fa-solid fa-users " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
+            <NavLink :href="route('employees')" :active="route().current('employees')"><font-awesome-icon icon="fa-solid fa-address-book " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Empleados</span></NavLink>
                 <Dropdown :align="IsRow?'right':'left-up' " width="48">
                     <template #trigger>
-                        <ButtonLink :active="route().current('Cortana.Presupuesto.Vista')"><font-awesome-icon icon="fa-solid fa-address-book ":class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Cortana</span></ButtonLink>
+                        <ButtonLink :active="route().current('Cortana.Presupuesto.Vista')"><font-awesome-icon icon="fa-solid fa-address-book " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Cortana</span></ButtonLink>
                     </template>
                     
                     <template #content>
@@ -59,7 +56,7 @@ function toggleNavsmartphone() {
                     </template>
                 </Dropdown>
         </div>
-        <Notification :classname="[IsRow?'sm:ms-2':'sm:mb-2']" :IsRow="IsRow"></Notification>
+        <Notification :classname="IsRow?'sm:ms-2':'sm:mb-2'" :IsRow="IsRow"></Notification>
         <div class="ms-3 relative hidden sm:block">
             <Dropdown :align="IsRow?'right':'left-up' " width="48">
             <template #trigger>
@@ -86,7 +83,7 @@ function toggleNavsmartphone() {
                 <div class="border-t border-gray-200" />
                 
                 <!-- Authentication -->
-                <form @submit.prevent="logout">
+                <form>
                     <DropdownLink as="button">
                         Cerrar Sesión
                     </DropdownLink>

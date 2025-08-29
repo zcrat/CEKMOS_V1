@@ -17,7 +17,13 @@ const props = defineProps({
 });
 
 let open = ref(false);
+let isnoti =computed(() => {
 
+    if (props.align === 'noti-right' || props.align === 'noti-left-up') {
+        return 'bg-black sm:bg-none opacity-10 sm:opacity-0';
+    }
+     return '';
+});
 const closeOnEscape = (e) => {
     if (open.value && e.key === 'Escape') {
         open.value = false;
@@ -39,7 +45,7 @@ const alignmentClasses = computed(() => {
         return 'absolute ltr:origin-top-left rtl:origin-top-right start-[100%] top-[100%]  transform  translate-x-[0] -translate-y-[100%] sm:ms-4';
     }
     if (props.align === 'noti-left-up') {
-        return 'fixed right-2 top-[4.5rem] sm:right-auto sm:top-auto sm:absolute sm:ltr:origin-top-left sm:rtl:origin-top-right sm:start-[100%] sm:top-[100%]  transform  sm:translate-x-[0] sm:-translate-y-[100%] sm:ms-4';
+        return 'fixed right-2 top-[4.5rem] sm:right-auto sm:top-auto sm:absolute sm:ltr:origin-top-left sm:rtl:origin-top-right sm:start-[100%] sm:top-[100%]  transform  sm:translate-x-[0] sm:-translate-y-[100%] sm:ms-6';
     }
 
     if (props.align === 'left') {
@@ -53,7 +59,7 @@ const alignmentClasses = computed(() => {
         return 'absolute ltr:origin-top-right rtl:origin-top-left end-0';
     }
     if (props.align === 'noti-right') {
-        return 'fixed right-2 top-[4.5rem] sm:right-auto sm:top-auto sm:absolute sm:ltr:origin-top-right sm:rtl:origin-top-left sm:end-0';
+        return 'fixed end-2 top-[4.5rem] sm:top-[100%] sm:absolute sm:ltr:origin-top-right sm:rtl:origin-top-left sm:end-0';
     }
 
     return 'origin-top';
@@ -61,13 +67,13 @@ const alignmentClasses = computed(() => {
 </script>
 
 <template>
-    <div class="relative w-fit">
+    <div :class="['relative w-fit']">
         <div @click="open = ! open">
             <slot name="trigger" />
         </div>
 
         <!-- Full Screen Dropdown Overlay -->
-        <div v-show="open" class="fixed inset-0 z-40" @click="open = false" />
+        <div v-show="open" :class="['fixed inset-0 z-40', isnoti]" @click="open = false" />
 
         <transition
             enter-active-class="transition ease-out duration-200"

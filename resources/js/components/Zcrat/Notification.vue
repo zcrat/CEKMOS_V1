@@ -2,7 +2,7 @@
 import Dropdown from '@/components/Dropdown.vue';
 import Button from '@/components/Zcrat/Inputs/Button.vue';
 import { ref,onMounted} from 'vue'
-import { usePage } from '@inertiajs/vue3'
+
 import { useEcho } from '@laravel/echo-vue';
 import axios from 'axios' 
 const props = defineProps<{
@@ -26,6 +26,7 @@ const shownotifications = ref(5);
 const hasmore = ref(false);
 const userId = 1;
 onMounted(async () => {
+    try{
     const { listen } = useEcho(
     `App.Models.User.${userId}`,
     ".NewNotifications",
@@ -41,6 +42,9 @@ onMounted(async () => {
     }
   );
   listen();
+} catch (error) {
+  console.error(error);
+}
 });
 
 const getnotificaciones = async () => {
@@ -76,11 +80,10 @@ getnotificaciones();
 </script>
 <template>
     <div class="absolute right-5 sm:static">
-     <Dropdown :align="IsRow?'noti-right':'noti-left-up'" width="auto" :contentClasses="['bg-white overflow-hidden p-2 border border-gray-600']">
-         <
+     <Dropdown :align="IsRow?'noti-right':'noti-left-up'" width="auto" :contentClasses="['bg-white', 'overflow-hidden p-2 border border-gray-600']">
         <template #trigger>
             <div class="relative cursor-pointer">
-                <Button icon="fa-solid fa-bell" text="" :hiddenclases="true" :classname="'text-[#eab308] text-[1.5rem] '+classname" @click="()=>{
+                <Button icon="fa-solid fa-bell" text="" :hiddenclases="true" :classname="'text-[#eab308] text-[1.5rem] '+(props.classname||'')" @click="()=>{
                     notificaciones.forEach(n=>n.show=false);
                     shownotifications=5;
                 }"/>
