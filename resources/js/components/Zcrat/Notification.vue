@@ -30,13 +30,14 @@ onMounted(async () => {
     const { listen } = useEcho(
     `App.Models.User.${userId}`,
     ".NewNotifications",
-    (notification: Notification) => {
+    (notification:{notificacion:Notification}) => {
         countnotificaciones.value += 1;
         if (notificaciones.value.length === shownotifications.value ) {
             hasmore.value = true;
         }
+        console.log(notification);
         notificaciones.value = [
-            { ...notification, show: false },
+            { ...notification.notificacion, show: false },
             ...notificaciones.value.slice(0, shownotifications.value - 1)
         ];
     }

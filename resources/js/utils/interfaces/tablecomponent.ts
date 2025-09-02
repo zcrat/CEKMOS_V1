@@ -15,3 +15,7 @@ export interface Row {
   classname?: string
   columns: DataColumn[]
 }
+export interface  ComponentInterface {
+    element: Component;
+    props?: Record<string, any>;
+    }

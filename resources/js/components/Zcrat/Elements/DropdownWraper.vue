@@ -12,7 +12,14 @@ const props = defineProps<{
   children: ComponentInterface[];
   align?:string;
   width?:string;
+  stoppropagation?:boolean
 }>();
+function handleClick(event: MouseEvent) {
+  if (props.stoppropagation) {
+    event.stopPropagation();
+  }
+}
+
 </script>
 
 <template>
@@ -25,12 +32,14 @@ const props = defineProps<{
     </template>
 
     <template #content>
-      <component
+      <div @click="handleClick" class="p-2 gap-2 flex flex-col ">
+        <component
         v-for="(child, index) in props.children"
         :key="index"
         :is="child.element"
         v-bind="child.props || {}"
-      />
+        />
+      </div>
     </template>
   </Dropdown>
 </template>

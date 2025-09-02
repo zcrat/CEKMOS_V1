@@ -20,7 +20,7 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
-
+import 'vue-multiselect/dist/vue-multiselect.css' 
 library.add(far, fab, fas)
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel'

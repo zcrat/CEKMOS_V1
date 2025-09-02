@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\CortanaController;
 use App\Http\Controllers\EmpleadosController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\select2controller;
 Route::get('/', function () {
   return redirect('/login');
 
@@ -26,6 +27,6 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('/employees',[EmpleadosController::class,'View'])->name('employees');
     Route::post('/employees/create',[EmpleadosController::class,'create'])->name('employees.create');
 
-
     Route::get('cortana/vista/modulo',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
+    Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');
 });
