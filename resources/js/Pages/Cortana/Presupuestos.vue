@@ -34,10 +34,10 @@ const Listado  = ref<ListadoModulos[]>([{id:1,label:'CFE 2025 MORELIA GASOLINA'}
                 <Search Classdiv="sm:w-[30rem] w-full" placeholder="Buscar Por Folio, PLacas, Economico o Order De Servicio" />
                 <div class="flex gap-2 items-end">
                     <estatusfilter />
+                    <ModulosFilter :Listado="Listado" />
                     <Datapicker />
                 </div>
                 <empresasselect/>
-                <ModulosFilter :Listado="Listado" />
                 
         </template>
         <template #content>

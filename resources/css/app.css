@@ -13,7 +13,19 @@
   --color3: #ffc3d0;
   --color3a: #fda7b9;
 }
+.multiselect__input {
+  @apply px-3 py-2 border rounded focus:outline-none;
+}
 
+/* Opciones del dropdown */
+.multiselect__option {
+  @apply p-2 hover:bg-gray-100 cursor-pointer;
+}
+
+/* Etiquetas seleccionadas (tags) */
+.multiselect__tag {
+  @apply bg-blue-100 px-2 rounded mr-1 inline-block;
+}
 .focus-input {
   @apply focus:shadow-[0px_0px_1rem] focus:shadow-red-700 focus:ring-red-700 focus:border-red-700;
 }
