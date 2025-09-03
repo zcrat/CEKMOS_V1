@@ -15,7 +15,10 @@ const props = withDefaults(defineProps<{
   type: string
   default_option?: Option
   modelValue: Option | null
-}>(), {})
+  placeholder?:string
+}>(), {
+  placeholder:'Buscar...'
+})
 
 const options = ref<Option[]>([])
 const loading = ref(false)
@@ -69,7 +72,7 @@ const selectOption = () => {
           class="w-full ps-2 pr-6 truncate rounded border-2 ComboboxInput"
           :id="id"
           @change="query = $event.target.value"
-          placeholder="Buscar Usuarios"
+          :placeholder="placeholder"
           @focus="onFocus"
           @blur="isOpen = false"
           :displayValue="(option: unknown) => (option as Option | null)?.label ?? ''"
@@ -83,7 +86,7 @@ const selectOption = () => {
           ✕
         </button>
       </div>
-      <ComboboxOptions v-show="isOpen" static class="absolute border-2 border-gray-500 w-full bg-white p-2">
+      <ComboboxOptions v-show="isOpen" static class="absolute border-2 border-gray-500 w-full bg-white p-2 z-50">
         <div v-if="options.length === 0">Sin Resultados</div>
         <ComboboxOption
           v-for="option in options"

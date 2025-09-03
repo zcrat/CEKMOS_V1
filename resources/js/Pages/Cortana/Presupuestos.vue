@@ -31,13 +31,15 @@ const Listado  = ref<ListadoModulos[]>([{id:1,label:'CFE 2025 MORELIA GASOLINA'}
                 <Button text="Prefacturas" :classname="prefacturasactive?'bg-red-700' : 'bg-blue-700'"/>
         </template>
         <template #filtering>
+            <div class="flex gap-2  flex-row">
                 <Search Classdiv="sm:w-[30rem] w-full" placeholder="Buscar Por Folio, PLacas, Economico o Order De Servicio" />
-                <div class="flex gap-2 items-end">
+                <empresasselect/>
+            </div>
+                <div class="flex gap-2 items-end justify-between sm:justify-start">
                     <estatusfilter />
                     <ModulosFilter :Listado="Listado" />
                     <Datapicker />
                 </div>
-                <empresasselect/>
                 
         </template>
         <template #content>

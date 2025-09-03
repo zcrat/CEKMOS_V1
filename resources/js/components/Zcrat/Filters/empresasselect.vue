@@ -9,6 +9,6 @@ const empresa =ref<option | null>(null)
 </script>
 <template>
     <div class="min-w-[10rem] w-auto">
-        <ZDSelect endpoint="Select2.Empresas" type="empresas" v-model="empresa" id="empresasfilter"/>
+        <ZDSelect endpoint="Select2.Empresas" type="empresas" v-model="empresa" id="empresasfilter" placeholder="Buscar Empresas"/>
     </div> 
 </template>
