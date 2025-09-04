@@ -165,7 +165,87 @@ return new class extends Migration
         $table->foreignId('gasolina')->constrained('niveles_combustible');
         $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
     });
+    Schema::create('estados', function (Blueprint $table) {
+        $table->id();
+        $table->string('descripcion');
+    });
+    Schema::create('ciudades', function (Blueprint $table) {
+        $table->id();
+        $table->string('descripcion');
+        $table->foreignId('estado_id')->constrained('estados');
+    });
+Schema::create('regimenes', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('emisor_id')->constrained('emisor');
+        $table->foreignId('user_id')->constrained('users');
+        $table->text('xml');
+        $table->text('pdf');
+        $table->text('acuse')->nullable();
+        $table->foreignId('estatus_id')->constrained('estatus');
+        $table->decimal('monto',10,2);
+    });
+    Schema::create('empresas', function (Blueprint $table) {
+        $table->id();
+        $table->string('nombre');
+        $table->string('rfc');
+        $table->string('email');
+        $table->string('logo');
+        $table->string('calle');
+        $table->integer('cp');
+        $table->foreignId('ciudad_id')->constrained('ciudades');
+        $table->foreignId('emisor_id')->constrained('emisor');
+        $table->foreignId('user_id')->constrained('users');
+        $table->foreignId('regimen_id')->constrained('regimenes');
+        $table->integer('telefono');
+        $table->integer('tel_celular');
+        $table->integer('tel_negocio');
+    });
+    Schema::create('clietes', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('empresa_id')->constrained('empresas');
+        $table->string('nombre');
+        $table->string('rfc');
+        $table->string('email');
+        $table->string('logo');
+        $table->string('calle');
+        $table->integer('cp');
+        $table->foreignId('ciudad_id')->constrained('ciudades');
+        $table->foreignId('emisor_id')->constrained('emisor');
+        $table->integer('telefono');
+        $table->integer('tel_celular');
+        $table->integer('tel_negocio');
+    });
+    Schema::create('facturas', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('empresa_id')->constrained('empresas');
+        $table->foreignId('emisor_id')->constrained('emisor');
+        $table->foreignId('user_id')->constrained('users');
+        $table->text('xml');
+        $table->text('pdf');
+        $table->text('acuse')->nullable();
+        $table->foreignId('estatus_id')->constrained('estatus');
+        $table->decimal('monto',10,2);
+    });
     
+    Schema::create('presupuestos', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
+        $table->text('observaciones');
+        $table->text('descripcion_mo');
+        $table->text('garantia');
+        $table->string('folio');
+        $table->dateTime('vigencia');
+        $table->foreignId('factura_id')->constrained('facturas')->nullable();
+        $table->foreignId('tipo_id')->constrained('tipos');
+        $table->foreignId('estatus_id')->constrained('estatus');
+        $table->integer('kilomentraje');
+    });
+    Schema::create('pagos_presupuestos', function (Blueprint $table) {
+        $table->id();
+        $table->dateTime('fecha_pagado');
+        $table->decimal('importe',10,2);
+        $table->foreignId('presupuestos_id')->constrained('presupuestos');
+    });
     Schema::create('usuarios_taller', function (Blueprint $table) {
         $table->id();
         $table->string('nombre');
