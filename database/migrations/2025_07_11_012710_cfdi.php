@@ -20,15 +20,6 @@ return new class extends Migration
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });
-        Schema::create('cfdis_avaliables', function (Blueprint $table) {
-            $table->id();
-            $table->string('cfdi_id');
-            $table->string('regimen_fiscal');
-            $table->timestamps();
-            $table->timestamp('deleted_at')->nullable();
-        });
-
-
     }
 
     /**
@@ -37,6 +28,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('cfdis');
-        Schema::dropIfExists('cfdis_avaliables');
     }
 };

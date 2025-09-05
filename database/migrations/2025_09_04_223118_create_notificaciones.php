@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notificaciones', function (Blueprint $table) {
+       Schema::create('notificaciones', function (Blueprint $table) {
             $table->id();
-            $table->string('tipo')->default('info');
             $table->integer(('prioridad'))->default(1);
             $table->text('message');
             $table->string('title');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('tipo_id')->constrained('tipos');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });

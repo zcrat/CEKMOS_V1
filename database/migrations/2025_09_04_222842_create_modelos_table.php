@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('modulos', static function (Blueprint $table) {
-            // $table->engine('InnoDB');
-            $table->bigIncrements('id'); // permission id
-            $table->string('nombre');
-            $table->unique(['nombre']);
+        Schema::create('modelos', function (Blueprint $table) {
+            $table->id();
+            $table->string('descripcion');
+            $table->foreignId('marca_id')->constrained('marcas');
             $table->timestamps();
-            $table->softDeletes();
         });
-
     }
 
     /**
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('modulos');
+        Schema::dropIfExists('modelos');
     }
 };

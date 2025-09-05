@@ -10,24 +10,24 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-   {
-        Schema::create('empleados', function (Blueprint $table) {
+    {
+        Schema::create('cfdis_disponibles', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('paterno');
-            $table->string('materno');
-            $table->string('curp', 18)->unique();
-            $table->string('rfc', 13)->unique();;
+            $table->foreignId('uso_cfdi_id')->references('id')->on('cfdis');
             $table->string('regimen_fiscal_id', 3); // ⚠️ importante que coincida con el tipo
             $table->foreign('regimen_fiscal_id')->references('clave')->on('regimes_fiscales');
-            $table->integer('domicilio_fiscal');
             $table->timestamps();
-            $table->softDeletes();
+            $table->timestamp('deleted_at')->nullable();
         });
 
+
     }
+
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-          Schema::dropIfExists('empleados');
+        Schema::dropIfExists('cfdis_disponibles');
     }
 };
