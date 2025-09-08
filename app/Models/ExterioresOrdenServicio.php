@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 class ExterioresOrdenServicio extends Model
 {
-    use SoftDeletes;
     protected $table = 'exteriores_orden_servicios';
-
+    public $timestamps=false;
     protected $fillable = [
         'orden_servicio_id',
         'antena_radio',
@@ -24,57 +22,57 @@ class ExterioresOrdenServicio extends Model
     ];
 
     // Relaciones
-    public function OrdenServicio()
+    public function orden_servicio()
     {
         return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
     }
 
-    public function EstatusAntenaRadio()
+    public function estatus_antena_radio()
     {
         return $this->belongsTo(Estatus::class, 'antena_radio');
     }
 
-    public function EstatusAntenaTelefono()
+    public function estatus_antena_telefono()
     {
         return $this->belongsTo(Estatus::class, 'antena_telefono');
     }
 
-    public function EstatusAntenaCB()
+    public function estatus_antena_cb()
     {
         return $this->belongsTo(Estatus::class, 'antena_cb');
     }
 
-    public function EstatusEstribos()
+    public function estatus_estribos()
     {
         return $this->belongsTo(Estatus::class, 'estribos');
     }
 
-    public function EstatusEspejosLaterales()
+    public function estatus_espejos_laterales()
     {
         return $this->belongsTo(Estatus::class, 'espejos_laterales');
     }
 
-    public function EstatusGuardafangos()
+    public function estatus_guardafangos()
     {
         return $this->belongsTo(Estatus::class, 'guardafangos');
     }
 
-    public function EstatusParabrisas()
+    public function estatus_parabrisas()
     {
         return $this->belongsTo(Estatus::class, 'parabrisas');
     }
 
-    public function EstatusSistemaAlarma()
+    public function estatus_sistema_alarma()
     {
         return $this->belongsTo(Estatus::class, 'sistema_alarma');
     }
 
-    public function EstatusLimpiaParabrisas()
+    public function estatus_limpia_parabrisas()
     {
         return $this->belongsTo(Estatus::class, 'limpia_parabrisas');
     }
 
-    public function EstatusLucesExteriores()
+    public function estatus_luces_exteriores()
     {
         return $this->belongsTo(Estatus::class, 'luces_exteriores');
     }

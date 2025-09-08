@@ -16,12 +16,12 @@ class ArchivosOrdenServicio extends Model
     ];
 
     // Relaciones
-    public function OrdenServicio()
+    public function orden_servicio()
     {
         return $this->belongsTo(OrdenesServicio::class, 'orden_servicio_id');
     }
 
-    public function Tipo()
+    public function tipo()
     {
         return $this->belongsTo(Tipos::class, 'tipo_id');
     }

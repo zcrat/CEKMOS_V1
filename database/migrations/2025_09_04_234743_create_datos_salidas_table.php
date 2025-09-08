@@ -14,11 +14,9 @@ return new class extends Migration
         Schema::create('datos_salidas', function (Blueprint $table) {
             $table->id();
             $table->dateTime('fecha');
-            $table->integer('kilomentraje');
+            $table->decimal('kilomentraje',10,2);
             $table->foreignId('gasolina')->constrained('niveles_combustible');
             $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
-            $table->timestamps();
-            $table->softDeletes();
         });
     }
 

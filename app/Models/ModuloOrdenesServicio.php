@@ -16,23 +16,23 @@ class ModuloOrdenesServicio extends Model
         'zona_id',
         'año',
     ];
-    public function Modulo()
+    public function modulo()
     {
         return $this->belongsTo(Modulos::class, 'modulo_id');
     }
-    public function Zona()
+    public function zona()
     {
         return $this->belongsTo(Zonas::class, 'zona_id');
     }
-    public function Contrato()
+    public function contrato()
     {
         return $this->belongsTo(Contratos::class, 'contrato_id');
     }
-    public function OrdenesServicios()
+    public function ordenes_servicio()
     {
         return $this->hasMany(OrdenesServicio::class, 'modulo_orden_id');
     }
-    public function VehiculosConceptos(){
+    public function vehiculos_conceptos(){
         return $this->hasMany(VehiculosConceptosDisponibles::class, 'modulo_orden_id');
     }
 

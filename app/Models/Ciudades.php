@@ -12,15 +12,15 @@ class Ciudades extends Model
         'descripcion',
         'estado_id'
     ];
-    public function Estado()
+    public function estado()
     {
         return $this->belongsTo(Estados::class, 'estado_id');
     }
-    public function Empresas()
+    public function empresas()
     {
         return $this->hasMany(Empresas::class, 'ciudad_id');
     }
-    public function Clientes()
+    public function clientes()
     {
         return $this->hasMany(Clientes::class, 'ciudad_id');
     }

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PDO;
 
 class Colores extends Model
 {
@@ -14,7 +13,7 @@ class Colores extends Model
     'descripcion',
     ];
 
-    public function Vehiculos(){
+    public function vehiculos(){
         return $this->hasMany(Vehiculos::class,'color_id');
     }
 }

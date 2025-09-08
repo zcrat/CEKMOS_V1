@@ -30,63 +30,63 @@ class OrdenesServicio extends Model
         'diagnostico' => 'datetime',
     ];
 
-    public function ModuloOrden()
+    public function modulo_ordenes_servicio()
     {
         return $this->belongsTo(ModuloOrdenesServicio::class, 'modulo_orden_id');
     }
-    public function Vehiculo()
+    public function vehiculo()
     {
         return $this->belongsTo(Vehiculos::class, 'vehiculo_id');
     }
-    public function Vehiculo_Concepto()
+    public function vehiculo_concepto()
     {
         return $this->belongsTo(VehiculosConceptos::class, 'tipo_vehiculo_concepto_id');
     }
-    public function User()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    public function Empresa()
+    public function empresa()
     {
         return $this->belongsTo(Empresas::class, 'empresa_id');
     }
-    public function Cliente()
+    public function cliente()
     {
         return $this->belongsTo(Clientes::class, 'cliente_id');
     }
-    public function Archivos(){
+    public function archivos(){
         return $this->hasMany(ArchivosOrdenServicio::class,'orden_servicio_id');
     }
-    public function Entrada(){
+    public function entrada(){
         return $this->hasOne(DatosEntrada::class,'orden_servicio_id');
     }
-    public function Salida(){
+    public function salida(){
         return $this->hasOne(DatosSalida::class,'orden_servicio_id');
     }
-    public function Presupuestos(){
+    public function presupuestos(){
         return $this->hasMany(Presupuestos::class,'orden_servicio_id');
     }
-    public function Responsables()
+    public function responsables()
     {
         return $this->hasOne(ResponsablesOrdenServicio::class,'orden_servicio_id');
     }
-    public function Interiores()
+    public function interiores()
     {
         return $this->hasOne(InterioresOrdenServicio::class,'orden_servicio_id');
     }
-    public function Exteriores()
+    public function exteriores()
     {
         return $this->hasOne(ExterioresOrdenServicio::class,'orden_servicio_id');
     }
-    public function Inventarios()
+    public function inventarios()
     {
         return $this->hasOne(InventarioOrdenServicio::class,'orden_servicio_id');
     }
-    public function CondicionesPintura()
+    public function condiciones_pintura()
     {
         return $this->hasOne(CondicionesPinturaOrdenServicio ::class,'orden_servicio_id');
     }
-    public function PedidosAlmacen(){
+    public function pedidos_almacen(){
         return $this->hasMany(PedidosOrdenesAlmacen::class,'orden_servicio_id');
     }
 

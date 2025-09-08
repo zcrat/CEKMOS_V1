@@ -3,14 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDelete;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class InterioresOrdenServicio extends Model
 {
-    use SoftDeletes;
-     protected $table = 'interiores_orden_servicios';
 
+    protected $table = 'interiores_orden_servicios';
+    public $timestamps=false;
     protected $fillable = [
         'orden_servicio_id',
         'puerta_interior_frontal',
@@ -35,107 +33,107 @@ class InterioresOrdenServicio extends Model
         'espejos_retrovizor',
     ];
 
-    public function OrdenServicio()
+    public function orden_servicio()
     {
         return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
     }
 
-    public function EstatusPuertaInteriorFrontal()
+    public function estatus_puerta_interior_frontal()
     {
         return $this->belongsTo(Estatus::class, 'puerta_interior_frontal');
     }
 
-    public function EstatusPuertaInteriorTrasera()
+    public function estatus_puerta_interior_trasera()
     {
         return $this->belongsTo(Estatus::class, 'puerta_interior_trasera');
     }
 
-    public function EstatusPuertaDelanteraFrontal()
+    public function estatus_puerta_delantera_frontal()
     {
         return $this->belongsTo(Estatus::class, 'puerta_delantera_frontal');
     }
 
-    public function EstatusPuertaDelanteraTrasera()
+    public function estatus_puerta_delantera_trasera()
     {
         return $this->belongsTo(Estatus::class, 'puerta_delantera_trasera');
     }
 
-    public function EstatusAsientoInteriorFrontal()
+    public function estatus_asiento_interior_frontal()
     {
         return $this->belongsTo(Estatus::class, 'asiento_interior_frontal');
     }
 
-    public function EstatusAsientoInteriorTrasera()
+    public function estatus_asiento_interior_trasera()
     {
         return $this->belongsTo(Estatus::class, 'asiento_interior_trasera');
     }
 
-    public function EstatusAsientoDelanteraFrontal()
+    public function estatus_asiento_delantera_frontal()
     {
         return $this->belongsTo(Estatus::class, 'asiento_delantera_frontal');
     }
 
-    public function EstatusAsientoDelanteraTrasera()
+    public function estatus_asiento_delantera_trasera()
     {
         return $this->belongsTo(Estatus::class, 'asiento_delantera_trasera');
     }
 
-    public function EstatusConsolaCentral()
+    public function estatus_consola_central()
     {
         return $this->belongsTo(Estatus::class, 'consola_central');
     }
 
-    public function EstatusClaxon()
+    public function estatus_claxon()
     {
         return $this->belongsTo(Estatus::class, 'claxon');
     }
 
-    public function EstatusTablero()
+    public function estatus_tablero()
     {
         return $this->belongsTo(Estatus::class, 'tablero');
     }
 
-    public function EstatusQuemacocos()
+    public function estatus_quemacocos()
     {
         return $this->belongsTo(Estatus::class, 'quemacocos');
     }
 
-    public function EstatusToldo()
+    public function estatus_toldo()
     {
         return $this->belongsTo(Estatus::class, 'toldo');
     }
 
-    public function EstatusElevadoresEletricos()
+    public function estatus_elevadores_eletricos()
     {
         return $this->belongsTo(Estatus::class, 'elevadores_eletricos');
     }
 
-    public function EstatusLucesInteriores()
+    public function estatus_luces_interiores()
     {
         return $this->belongsTo(Estatus::class, 'luces_interiores');
     }
 
-    public function EstatusSegurosEletricos()
+    public function estatus_seguros_eletricos()
     {
         return $this->belongsTo(Estatus::class, 'seguros_eletricos');
     }
 
-    public function EstatusTapetes()
+    public function estatus_tapetes()
     {
         return $this->belongsTo(Estatus::class, 'tapetes');
     }
 
-    public function EstatusClimatizador()
+    public function estatus_climatizador()
     {
         return $this->belongsTo(Estatus::class, 'climatizador');
     }
 
-    public function EstatusRadio()
+    public function estatus_radio()
     {
         return $this->belongsTo(Estatus::class, 'radio');
     }
 
-    public function EstatusEspejosRetrovizor()
+    public function estatus_espejos_retrovizor()
     {
         return $this->belongsTo(Estatus::class, 'espejos_retrovizor');
     }

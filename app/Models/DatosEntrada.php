@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 class DatosEntrada extends Model
 {
-    use SoftDeletes;
+    public $timestamps = false;
     protected $table = 'datos_entradas';
 
     protected $fillable = [
@@ -17,13 +17,18 @@ class DatosEntrada extends Model
         'orden_servicio_id',
     ];
 
-    // Relaciones
-    public function nivelCombustible()
+    protected $casts = [
+        'fecha' => 'datetime',
+        'estimacion' => 'datetime',
+        'kilomentraje' => 'decimal:10,2',
+    ];
+
+    public function nivel_combustible()
     {
         return $this->belongsTo(NivelesCombustible::class, 'gasolina');
     }
 
-    public function ordenServicio()
+    public function orden_servicio()
     {
         return $this->belongsTo(OrdenesServicio::class, 'orden_servicio_id');
     }

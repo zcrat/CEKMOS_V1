@@ -11,4 +11,14 @@ class NivelesCombustible extends Model
     protected $fillable = [
     'descripcion',
     ];
+
+    public function datos_entrada()
+    {
+        return $this->hasMany(DatosEntrada::class, 'gasolina');
+    }
+
+    public function datos_salida()
+    {
+        return $this->hasMany(DatosSalida::class, 'gasolina');
+    }
 }

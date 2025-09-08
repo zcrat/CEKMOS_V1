@@ -14,11 +14,11 @@ class CFDDisponiblesModel extends Model
     ];
     protected $casts = [];
 
-    public function Regimenfiscal()
+    public function regimen_fiscal()
     {
         return $this->belongsTo(RegimenesFiscalesModel::class, 'regimen_fiscal_id');
     }
-    public function Usocfdi()
+    public function uso_cfdi()
     {
         return $this->belongsTo(CFDIModel::class, 'uso_cfdi_id');
     }

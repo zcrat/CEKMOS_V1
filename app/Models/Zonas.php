@@ -11,7 +11,7 @@ class Zonas extends Model
     protected $fillable = [
         'descripcion',
     ];
-    public function ModuloOrdenesServicio(){
+    public function modulos_ordenes_servicio(){
         return $this->hasMany(ModuloOrdenesServicio::class,'zona_id');
     }
 }

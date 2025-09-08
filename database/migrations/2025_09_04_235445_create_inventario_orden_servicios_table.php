@@ -25,8 +25,6 @@ return new class extends Migration
             $table->boolean('triangulo_seguridad')->default(false);
             $table->boolean('extinguidor')->default(false);
             $table->boolean('placas')->default(false);
-            $table->timestamps();
-            $table->softDeletes();
         });
     }
 

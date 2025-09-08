@@ -3,13 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 class CondicionesPinturaOrdenServicio extends Model
 {
-    use SoftDeletes;
 
     protected $table = 'condiciones_pintura_orden_servicios';
-
+    public $timestamps=false;
     protected $fillable = [
         'orden_servicio_id',
         'decolorada',
@@ -38,7 +36,7 @@ class CondicionesPinturaOrdenServicio extends Model
     ];
 
     // Relación principal
-    public function OrdenServicio()
+    public function orden_servicio()
     {
         return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
     }

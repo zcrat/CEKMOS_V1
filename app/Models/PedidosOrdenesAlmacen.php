@@ -20,7 +20,7 @@ class PedidosOrdenesAlmacen extends Model
     ];
 
     // Relaciones
-    public function OrdenServicio()
+    public function orden_servicio()
     {
         return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
     }

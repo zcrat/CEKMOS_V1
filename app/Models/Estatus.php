@@ -16,11 +16,11 @@ class Estatus extends Model
     {
         return $this->belongsTo(Categorias::class, 'categoria_id');
     }
-    public function Facturas()
+    public function facturas()
     {
         return $this->hasMany(Facturas::class, 'estatus_id');
     }
-    public function Presupuestos(){
+    public function presupuestos(){
         return $this->hasMany(Presupuestos::class,'estatus_id');
     }
 }

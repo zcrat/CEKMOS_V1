@@ -21,10 +21,10 @@ class Emisor extends Model
         'serie_factura',
         'serie_p_factura',
     ];
-    public function Modulos(){
+    public function modulos(){
         return $this->hasMany(Modulos::class,'emisor_id');
     }
-    public function Facturas()
+    public function facturas()
     {
         return $this->hasMany(Facturas::class, 'emisor_id');
     }

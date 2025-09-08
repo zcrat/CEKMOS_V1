@@ -24,23 +24,23 @@ class Empresas extends Model
     ];
     protected $casts = [];
     
-    public function User(){
+    public function user(){
         return $this->belongsTo(User::class,'user_id');
     }
-    public function Ciudad(){
+    public function ciudad(){
         return $this->belongsTo(Ciudades::class,'ciudad_id');
     }
-    public function Regimen(){
+    public function regimen(){
         return $this->belongsTo(RegimenesFiscalesModel::class,'regimen_id');
     }
-    public function Clientes(){
+    public function clientes(){
         return $this->hasMany(Clientes::class,'empresa_id');
     }
-    public function OrdenesServicios()
+    public function ordenes_Servicio()
     {
         return $this->hasMany(OrdenesServicio::class, 'empresa_id');
     }
-    public function Facturas()
+    public function facturas()
     {
         return $this->hasMany(Facturas::class, 'empresa_id');
     }

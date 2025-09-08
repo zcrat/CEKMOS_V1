@@ -20,27 +20,29 @@ class Facturas extends Model
         'folio',
     ];
 
-    // Relaciones
-    public function Empresa()
+    protected $casts=[
+        'monto' => 'decimal:10,2'
+    ];
+    public function empresa()
     {
         return $this->belongsTo(Empresas::class,'empresa_id');
     }
 
-    public function Emisor()
+    public function emisor()
     {
         return $this->belongsTo(Emisor::class,'emisor_id');
     }
 
-    public function User()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function Estatus()
+    public function estatus()
     {
         return $this->belongsTo(Estatus::class,'estatus_id');
     }
-    public function Presupuestos(){
+    public function presupuestos(){
         return $this->hasMany(Presupuestos::class,'factura_id');
     }
 

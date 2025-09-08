@@ -25,15 +25,15 @@ class Tipos extends Model
     {
         return $this->hasMany(Vehiculos::class, 'tipo_id');
     }
-    public function RutasArchivo()
+    public function rutas_archivo()
     {
-        return $this->hasMany(RutasTiposArchivo::class, 'tipo_id');
+        return $this->hasOne(RutasTiposArchivo::class, 'tipo_id');
     }
-    public function ArchivosOrdenServicio()
+    public function archivos_orden_servicio()
     {
         return $this->hasMany(ArchivosOrdenServicio::class, 'tipo_id');
     }
-    public function Presupuestos(){
+    public function presupuestos(){
         return $this->hasMany(Presupuestos::class,'tipo_id');
     }
 }

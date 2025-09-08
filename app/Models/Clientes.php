@@ -22,16 +22,16 @@ class Clientes extends Model
     ];
     protected $casts = [];
     
-    public function User(){
+    public function user(){
         return $this->belongsTo(User::class,'user_id');
     }
-    public function Ciudad(){
+    public function ciudad(){
         return $this->belongsTo(Ciudades::class,'ciudad_id');
     }
-    public function Empresa(){
+    public function empresa(){
         return $this->belongsTo(Empresas::class,'empresa_id');
     }
-    public function OrdenesServicios()
+    public function ordenes_servicios()
     {
         return $this->hasMany(OrdenesServicio::class, 'cliente_id');
     }

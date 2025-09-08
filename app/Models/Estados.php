@@ -13,6 +13,6 @@ class Estados extends Model
     ];
     public function ciudades()
     {
-        return $this->hasMany(Ciudades::class, 'categoria_id');
+        return $this->hasMany(Ciudades::class, 'estado_id');
     }
 }

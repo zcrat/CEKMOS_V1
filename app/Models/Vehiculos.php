@@ -19,19 +19,19 @@ class Vehiculos extends Model
     ];
     protected $casts=[];
 
-    public function Tipo()
+    public function tipo()
     {
         return $this->belongsTo(Tipos::class, 'tipo_id');
     }
-    public function Color()
+    public function color()
     {
         return $this->belongsTo(Colores::class, 'color_id');
     }
-    public function Modelo()
+    public function modelo()
     {
         return $this->belongsTo(Modelos::class, 'modelo_id');
     }
-    public function OrdenesServicios()
+    public function ordenes_servicio()
     {
         return $this->hasMany(OrdenesServicio::class, 'vehiculo_id');
     }

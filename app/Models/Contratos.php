@@ -13,7 +13,7 @@ class Contratos extends Model
         'numero',
         'monto',
     ];
-    public function ModuloOrdenesServicio(){
+    public function modulos_ordenes_servicio(){
         return $this->hasMany(ModuloOrdenesServicio::class,'contrato_id');
     }
 }

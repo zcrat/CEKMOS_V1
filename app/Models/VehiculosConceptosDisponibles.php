@@ -14,12 +14,12 @@ class VehiculosConceptosDisponibles extends Model
     ];
 
     // Relaciones
-    public function VehiculoConcepto()
+    public function vehiculo_concepto()
     {
         return $this->belongsTo(VehiculosConceptos::class, 'vehiculo_concepto_id');
     }
 
-    public function ModuloOrden()
+    public function modulo_ordenes_servicio()
     {
         return $this->belongsTo(ModuloOrdenesServicio::class, 'modulo_orden_id');
     }

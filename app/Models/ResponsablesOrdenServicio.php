@@ -3,12 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 class ResponsablesOrdenServicio extends Model
 {
-    use SoftDeletes;
-    protected $table = 'responsables_orden_servicios';
 
+    protected $table = 'responsables_orden_servicios';
+    public $timestamps=false;
     protected $fillable = [
         'administrador_transporte_id',
         'jefe_de_proceso_id',
@@ -18,27 +17,27 @@ class ResponsablesOrdenServicio extends Model
     ];
 
     // Relaciones con alias
-    public function AdministradorTransporte()
+    public function administrador_transporte()
     {
         return $this->belongsTo(UsuariosTaller::class, 'administrador_transporte_id');
     }
 
-    public function JefeDeProceso()
+    public function jefe_de_proceso()
     {
         return $this->belongsTo(UsuariosTaller::class, 'jefe_de_proceso_id');
     }
 
-    public function Trabajador()
+    public function trabajador()
     {
         return $this->belongsTo(UsuariosTaller::class, 'trabajador_id');
     }
 
-    public function Tecnico()
+    public function tecnico()
     {
         return $this->belongsTo(UsuariosTaller::class, 'tecnico_id');
     }
 
-    public function OrdenServicio()
+    public function orden_servicio()
     {
         return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
     }

@@ -24,8 +24,7 @@ return new class extends Migration
             $table->foreignId('sistema_alarma')->constrained('estatus');
             $table->foreignId('limpia_parabrisas')->constrained('estatus');
             $table->foreignId('luces_exteriores')->constrained('estatus');
-            $table->timestamps();
-            $table->softDeletes();
+
         });
     }
 

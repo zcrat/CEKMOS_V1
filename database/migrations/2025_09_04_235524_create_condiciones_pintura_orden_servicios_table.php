@@ -24,8 +24,6 @@ return new class extends Migration
             $table->boolean('danios_granizado')->default(false);
             $table->boolean('carroceria_golpes')->default(false);
             $table->boolean('lluvia_acido')->default(false);
-            $table->timestamps();
-            $table->softDeletes();
         });
     }
 

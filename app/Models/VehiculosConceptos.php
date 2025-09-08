@@ -12,11 +12,11 @@ class VehiculosConceptos extends Model
         'descripcion',
     ];
 
-    public function OrdenesServicios()
+    public function ordenes_servicio()
     {
-        return $this->hasMany(OrdenesServicio::class, 'tipo_vehiculo_concepto_id');
+        return $this->hasMany(OrdenesServicio::class, 'vehiculo_concepto_id');
     }
-    public function ModulosOrden()
+    public function modulos_orden()
     {
         return $this->hasMany(VehiculosConceptosDisponibles::class, 'vehiculo_concepto_id');
     }

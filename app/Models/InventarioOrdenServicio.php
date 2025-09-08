@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 class InventarioOrdenServicio extends Model
 {
-    use SoftDeletes;
     protected $table = 'inventario_orden_servicios';
-
+    public $timestamps=false;
     protected $fillable = [
         'orden_servicio_id',
         'llanta',
@@ -39,7 +37,7 @@ class InventarioOrdenServicio extends Model
     ];
 
     // Relación principal
-    public function OrdenServicio()
+    public function orden_servicio()
     {
         return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
     }

@@ -34,8 +34,6 @@ return new class extends Migration
             $table->foreignId('climatizador')->constrained('estatus');
             $table->foreignId('radio')->constrained('estatus');
             $table->foreignId('espejos_retrovizor')->constrained('estatus');
-            $table->timestamps();
-            $table->softDeletes();
         });
     }
 

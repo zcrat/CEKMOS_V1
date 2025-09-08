@@ -19,7 +19,7 @@ class EmpleadosModel extends Model
     ];
     protected $casts = [];
 
-    public function regimenfiscal()
+    public function regimen_fiscal()
     {
         return $this->belongsTo(RegimenesFiscalesModel::class, 'regimen_fiscal_id');
     }

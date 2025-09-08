@@ -14,20 +14,20 @@ class UsuariosTaller extends Model
         'tipo_id',
     ];
 
-    public function Tipo()
+    public function tipo()
     {
         return $this->belongsTo(Tipos::class,'tipo_id');
     }
-    public function AdministradoresOrdenServicio(){
+    public function administradores_ordenes_servicio(){
         return $this->hasMany(ResponsablesOrdenServicio::class,'administrador_transporte_id');
     }
-    public function JefeDeProcesoOrdenServicio(){
+    public function jefeDeProceso_ordenes_servicio(){
         return $this->hasMany(ResponsablesOrdenServicio::class,'jefe_de_proceso_id');
     }
-    public function TrabajadoresOrdenServicio(){
+    public function trabajadores_ordenes_servicio(){
         return $this->hasMany(ResponsablesOrdenServicio::class,'trabajador_id');
     }
-    public function TecnicosOrdenServicio(){
+    public function tecnicos_ordenes_servicio(){
         return $this->hasMany(ResponsablesOrdenServicio::class,'tecnico_id');
     }
 

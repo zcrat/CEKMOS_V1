@@ -3,26 +3,26 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 class DatosSalida extends Model
 {
-   use SoftDeletes;
     protected $table = 'datos_salidas';
-
+    public $timestamps = false;
     protected $fillable = [
         'fecha',
         'kilomentraje',
         'gasolina',
         'orden_servicio_id',
     ];
-
-    // Relaciones
-    public function nivelCombustible()
+    protected $casts = [
+        'fecha' => 'datetime',
+        'kilomentraje' => 'decimal:10,2',
+    ];
+    public function nivel_combustible()
     {
         return $this->belongsTo(NivelesCombustible::class, 'gasolina');
     }
 
-    public function ordenServicio()
+    public function orden_servicio()
     {
         return $this->belongsTo(OrdenesServicio::class, 'orden_servicio_id');
     }
