@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('color_id')->constrained('colores');
             $table->foreignId('modelo_id')->constrained('modelos');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

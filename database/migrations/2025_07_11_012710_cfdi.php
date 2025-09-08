@@ -18,7 +18,7 @@ return new class extends Migration
             $table->boolean('persona_fisica');
             $table->boolean('persona_moral');
             $table->timestamps();
-            $table->timestamp('deleted_at')->nullable();
+            $table->softDeletes();
         });
     }
 

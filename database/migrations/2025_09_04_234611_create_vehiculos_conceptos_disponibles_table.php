@@ -13,15 +13,13 @@ return new class extends Migration
     {
         Schema::create('vehiculos_conceptos_disponibles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tipo_id')->constrained('vehiculos_conceptos');
-            $table->foreignId('modulo_orden')->constrained('modulos_ordenes_servicio');
+            $table->foreignId('vehiculo_concepto_id')->constrained('vehiculos_conceptos');
+            $table->foreignId('modulo_orden_id')->constrained('modulo_ordenes_servicios');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('vehiculos_conceptos_disponibles');

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('numero');
             $table->decimal('monto',10,2);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

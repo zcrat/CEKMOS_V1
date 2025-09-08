@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('pedidos_ordenes_almacens', function (Blueprint $table) {
             $table->id();
             $table->dateTime('pedido_hecho');
-                $table->dateTime('pedido_entregado')->nullable();
-                $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
+            $table->dateTime('pedido_entregado')->nullable();
+            $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
             $table->timestamps();
         });
     }

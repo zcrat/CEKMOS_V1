@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ordenes_servicios', function (Blueprint $table) {
+        Schema::create('ordenes_servicio', function (Blueprint $table) {
             $table->id();
             $table->string('orden_servicio')->unique();
             $table->string('orden_seguimiento')->unique();
-            $table->foreignId('modulo_orden')->constrained('modulos_ordenes_servicio');
+            $table->foreignId('modulo_orden_id')->constrained('modulo_ordenes_servicios');
             $table->foreignId('vehiculo_id')->constrained('vehiculos');
-            $table->foreignId('tipo_vehiculo_concepto_id')->constrained('vehiculos_conceptos');
+            $table->foreignId('vehiculo_concepto_id')->constrained('vehiculos_conceptos');
             $table->foreignId('user_id')->constrained('users');  
             $table->foreignId('empresa_id')->constrained('empresas');
             $table->foreignId('cliente_id')->constrained('clientes');
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->text('indicaciones_cliente')->nullable();
             $table->text('notas_mecanico')->nullable();
             $table->text('notas_retraso')->nullable();
-            $table->string('telefono')->nullable();
+            $table->integer('telefono')->nullable();
             $table->string('ubicacion')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -7,18 +7,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CFDDisponiblesModel extends Model
 {
     use SoftDeletes;
-    protected $table = 'cfdis_avaliables';
+    protected $table = 'cfdis_disponibles';
     protected $fillable = [
         'regimen_fiscal_id',
         'uso_cfdi_id',
     ];
     protected $casts = [];
 
-    public function regimenfiscal()
+    public function Regimenfiscal()
     {
         return $this->belongsTo(RegimenesFiscalesModel::class, 'regimen_fiscal_id');
     }
-    public function usocfdi()
+    public function Usocfdi()
     {
         return $this->belongsTo(CFDIModel::class, 'uso_cfdi_id');
     }

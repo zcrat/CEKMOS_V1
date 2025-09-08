@@ -15,17 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas');
             $table->string('nombre');
-            $table->string('rfc');
-            $table->string('email');
-            $table->string('logo');
             $table->string('calle');
             $table->integer('cp');
             $table->foreignId('ciudad_id')->constrained('ciudades');
-            $table->foreignId('emisor_id')->constrained('emisor');
+            $table->foreignId('user_id')->constrained('users');
+            $table->string('email');
             $table->integer('telefono');
             $table->integer('tel_celular');
             $table->integer('tel_negocio');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

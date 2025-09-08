@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmpleadosModel extends Model
 {   use SoftDeletes;
-    protected $table = 'employes';
+    protected $table = 'empleados';
     protected $fillable = [
         'nombre',
         'paterno',

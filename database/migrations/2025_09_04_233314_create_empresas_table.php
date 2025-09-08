@@ -20,13 +20,14 @@ return new class extends Migration
             $table->string('calle');
             $table->integer('cp');
             $table->foreignId('ciudad_id')->constrained('ciudades');
-            $table->foreignId('emisor_id')->constrained('emisor');
             $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('regimen_id')->constrained('regimes_fiscales');
+            $table->string('regimen_fiscal_id', 3);
+            $table->foreign('regimen_fiscal_id')->references('clave')->on('regimes_fiscales');
             $table->integer('telefono');
             $table->integer('tel_celular');
             $table->integer('tel_negocio');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

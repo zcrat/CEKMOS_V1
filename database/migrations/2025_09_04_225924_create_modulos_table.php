@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('modulos', function (Blueprint $table) {
             $table->id();
             $table->string('descripcion')->unique();
-            $table->foreignId('emisor_id')->constrained('emisor');
+            $table->foreignId('emisor_id')->constrained('emisores');
             $table->timestamps();
             $table->softDeletes();
         });

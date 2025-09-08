@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class ModuloOrdenesServicio extends Model
 {       
-    protected $table = 'modulos';
+    use SoftDeletes;
+    protected $table = 'modulo_ordenes_servicios';
     protected $fillable = [
         'descripcion',
         'clave',
@@ -15,17 +16,24 @@ class ModuloOrdenesServicio extends Model
         'zona_id',
         'año',
     ];
-    public function modulo()
+    public function Modulo()
     {
-        return $this->belongsTo(Emisor::class, 'modulo_id');
+        return $this->belongsTo(Modulos::class, 'modulo_id');
     }
-    public function zona()
+    public function Zona()
     {
-        return $this->belongsTo(Emisor::class, 'contrato_id');
+        return $this->belongsTo(Zonas::class, 'zona_id');
     }
-    public function contrato()
+    public function Contrato()
     {
-        return $this->belongsTo(Emisor::class, 'zona_id');
+        return $this->belongsTo(Contratos::class, 'contrato_id');
+    }
+    public function OrdenesServicios()
+    {
+        return $this->hasMany(OrdenesServicio::class, 'modulo_orden_id');
+    }
+    public function VehiculosConceptos(){
+        return $this->hasMany(VehiculosConceptosDisponibles::class, 'modulo_orden_id');
     }
 
 }

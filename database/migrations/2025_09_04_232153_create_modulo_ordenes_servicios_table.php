@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('zona_id')->constrained('zonas');
             $table->year('año');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

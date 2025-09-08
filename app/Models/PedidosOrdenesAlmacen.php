@@ -6,5 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class PedidosOrdenesAlmacen extends Model
 {
-    //
+   protected $table = 'pedidos_ordenes_almacens';
+
+    protected $fillable = [
+        'pedido_hecho',
+        'pedido_entregado',
+        'orden_servicio_id',
+    ];
+
+    protected $casts = [
+        'pedido_hecho' => 'datetime',
+        'pedido_entregado' => 'datetime',
+    ];
+
+    // Relaciones
+    public function OrdenServicio()
+    {
+        return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
+    }
 }

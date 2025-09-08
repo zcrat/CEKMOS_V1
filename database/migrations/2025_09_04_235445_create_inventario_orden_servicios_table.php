@@ -26,6 +26,7 @@ return new class extends Migration
             $table->boolean('extinguidor')->default(false);
             $table->boolean('placas')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

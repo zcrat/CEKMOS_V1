@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
-            $table->foreignId('tipo_id')->constrained('tipos_imagenes');
+            $table->foreignId('tipo_id')->constrained('tipos');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

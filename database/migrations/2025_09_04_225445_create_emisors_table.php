@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('serie_factura');
             $table->string('serie_p_factura');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

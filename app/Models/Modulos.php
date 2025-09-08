@@ -12,8 +12,11 @@ class Modulos extends Model
         'descripcion',
         'emisor_id'
     ];
-    public function emisor()
+    public function Emisor()
     {
         return $this->belongsTo(Emisor::class, 'emisor_id');
+    }
+    public function ModuloOrdenesServicio(){
+        return $this->hasMany(ModuloOrdenesServicio::class,'modulo_id');
     }
 }

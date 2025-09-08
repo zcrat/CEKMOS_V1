@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('descripcion');
             $table->foreignId('tipo_id')->constrained('tipos');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

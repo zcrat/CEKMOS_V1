@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('gasolina')->constrained('niveles_combustible');
             $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

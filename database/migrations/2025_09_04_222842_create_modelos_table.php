@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('descripcion');
             $table->foreignId('marca_id')->constrained('marcas');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

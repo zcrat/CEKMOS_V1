@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Vehiculos extends Model
-{
+{   
+    use SoftDeletes;
     protected $table = 'vehiculos';
     protected $fillable = [
         'placas',
@@ -16,16 +17,22 @@ class Vehiculos extends Model
         'color_id',
         'modelo_id',
     ];
-    public function tipo()
+    protected $casts=[];
+
+    public function Tipo()
     {
         return $this->belongsTo(Tipos::class, 'tipo_id');
     }
-    public function color()
+    public function Color()
     {
         return $this->belongsTo(Colores::class, 'color_id');
     }
-    public function modelo()
+    public function Modelo()
     {
         return $this->belongsTo(Modelos::class, 'modelo_id');
+    }
+    public function OrdenesServicios()
+    {
+        return $this->hasMany(OrdenesServicio::class, 'vehiculo_id');
     }
 }

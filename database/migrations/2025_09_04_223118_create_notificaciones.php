@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('tipo_id')->constrained('tipos');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

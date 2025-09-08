@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('regimen_fiscal_id', 3); // ⚠️ importante que coincida con el tipo
             $table->foreign('regimen_fiscal_id')->references('clave')->on('regimes_fiscales');
             $table->timestamps();
-            $table->timestamp('deleted_at')->nullable();
+            $table->softDeletes();
         });
 
 

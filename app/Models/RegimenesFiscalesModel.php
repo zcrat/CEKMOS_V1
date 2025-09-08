@@ -19,4 +19,17 @@ class RegimenesFiscalesModel extends Model
     ];
     protected $casts = [];
 
+    public function Cfdi_disponibles()
+    {
+        return $this->hasMany(CFDDisponiblesModel::class,'regimen_fiscal_id','clave');
+    }
+    public function Empleados()
+    {
+        return $this->hasMany(EmpleadosModel::class,'regimen_fiscal_id','clave');
+    }
+    public function Empresas()
+    {
+        return $this->hasMany(Empresas::class, 'regimen_id');
+    }
+
 }
