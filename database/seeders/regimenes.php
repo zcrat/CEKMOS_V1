@@ -43,7 +43,6 @@ class regimenes extends Seeder
             RegimenesFiscalesModel::create([
                 'clave' => $r['id'],
                 'descripcion' => substr($r['nombre'], strpos($r['nombre'], '-') + 2),
-                // Puedes ajustar esto manualmente si deseas exactitud total
                 'persona_fisica' => in_array($r['id'], ['605','606','607','608','611','612','614','615','616','621','625','626']),
                 'persona_moral' => in_array($r['id'], ['601','603','609','610','620','622','623','624','628','629','630','626']),
             ]);

@@ -13,6 +13,10 @@ class Contratos extends Model
         'numero',
         'monto',
     ];
+
+    protected $casts=[
+        'monto'=>'decimal:10,2',
+    ];
     public function modulos_ordenes_servicio(){
         return $this->hasMany(ModuloOrdenesServicio::class,'contrato_id');
     }

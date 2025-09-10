@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contratos', function (Blueprint $table) {
+        Schema::create('modulos_per_users', function (Blueprint $table) {
             $table->id();
-            $table->string('descripcion');
-            $table->string('numero');
-            $table->decimal('monto',10,2);
+            $table->foreignId('modulo_orden_id')->constrained('modulo_ordenes_servicios');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contratos');
+        Schema::dropIfExists('modulos_per_users');
     }
 };

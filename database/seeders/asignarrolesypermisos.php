@@ -16,7 +16,10 @@ class asignarrolesypermisos extends Seeder
         // Crear permisos
         $permissions = [
             'Administrar_Roles_Permisos_User',
-            'Administrar_Permisos_Roles'
+            'Administrar_Permisos_Roles',
+            'Ver_Presupuestos',
+            'Ver_Presupuestos_Admin',
+            'Ver_Ordenes_Servicio',
         ];
 
         foreach ($permissions as $permission) {

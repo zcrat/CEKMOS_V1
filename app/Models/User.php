@@ -67,4 +67,8 @@ protected $dateFormat = 'Y-m-d H:i:s.v'; // Formato compatible con SQL Server
             'password' => 'hashed',
         ];
     }
+    public function modulos_orden()
+    {
+        return $this->hasMany(ModulosPerUser::class, 'user_id');
+    }
 }
