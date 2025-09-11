@@ -40,35 +40,32 @@ onMounted(() => {
 </script>
 
 <template>
-    <div>
         <Head :title="title" />
-        
-        <div :class="['min-h-screen relative h-screen bg-gray-100 pt-2 px-2 flex flex-col',showingNavigationtop ? '' : 'sm:flex-row']">
+        <div :class="['min-h-screen relative h-screen bg-gray-100 pt-2 px-2 flex flex-col overflow-auto',showingNavigationtop ? '' : 'sm:flex-row' ]">
             <BarNavegation :IsRow="showingNavigationtop" @toggle="toggleshowingNavigationtop()" @toggle_smartphone_active="Barnav_smartphone_active = !Barnav_smartphone_active"/>
             <BarNavegation_Smartphone v-if="!isSmOrLarger" :barnav_active="Barnav_smartphone_active"/>
 
-            <main class="h-full w-full z-0 relative flex flex-col">
-              <div class="flex flex-row gap-2 mt-2" v-if="$slots.header">
-                <slot name="header"/>
+            <main class="flex flex-col flex-1">
+            <div class="flex flex-row gap-2 mt-2" v-if="$slots.header">
+              <slot name="header"/>
+            </div>
+            <div class="flex-1 flex flex-col items-start justify-start">
+              <div class="flex flex-col sm:flex-row justify-start w-full mt-2 gap-2" v-if="$slots.filtering">
+                <slot name="filtering"/>
               </div>
-              <div class="h-full flex flex-col items-start justify-start">
-                <div class="flex flex-col sm:flex-row justify-start w-full mt-2  gap-2" v-if="$slots.filtering">
-                  <slot name="filtering"/>
-                </div>
-                <div class="flex w-full ">
-                  <Loanding v-if="loading" text="Cargando Usuarios"/>
-                  <slot  v-else name="content"/>
-                </div>
+              <div class="w-full">
+                <Loanding v-if="loading" text="Cargando Usuarios"/>
+                <slot v-else name="content"/>
               </div>
-              <footer class="h-12 p-4 justify-center rounded-md bg-blue-100 border border-black relative bottom-0 overflow-hidden mb-2">
-                <span class="flex flex-nowrap justify-between w-full text-xs">
-                  <div class="flex flex-row gap-2">
-                    <strong>Copyright © 2025-2026</strong> Zcrat Developer. <p>All rights reserved.</p>
-                  </div>
-                  <strong>Version 1</strong>
-                </span>
-              </footer>
-            </main>
+            </div>
+            <footer class="h-12 p-4 justify-center rounded-md bg-blue-100 border border-black my-2">
+              <span class="flex flex-nowrap justify-between w-full text-xs">
+                <div class="flex flex-row gap-2">
+                  <strong>Copyright © 2025-2026</strong> Zcrat Developer. <p>All rights reserved.</p>
+                </div>
+                <strong>Version 1</strong>
+              </span>
+            </footer>
+          </main>
         </div>
-    </div>
 </template>

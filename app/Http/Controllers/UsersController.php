@@ -161,7 +161,21 @@ class UsersController extends Controller
         $user=User::find($user);
         return $this->GetModulosPerUser($user);
     }
-
+    public function DeleteUser(Request $request){
+        $request->validate([
+            'id' => ['required','exists:users,id'],
+        ],
+        [
+            'id.required' => 'El ID del usuario es obligatorio.',
+            'id.exists' => 'El usuario no existe.',
+        ]);
+        if($request->id === $request->user()->id){
+            return response()->json(['message'=>'No Puedes Eliminar Tu Propio Perfil'],500);
+        }
+        $user=User::findorfail($request->id);
+        $user->delete();
+         return response()->json(['message' => 'Usuario eliminado correctamente.'], 200);
+    }
     private function GetModulosPerUser($user){
         $usermodulos = $user->load('modulos_orden')->modulos_orden->isNotEmpty()
         ? $user->modulos_orden->pluck('modulo_orden_id')->toArray()
