@@ -3,5 +3,4 @@ export interface buttonconfirmed{
     classname?:string
     disabled?:boolean
     onClick: (event: MouseEvent) => void
-    disabled?: boolean  
 }

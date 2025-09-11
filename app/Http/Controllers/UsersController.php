@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ModuloOrdenesServicio;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use \Spatie\Permission\Models\Permission;
 use \Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
 use App\Models\Notificaciones;
+use App\Models\ModulosPerUser;
 use \App\Notifications\SeendNotification;
 class UsersController extends Controller
 {
@@ -35,6 +37,14 @@ class UsersController extends Controller
             return response()->json(['message'=>'Usuario no encontrado'],404);
         }
         return $this->GetRolesAndPermission($user);
+    }
+    public function GetModulos(Request $request){
+        $id=$request->id;
+        $user=User::with('modulos_orden')->find($id);
+        if(!$user){
+            return response()->json(['message'=>'Usuario no encontrado'],404);
+        }
+        return $this->GetModulosPerUser($user);
     }
     public function UpdatePermisos(Request $request){
         $request->validate([
@@ -121,7 +131,51 @@ class UsersController extends Controller
         }
         return $this->GetRolesAndPermission($user);
     }
+    public function ToggleModulo(Request $request){
+        $request->validate([
+            'user' => ['required','exists:users,id'],
+            'modulo' => ['required','exists:modulo_ordenes_servicios,id'],
+        ],
+        [
+            'user.required' => 'El ID del usuario es obligatorio.',
+            'user.exists' => 'El usuario no existe.',
+            'modulo.required' => 'El Modulo De Orden De Servicio es obligatorio.',
+            'modulo.exists' => 'El Modulo De Orden De Servicio no existe.',
+        ]);
+        $user=$request->user;
+        $modulo=$request->modulo;
+        $exist=ModulosPerUser::withTrashed()->where('user_id',$user)->where('modulo_orden_id',$modulo)->first();
+        if ($exist) {
+            if (isset($exist->deleted_at)) {
+                $exist->restore();
+            } else {
+                $exist->delete();
+            }
+        }else{
+            ModulosPerUser::create([
+                'modulo_orden_id'=>$modulo,
+                'user_id'=>$user,
+            ]);
+        }
+        
+        $user=User::find($user);
+        return $this->GetModulosPerUser($user);
+    }
 
+    private function GetModulosPerUser($user){
+        $usermodulos = $user->load('modulos_orden')->modulos_orden->isNotEmpty()
+        ? $user->modulos_orden->pluck('modulo_orden_id')->toArray()
+        : [];
+
+        $allmodulos=ModuloOrdenesServicio::all()->map(function($item){
+            return [
+                'id'=>$item->id,
+                'descripcion'=>$item->descripcion,
+            ];
+        });
+
+        return response()->json(compact('usermodulos', 'allmodulos'));
+    }
     private function GetRolesAndPermission($user){
 
         $userpermisos=$user->getAllPermissions();
@@ -170,13 +224,13 @@ class UsersController extends Controller
         }
         return response()->json(['message'=>'Notificación marcada como leída']);
     }
-    private function Notificate($user_id, $title, $message, $tipo='info', $prioridad=1){
+    private function Notificate($user_id, $title, $message, $tipo=1, $prioridad=1){
         try{
             $notificacion=new Notificaciones();
             $notificacion->user_id=$user_id;
             $notificacion->title=$title;
             $notificacion->message=$message;
-            $notificacion->tipo=$tipo;
+            $notificacion->tipo_id=$tipo;
             $notificacion->prioridad=$prioridad;
             $notificacion->save();
             $user=User::find($user_id);

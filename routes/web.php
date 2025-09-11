@@ -19,6 +19,8 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
 
     Route::get('/Get/Users',[UsersController::class,"ReadUsers"])->name('getusers');
     Route::get('/Get/Permisos/User',[UsersController::class,"GetPermisos"])->name('getpermisosuser');
+    Route::get('/Get/Modulos/User',[UsersController::class,"GetModulos"])->name('get.modulos.user');
+    Route::post('/Toggle/Modulos/User',[UsersController::class,"ToggleModulo"])->name('toggle.modulo');
     Route::post('/Toggle/Roles/User',[UsersController::class,"ToggleRole"])->name('toggle.role');
     Route::post('/Toggle/Permisos/User',[UsersController::class,"TogglePermiso"])->name('toggle.permiso');
     Route::get('/User/Notifications',[UsersController::class,"GetNotificaciones"])->name('getnotifications');

@@ -8,11 +8,13 @@ import {ref} from 'vue'
 import { UsersTable} from '@/utils/interfaces/users';
 import Button  from "@/components/Zcrat/Inputs/Button.vue";
 import ChangePermissionsUser from '@/components/Zcrat/modals/ChangePermissionsUser.vue'
+import ChangeModulosServicio from '@/components/Zcrat/modals/ChangeModulosServicio.vue'
 
 
 const rows = ref<UsersTable[]>([])
 const loading = ref<boolean>(false)
 const ModalExampleShoW = ref(false)
+const ModalEditModuls = ref(false)
 const iduser = ref<number | null>(null)
 
 console.log("Componente cargado");
@@ -69,7 +71,11 @@ GetElements() // ✅ ahora inject ya existe
                             children: [
                                 {
                                 element: Button,
-                                props: {text:'Editar', onClick:()=>{iduser = row.id; ModalExampleShoW = true},hiddenclases:true,classname:'w-full text-center p-2 '}
+                                props: {text:'Editar Roles Y Permisos', onClick:()=>{iduser = row.id; ModalExampleShoW = true},hiddenclases:true,classname:'w-full text-center p-2 '}
+                                },
+                                {
+                                element: Button,
+                                props: {text:'Editar Modulos Visibles', onClick:()=>{iduser = row.id; ModalEditModuls = true},hiddenclases:true,classname:'w-full text-center p-2 '}
                                 },
                                 {
                                 element: Button,
@@ -85,4 +91,5 @@ GetElements() // ✅ ahora inject ya existe
         </template>
     </AppLayout>
     <ChangePermissionsUser v-model:show="ModalExampleShoW"  :id="iduser" />
+    <ChangeModulosServicio v-model:show="ModalEditModuls"  :id="iduser" />
 </template>
