@@ -44,10 +44,10 @@ function toggleNavsmartphone() {
                     </template>
                     
                     <template #content>
-                        <DropdownLink :href="route('Cortana.Presupuesto.Vista',{'modulo':'CFE'})">
+                        <DropdownLink :href="route('Cortana.Presupuesto.Vista')">
                             Presupuestos
                         </DropdownLink>
-                        <DropdownLink :href="route('Cortana.Presupuesto.Vista',{'modulo':'CFB'})">
+                        <DropdownLink :href="route('Cortana.Presupuesto.Vista')">
                             Recepciones Vehiculares
                         </DropdownLink>
                     </template>

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class OrdenesServicio extends Model
 {
     use SoftDeletes;
-    protected $table = 'ordenes_servicios';
+    protected $table = 'ordenes_servicio';
     protected $fillable = [
         'orden_servicio',
         'orden_seguimiento',

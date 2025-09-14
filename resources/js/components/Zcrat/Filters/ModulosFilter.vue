@@ -4,12 +4,10 @@
   import { computed } from 'vue';
 import { ref } from 'vue';
 import type {ComponentInterface} from '@/utils/interfaces/tablecomponent'
-interface ListadoModulos{
-    id:number,
-    label:string
-}
+import { modulosorden} from '@/utils/interfaces/generales';
+
 const props = defineProps<{
-    Listado:ListadoModulos[]
+    Listado:modulosorden[]
 }>()
 const ListadoModulos=computed(() => props.Listado.map(function(fila){
     return{
@@ -18,7 +16,7 @@ const ListadoModulos=computed(() => props.Listado.map(function(fila){
             id:'pedientes',
             checked: true,
             name:'pedientes',
-            label: fila.label,
+            label: fila.descripcion,
             value: fila.id,
             classname: 'rounded-lg border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500',
         }

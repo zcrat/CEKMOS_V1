@@ -56,7 +56,7 @@ GetElements() // ✅ ahora inject ya existe
                     {title:'opciones',classname:'uppercase'}
                 ]"
                 :rows="rows.map(function(row){return {
-                    classname:'',
+                    classname:'bg-grey-300',
                     columns:[
                         {element:row.name, classname:'capitalize'},
                         {element:row.email, classname:'lowercase'},
@@ -71,18 +71,19 @@ GetElements() // ✅ ahora inject ya existe
                             children: [
                                 {
                                 element: Button,
-                                props: {text:'Editar Roles Y Permisos', onClick:()=>{iduser = row.id; ModalExampleShoW = true},hiddenclases:true,classname:'w-full text-center p-2 '}
+                                props: {text:'Editar Roles Y Permisos', onClick:()=>{iduser = row.id; ModalExampleShoW = true},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
                                 },
                                 {
                                 element: Button,
-                                props: {text:'Editar Modulos Visibles', onClick:()=>{iduser = row.id; ModalEditModuls = true},hiddenclases:true,classname:'w-full text-center p-2 '}
+                                props: {text:'Editar Modulos Visibles', onClick:()=>{iduser = row.id; ModalEditModuls = true},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
                                 },
                                 {
                                 element: Button,
-                                props: {text:'Eliminar', onClick:GetElements,hiddenclases:true, classname:'w-full text-center p-2 '}
+                                props: {text:'Eliminar', onClick:GetElements,hiddenclases:true, classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
                                 },
                             ]
-                        },classname:'items-center flex justify-center'
+                            ,contentClasses:['bg-gray-200']
+                        }
                         }
                                             ]
                 }})" 
