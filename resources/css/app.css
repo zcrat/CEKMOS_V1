@@ -10,8 +10,8 @@
   --btnprimary: #0479d8;
   --color1: #000000;
   --color2: #ffffff;
-  --color3: #ffc3d0;
-  --color3a: #fda7b9;
+  --color3: #b30e32;
+  --color3a: #c02a4a;
 }
 .multiselect__input {
   @apply px-3 py-2 border rounded focus:outline-none;
@@ -52,7 +52,16 @@
 .tabla tbody tr {
   @apply bg-blue-50 even:bg-blue-100;
 }
+.PageActive{
+  @apply w-8 text-center bg-[--micolor] text-[--color2] rounded-md h-8 justify-center items-center;
+}
+.PageInactive{
+   @apply w-8 text-center bg-[--color3] text-[--color2] rounded-md h-8 justify-center items-center;
 
+}
+.PageInactive:hover{
+  @apply bg-[--micolor] text-[--color2];
+}
 .barra{
     margin: 0;
     height: 3rem;

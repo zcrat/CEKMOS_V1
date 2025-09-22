@@ -31,7 +31,7 @@
 </script>
 <template>
     <div :class="'flex gap-2 flex-wrap items-center w-full my-2 '+(props.clases ? props.clases : '')">
-        <select v-if="props.chnagesItems"
+        <select v-if="props.chnagesItems && totalItems>1"
             name="ElementsPerPage"
             id="ElementsPerPage"
             v-model="itemsPerPage"
@@ -45,7 +45,7 @@
             />
         </select>
         <div v-if="totalPages>1" class='flex justify-between max-[640px]:w-full gap-[0.075rem] items-center'>
-            <button  class='PageInactive' :disabled="currentPage === 1 ? true : false" @click="()=>setPage(currentPage-1)"><-</button>
+            <button  class='PageInactive' :disabled="currentPage === 1 ? true : false" @click="()=>setPage(currentPage-1)"><font-awesome-icon icon="fa-solid fa-left-long "/></button>
             <button  :class="currentPage === 1 ? 'PageActive':'PageInactive'" @click="()=>setPage(1)">1</button>
             <button
                 v-for="num in visiblePages"
@@ -57,7 +57,7 @@
             </button>
 
             <button  :class="currentPage === totalPages ?'PageActive':'PageInactive'" @click="()=>setPage(totalPages)">{{totalPages}}</button>
-            <button  :disabled="currentPage === totalPages" class='PageInactive' @click="()=>setPage(totalPages)">-></button>
+            <button  :disabled="currentPage === totalPages" class='PageInactive' @click="()=>setPage(totalPages)"><font-awesome-icon icon="fa-solid fa-right-long "/></button>
         </div> 
       </div> 
 </template>
