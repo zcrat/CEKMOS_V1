@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref,onMounted } from 'vue';
+import { ref,onMounted,computed } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import BarNavegation from '@/components/Zcrat/BarNavegation.vue';
 import BarNavegation_Smartphone from '@/components/Zcrat/BarNavegation_Smartphone.vue';
 import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
-defineProps({
+
+const props = defineProps({
     title: String,
     loading: Boolean
 });
-
+const title=computed(() => props.title);
+const loading=computed(() => props.loading);
 const STORAGE_KEY:string = 'showingNavigationtop';
 const isSmOrLarger = ref(false)
 // Cargar valor inicial desde localStorage o usar true por defecto
@@ -53,7 +55,7 @@ onMounted(() => {
               <div class="flex flex-col sm:flex-row justify-start w-full mt-2 gap-2" v-if="$slots.filtering">
                 <slot name="filtering"/>
               </div>
-              <div class="w-full">
+              <div class="w-full flex-1 flex flex-col">
                 <Loanding v-if="loading" text="Cargando Usuarios"/>
                 <slot v-else name="content"/>
               </div>

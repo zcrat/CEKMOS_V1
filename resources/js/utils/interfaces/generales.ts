@@ -13,3 +13,13 @@ export interface presupuestos{
   creacion:string;
   estatus:string;
 }
+
+export interface paginationprops {
+    onSearch: (currentPage: number, perPage: number) => void
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    itemsPerPage: number;
+    clases?: string;
+    chnagesItems?:boolean;
+    }

@@ -4,7 +4,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 </script>
 
 <template>
-    <AppLayout title="Pagina Principal" description="Bienvenido al sistema CEKMOS">
+    <AppLayout title="Pagina Principal">
         <template #header>
         </template>
 

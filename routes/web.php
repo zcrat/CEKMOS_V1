@@ -30,6 +30,8 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('/employees',[EmpleadosController::class,'View'])->name('employees');
     Route::post('/employees/create',[EmpleadosController::class,'create'])->name('employees.create');
 
-    Route::get('cortana/vista/modulo',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
+    Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
+    Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('Cortana.Presupuesto.Items');
+
     Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');
 });

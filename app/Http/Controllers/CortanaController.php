@@ -11,24 +11,25 @@ use Inertia\Inertia;
 class CortanaController extends Controller
 {
     public function PresupuestosVista(Request $request){
-       $user=Auth::user()->load('modulos_orden');
+        return Inertia::render('Cortana/Presupuestos');
+    }
+    public function GetItems(Request $request){
+        $user=Auth::user()->load('modulos_orden');
+        $currentPage=$request->currentPage ?? 1;
+        $itemsPerPage=$request->itemsPerPage ?? 10;
+        $offset=($currentPage-1)*$itemsPerPage;
+        $modulosvisibles=$user->modulos_orden ? $user->modulos_orden->pluck('modulo_orden_id')->toarray(): [] ;
+        $query=Presupuestos::whereHas('orden_servicio', function ($query) use($modulosvisibles){
+            $query->whereIn('modulo_orden_id', $modulosvisibles);
+        });
+        //aplicar filtros
 
-    $modulosvisibles=$user->modulos_orden ? $user->modulos_orden->pluck('modulo_orden_id')->toarray(): [] ;
-    $presupuestos=Presupuestos::whereHas('orden_servicio', function ($query) use($modulosvisibles){
-        $query->whereIn('modulo_orden_id', $modulosvisibles);
-    })->take(10);
-    $totalitems=Presupuestos::whereHas('orden_servicio', function ($query) use($modulosvisibles){
-        $query->whereIn('modulo_orden_id', $modulosvisibles);
-    })->count();
+        $totalItems=(clone $query)->count();
+        $items=$query->skip($offset)->take($itemsPerPage);
 
-
-        return Inertia::render('Cortana/Presupuestos', [
-            'currentpage' => 1,
-            'perpage' => 10,
-            'totalpages' => ceil($totalitems/10),
-            'totalitems' => $totalitems,
-            'items' => $presupuestos,
-        ]);
-        return redirect()->route('dashboard');
+        $totalPages=ceil($totalItems/$itemsPerPage);
+        return response()->json(
+            compact('currentPage', 'itemsPerPage', 'totalPages', 'totalItems', 'items')
+        );
     }
 }
