@@ -23,3 +23,31 @@ export interface paginationprops {
     clases?: string;
     chnagesItems?:boolean;
     }
+export interface DatosPresupuestos {
+  observaciones: string,
+  descripcion_mo: string,
+  garantia: string,
+  folio: string,
+  vigencia: Date|null,
+  factura_id: number | null,
+  tipo_id: number | null,
+  estatus_id: number | null,
+}
+
+export interface DatosOrdenServicio {
+  orden_servicio: string,
+  orden_seguimiento: string,
+  modulo_orden_id: number | null,
+  vehiculo_id: number | null,
+  vehiculo_concepto_id: number | null,
+  user_id: number | null,
+  empresa_id: number | null,
+  cliente_id: number | null,
+  update_fotos: boolean | null,
+  diagnostico: Date | null,
+  indicaciones_cliente: string,
+  notas_mecanico: string,
+  notas_retraso: string,
+  telefono: string,
+  ubicacion: string,
+}

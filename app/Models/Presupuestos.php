@@ -20,7 +20,6 @@ class Presupuestos extends Model
         'factura_id',
         'tipo_id',
         'estatus_id',
-        'kilomentraje',
     ];
 
     // Relaciones

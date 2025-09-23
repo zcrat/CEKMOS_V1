@@ -22,7 +22,6 @@ return new class extends Migration
             $table->foreignId('factura_id')->constrained('facturas')->nullable();
             $table->foreignId('tipo_id')->constrained('tipos');
             $table->foreignId('estatus_id')->constrained('estatus');
-            $table->integer('kilomentraje');
             $table->timestamps();
             $table->softDeletes();
         });
