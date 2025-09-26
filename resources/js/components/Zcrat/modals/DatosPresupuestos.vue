@@ -9,7 +9,7 @@ import axios from 'axios'
 import { ref, watch ,reactive} from 'vue' 
 import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
 import type { DatosPresupuestos,DatosOrdenServicio } from '@/utils/interfaces/generales'
-
+import Combobox from '@/components/Zcrat/Elements/ZdCombobox.vue'
 
 const props = defineProps<{show: boolean}>()
 const emit = defineEmits(['update:show'])
@@ -50,10 +50,11 @@ const ordenservicio = reactive<DatosOrdenServicio>({ // Use reactive to make new
 <template>
   <BaseModal modaltitle="Presupuestos" :position="'center'" :modelValue="props.show" @update:modelValue="updateVisibility" >
     <div class="grid grid-cols-2 md:grid-cols-4 gap-2" >
-      <InputBasic id="ordenservicio" label="Orden De Servicio" type="text" v-model="ordenservicio.orden_servicio"/>
+      <Combobox endpoint="Combobox.Ordenes_Servicio" label="Orden De Servicio" id="OrdenServicio" v-model="ordenservicio.orden_servicio"  placeholder="Buscar o nueva"/>
       <InputBasic id="Folio" label="Folio" type="text" v-model="presupuesto.folio"/>
       <InputBasic id="ordenseguimiento" label="Orden De Seguimiento" type="text" v-model="ordenservicio.orden_seguimiento"/>
       <InputBasic id="ubicacion" label="Ubicacion" type="text" v-model="ordenservicio.ubicacion"/>
     </div>
   </BaseModal>
 </template>
+2
