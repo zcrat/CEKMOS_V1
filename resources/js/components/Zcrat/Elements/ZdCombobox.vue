@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref,defineModel, watch } from 'vue'
 import InputBasic from '../Inputs/form/InputBasic.vue'
 import axios from 'axios'
 
-const search = ref<string|null>('');
+const search = defineModel<string|null>()
 const isactive = ref<boolean>(false);
 const posibleitems = ref<string[]>([])
 const inputRef = ref<HTMLElement | null>(null)
@@ -47,7 +47,7 @@ watch(search, () => {
     
     <div class="relative">
       <InputBasic :id="props.id" ref="inputRef" :label="props.label" type="text" v-model="search" :OnFocus="()=>isactive=true" :OnBlur="()=>isactive=false" />
-      <div v-if="posibleitems.length > 0 && isactive" class="absolute bg-white border flex flex-col w-full " >
+      <div v-if="posibleitems.length > 0 && isactive" class="absolute bg-white border flex flex-col w-full z-10" >
         <button v-for="value in posibleitems" @mousedown.prevent="changesearch(value)" class="p-2 text-start">{{value}}</button>
       </div>
     </div>

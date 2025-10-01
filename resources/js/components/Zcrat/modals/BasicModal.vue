@@ -33,7 +33,7 @@
     <DialogOverlay class="fixed inset-0 bg-black/40" />
 
     <div class="fixed inset-0 flex items-center justify-center">
-      <DialogPanel class="max-w-screen w-full m-4 sm:w-auto p-6 bg-white rounded-xl shadow-xl">
+      <DialogPanel class="max-w-screen w-full m-4 sm:w-auto p-6 bg-white rounded-xl shadow-xl max-h-[90vh] overflow-auto">
         <DialogTitle v-if="modaltitle" :class="['text-lg font-semibold mb-2', classtitleposition]">{{modaltitle}}</DialogTitle>
         <slot />
         <div class="mt-4 flex justify-end gap-4">

@@ -7,6 +7,7 @@ use App\Http\Controllers\CortanaController;
 use App\Http\Controllers\EmpleadosController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\select2controller;
+use App\Http\Controllers\selectcontroller;
 use App\Http\Controllers\ComboboxController;
 Route::get('/', function () {
   return redirect('/login');
@@ -35,6 +36,8 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('Cortana.Presupuesto.Items');
 
     Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');
+    
+    Route::get('select/niveles/combustible',[selectcontroller::class,'NivelesCombustible'])->name('select.niveles.combustible');
 
     Route::get('ComboBox/OrdenesServicio',[ComboboxController::class,'GetOrdenesServicio'])->name('Combobox.Ordenes_Servicio');
 });

@@ -2,6 +2,10 @@ export interface modulosorden{
   id:number;
   descripcion:string;
 }
+export interface option{
+  value:number|string;
+  label:string;
+}
 
 export interface presupuestos{
   id:number;
@@ -50,4 +54,11 @@ export interface DatosOrdenServicio {
   notas_retraso: string,
   telefono: string,
   ubicacion: string,
+}
+export interface DatosEntrada {
+  orden_servicio_id?:number,
+  fecha?: Date,
+  estimacion: Date,
+  kilometraje: number | null,
+  gasolina: string
 }

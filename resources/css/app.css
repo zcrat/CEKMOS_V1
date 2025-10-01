@@ -5,6 +5,9 @@
 [x-cloak] {
     display: none;
 }
+input{
+  @apply border-gray-500;
+}
 :root {
   --micolor: #176cb3;
   --btnprimary: #0479d8;
