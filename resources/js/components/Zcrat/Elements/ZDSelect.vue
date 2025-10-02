@@ -12,17 +12,15 @@ interface Option {
 const props = withDefaults(defineProps<{
   id:string
   endpoint: string
-  type: string
   default_option?: Option
-  modelValue: Option | null
   placeholder?:string
+  label?: string
 }>(), {
   placeholder:'Buscar...'
 })
-
+const optionselect = defineModel<string | number |null>()
 const options = ref<Option[]>([])
 const loading = ref(false)
-const optionselect = ref<Option | null>(props.default_option ?? null)
 const query = ref('')
 const isOpen = ref(false)
 
@@ -49,15 +47,6 @@ const onFocus = () => {
   query.value = ''
   GetOptions()
 }
-
-const emit = defineEmits(['update:modelValue'])
-
-watch(optionselect, (val) => {
-  emit('update:modelValue', val)
-})
-
-watch(() => props.modelValue, (val) => { optionselect.value = val }, { immediate: true })
-
 const selectOption = () => {
   const input = document.querySelector('#'+props.id) as HTMLInputElement
   input?.blur()
@@ -65,10 +54,12 @@ const selectOption = () => {
 </script>
 
 <template>
-  <Combobox v-model="optionselect">
-    <div class="relative">
-      <div>
-        <ComboboxInput
+  <div class="flex flex-col w-full">
+    <label for="" v-if="props.label">{{ props.label }}</label>
+    <Combobox v-model="optionselect">
+      <div class="relative">
+        <div>
+          <ComboboxInput
           class="w-full ps-2 pr-6 truncate rounded border-2 ComboboxInput"
           :id="id"
           @change="query = $event.target.value"
@@ -76,7 +67,7 @@ const selectOption = () => {
           @focus="onFocus"
           @blur="isOpen = false"
           :displayValue="(option: unknown) => (option as Option | null)?.label ?? ''"
-        />
+          />
         <button
           v-if="optionselect"
           type="button"
@@ -89,23 +80,23 @@ const selectOption = () => {
       <ComboboxOptions v-show="isOpen" static class="absolute border-2 border-gray-500 w-full bg-white p-2 z-50">
         <div v-if="options.length === 0">Sin Resultados</div>
         <ComboboxOption
-          v-for="option in options"
+        v-for="option in options"
           :key="option.value"
-          :value="option"
+          :value="option.value"
           @click="selectOption()"
-          :disabled="option.value === optionselect?.value"
+          :disabled="option.value === optionselect"
           v-slot="{ selected, active }"
           as="template"
         >
           <li
-            class="relative cursor-default select-none py-2 pl-10 pr-4"
+          class="relative cursor-default select-none py-2 pl-10 pr-4"
             :class="{ 'bg-teal-600 text-white': active, 'text-gray-900': !active }"
           >
             <span :class="{ 'font-medium': selected, 'font-normal': !selected }" class="block truncate">
               {{ option.label }}
             </span>
             <span
-              v-if="option.value === optionselect?.value"
+              v-if="option.value === optionselect"
               class="absolute inset-y-0 left-0 flex items-center pl-3"
               :class="{ 'text-white': active, 'text-teal-600': !active }"
             >
@@ -116,4 +107,5 @@ const selectOption = () => {
       </ComboboxOptions>
     </div>
   </Combobox>
+  </div>
 </template>

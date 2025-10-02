@@ -6,7 +6,7 @@ const props = defineProps<{
   canempty?:boolean
   options:option[]
 }>()
-const selected = defineModel<string|number|null>();
+const selected = defineModel<string|number>();
 </script>
 <template>
     

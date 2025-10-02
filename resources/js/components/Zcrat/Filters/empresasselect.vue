@@ -5,7 +5,7 @@ interface option {
     value: number | string
     label: string
 }
-const empresa =ref<option | null>(null)
+const empresa =ref<string| null>(null)
 </script>
 <template>
     <div class="min-w-[10rem] w-auto">

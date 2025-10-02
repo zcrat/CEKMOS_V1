@@ -69,6 +69,6 @@ protected $dateFormat = 'Y-m-d H:i:s.v'; // Formato compatible con SQL Server
     }
     public function modulos_orden()
     {
-        return $this->hasMany(ModulosPerUser::class, 'user_id');
+        return $this->hasMany(ModulosPerUser::class, 'user_id','id');
     }
 }

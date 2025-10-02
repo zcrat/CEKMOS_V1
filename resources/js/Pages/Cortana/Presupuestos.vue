@@ -14,7 +14,7 @@ import { modulosorden,presupuestos} from '@/utils/interfaces/generales';
 import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import axios from 'axios'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
-import DatosPresupuestos from '@/components/Zcrat/modals/DatosPresupuestos.vue';
+import Nuevo from '@/components/Zcrat/modals/CreatePresupuesto.vue';
 
 const currentPage=ref<number>(1)
 const itemsPerPage=ref<number>(10)
@@ -26,7 +26,7 @@ const prefacturasactive = false;
 const loading = ref<boolean>(false);
 const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
 const Listado  = ref<modulosorden[]>([{id:1,descripcion:'CFE 2025 MORELIA GASOLINA'},{id:2,descripcion:'CFE 2025 MORELIA DiSEL'},{id:2,descripcion:'CFE 2025 BAJIO DiSEL'}])
-const ShowDatosPresupuestos = ref<boolean>(false)
+const ShowNuevo = ref<boolean>(false)
 const SearchData=async (currentPage:number,itemsPerPage:number)=>{
     try {
         loading.value=true;
@@ -50,7 +50,7 @@ SearchData(currentPage.value,itemsPerPage.value);
     <AppLayout title="Presupuestos" :loading="loading">
         <template #header>
                 <Button text="Exportar" />
-                <Button text="Nueva" @click="ShowDatosPresupuestos=true"  />
+                <Button text="Nueva" @click="ShowNuevo=true"  />
                 <Button text="Prefacturas" :classname="prefacturasactive?'bg-red-700' : 'bg-blue-700'"/>
         </template>
         <template #filtering>
@@ -113,5 +113,5 @@ SearchData(currentPage.value,itemsPerPage.value);
             </div>
         </template>
     </AppLayout>
-    <DatosPresupuestos v-model:show="ShowDatosPresupuestos" />
+    <Nuevo v-model:show="ShowNuevo" />
 </template>

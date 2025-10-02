@@ -62,3 +62,50 @@ export interface DatosEntrada {
   kilometraje: number | null,
   gasolina: string
 }
+export interface Vehiculo {
+  id?:number,
+  placas:string,
+  año:number|null,
+  economico:string,
+  vin:string,
+  tipo_id:number|null,
+  color_id:number|null,
+  modelo_id:number|null
+}
+export interface ResponsablesNombres {
+  administrador: string,
+  jefe: string,
+  trabajador: string,
+  tecnico: string,
+}
+export interface NuevoPresupuesto {
+  orden_servicio: string,
+  folio: string,
+  orden_seguimiento: string,
+  ubicacion: string,
+  telefono: number | null,
+  empresa_id: number|null,
+  cliente_id:number|null,
+  gasolina: number | string,
+  kilometraje: number | null,
+  estimacion: Date,
+  administrador: string,
+  jefe: string,
+  trabajador: string,
+  tecnico: string,
+  descripcion_mo: string,
+  indicaciones_cliente: string,
+  garantia: string,
+  observaciones: string,//tiempo de entrega
+  tipo_id: 1|2|3//correctivo, preventivo,ambos
+  vehiculo_concepto_id: number| null,
+  economico: string,
+  placas: string,
+  vin: string,
+  marca: string,
+  modelo: string,
+  año: number|null,
+  modulo_orden: number|string,
+  //datos posibles
+  vigencia: Date|null,
+ }
