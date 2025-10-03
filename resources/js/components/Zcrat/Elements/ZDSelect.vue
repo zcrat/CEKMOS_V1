@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/vue'
 import { CheckIcon } from '@heroicons/vue/20/solid'
 import axios from 'axios'
-
+import { useDebounceFn } from '@vueuse/core'
 interface Option {
   value: number | string
   label: string
@@ -12,45 +12,86 @@ interface Option {
 const props = withDefaults(defineProps<{
   id:string
   endpoint: string
-  default_option?: Option
+  new_option?: Option | null
   placeholder?:string
   label?: string
+  timeout?: number
 }>(), {
+  timeout: 400,
   placeholder:'Buscar...'
 })
-const optionselect = defineModel<string | number |null>()
+const selected = defineModel<string | number |null>()
 const options = ref<Option[]>([])
+const optionselect = ref<Option | null>(null)
 const loading = ref(false)
 const query = ref('')
 const isOpen = ref(false)
 
+let controller: AbortController | null = null
+
 const GetOptions = async () => {
   try {
+    // Cancelar solicitud anterior si existe
+    if (controller) controller.abort()
+    controller = new AbortController()
+
     loading.value = true
-    const response = await axios.get(route(props.endpoint), { params: { query: query.value } })
+    const response = await axios.get(route(props.endpoint), { 
+      params: { query: query.value },
+      signal: controller.signal  // <-- pasar el signal al fetch
+    })
     options.value = response.data.options
   } catch (error: any) {
+    if (error.name === 'CanceledError') return  // solicitud cancelada
     console.error(error)
   } finally {
     loading.value = false
   }
 }
 
-let timeout: ReturnType<typeof setTimeout>
-watch(query, () => {
-  clearTimeout(timeout)
-  timeout = setTimeout(() => { GetOptions() }, 400)
-})
+const debouncedGetOptions = useDebounceFn(GetOptions, props.timeout)
+
+watch(query, debouncedGetOptions)
 
 const onFocus = () => {
   isOpen.value = true
-  query.value = ''
+  //query.value = '' opcional para resetear la busqueda al enfocar
   GetOptions()
 }
 const selectOption = () => {
   const input = document.querySelector('#'+props.id) as HTMLInputElement
   input?.blur()
 }
+watch(() => props.new_option, (val) => {
+  if(val != undefined){
+    if (!options.value.find(o => o.value === val.value) && val != null) {
+      options.value.push(val)
+    }
+    optionselect.value = val;
+  }
+}, { immediate: true })
+
+watch(optionselect, (val) => {
+  selected.value = val ? val.value : null
+})
+
+watch(selected, (val) => {
+  if (val == null || val === undefined) {
+    optionselect.value = null
+  } else {
+    if (!options.value.find(o => o.value === val)) {
+        
+    }
+    const found = options.value.find(o => o.value === val)
+    if (found) {
+      optionselect.value = found
+    } else {
+      const tempOption = { value: val, label: String(val) }
+      options.value.push(tempOption)
+      optionselect.value = tempOption
+    }
+  }
+})
 </script>
 
 <template>
@@ -77,32 +118,22 @@ const selectOption = () => {
           ✕
         </button>
       </div>
-      <ComboboxOptions v-show="isOpen" static class="absolute border-2 border-gray-500 w-full bg-white p-2 z-50">
-        <div v-if="options.length === 0">Sin Resultados</div>
+      <ComboboxOptions v-show="isOpen" static class="absolute border-2 border-gray-500 w-full rounded-md bg-white z-50">
+        <div v-if="options.length === 0 && !loading">Sin Resultados</div>
+        <div v-if="options.length === 0 && loading">Cargando...</div>
         <ComboboxOption
-        v-for="option in options"
+          v-for="option in options"
           :key="option.value"
-          :value="option.value"
+          :value="option"
           @click="selectOption()"
-          :disabled="option.value === optionselect"
-          v-slot="{ selected, active }"
+          
+          v-slot="{ active }"
           as="template"
         >
-          <li
-          class="relative cursor-default select-none py-2 pl-10 pr-4"
-            :class="{ 'bg-teal-600 text-white': active, 'text-gray-900': !active }"
-          >
-            <span :class="{ 'font-medium': selected, 'font-normal': !selected }" class="block truncate">
-              {{ option.label }}
-            </span>
-            <span
-              v-if="option.value === optionselect"
-              class="absolute inset-y-0 left-0 flex items-center pl-3"
-              :class="{ 'text-white': active, 'text-teal-600': !active }"
-            >
-              <CheckIcon class="h-5 w-5" aria-hidden="true" />
-            </span>
-          </li>
+          <div :class="['px-4 py-2 rounded-sm ', active && option.value != optionselect?.value ? 'bg-blue-500 text-white hover:cursor-pointer' : 'text-gray-700' , option.value === optionselect?.value ? 'font-semibold bg-green-200 hover:cursor-default' : 'font-normal']">
+            {{ option.label }}
+          </div>
+
         </ComboboxOption>
       </ComboboxOptions>
     </div>

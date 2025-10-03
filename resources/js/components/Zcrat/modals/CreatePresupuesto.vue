@@ -76,7 +76,9 @@ const presupuesto = reactive<NuevoPresupuesto>({
   modulo_orden:''
 })
 
-
+watch(() => presupuesto, (newVal) => {
+  console.log('Presupuesto changed:', newVal);
+}, { deep: true } );
 
 function sumarDiasSinDomingo(fecha: Date, dias: number): Date {
   const resultado = new Date(fecha);
@@ -105,9 +107,9 @@ function sumarDiasSinDomingo(fecha: Date, dias: number): Date {
       <Datapicker label="Fecha Estimada" v-model="presupuesto.estimacion" :clearable="false" :time="true" :range="false" class="w-full"/>
       <InputBasic id="kilometraje" label="Kilometraje" type="number" v-model="presupuesto.kilometraje" placeholder="ej. 392.31"/>
       <Select id="gasolina" :canempty="true" v-model="presupuesto.gasolina" label="Gasolina" :options="optionsgasolima"></Select>
-      <Select label="Tipo De Presupuesto"  v-model="presupuesto.tipo_id" id="presupuestocliente"  :options="optionstipos"></Select>
-      <Select2 label="Vehiculo De Los Conceptos" endpoint="Select2.Empresas" v-model="presupuesto.vehiculo_concepto_id" id="presupuestocliente" placeholder="Buscar Cliente" />
-      <Select2 label="Empresa" endpoint="Select2.Empresas" v-model="presupuesto.empresa_id" id="presupuestoempresa" placeholder="Buscar Empresas"/>
+      <Select label="Tipo De Presupuesto"  v-model="presupuesto.tipo_id" id="presupuestotipo"  :options="optionstipos"></Select>
+      <Select2 label="Vehiculo De Los Conceptos" endpoint="Select2.Empresas" v-model="presupuesto.vehiculo_concepto_id" id="presupuestovehiculoconcepto" placeholder="Buscar Cliente" />
+      <Select2 label="Empresa" id="presupuestoempresa" endpoint="Select2.Empresas" v-model="presupuesto.empresa_id" placeholder="Buscar Empresas"/>
       <Select2 label="Cliente" endpoint="Select2.Empresas" v-model="presupuesto.cliente_id" id="presupuestocliente" placeholder="Buscar Cliente"/>
       <Select label="Modulo Orden"  v-model="presupuesto.modulo_orden" id="modulooreden" :canempty="true" :options="modulosdisponibles"></Select>
     </div>
