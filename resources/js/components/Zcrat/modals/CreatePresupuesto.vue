@@ -110,7 +110,7 @@ function sumarDiasSinDomingo(fecha: Date, dias: number): Date {
       <Select label="Tipo De Presupuesto"  v-model="presupuesto.tipo_id" id="presupuestotipo"  :options="optionstipos"></Select>
       <Select2 label="Vehiculo De Los Conceptos" endpoint="Select2.Empresas" v-model="presupuesto.vehiculo_concepto_id" id="presupuestovehiculoconcepto" placeholder="Buscar Cliente" />
       <Select2 label="Empresa" id="presupuestoempresa" endpoint="Select2.Empresas" v-model="presupuesto.empresa_id" placeholder="Buscar Empresas"/>
-      <Select2 label="Cliente" endpoint="Select2.Empresas" v-model="presupuesto.cliente_id" id="presupuestocliente" placeholder="Buscar Cliente"/>
+      <Select2 label="Cliente" endpoint="Select2.Empresas" v-model="presupuesto.cliente_id" id="presupuestoempresa" placeholder="Buscar Cliente"/>
       <Select label="Modulo Orden"  v-model="presupuesto.modulo_orden" id="modulooreden" :canempty="true" :options="modulosdisponibles"></Select>
     </div>
     <Subtitle>Empleados Encargados</Subtitle>

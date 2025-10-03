@@ -26,7 +26,7 @@ const optionselect = ref<Option | null>(null)
 const loading = ref(false)
 const query = ref('')
 const isOpen = ref(false)
-
+const thisid=props.id+Date.now()
 let controller: AbortController | null = null
 
 const GetOptions = async () => {
@@ -59,7 +59,7 @@ const onFocus = () => {
   GetOptions()
 }
 const selectOption = () => {
-  const input = document.querySelector('#'+props.id) as HTMLInputElement
+  const input = document.querySelector('#'+thisid) as HTMLInputElement
   input?.blur()
 }
 watch(() => props.new_option, (val) => {
@@ -102,7 +102,7 @@ watch(selected, (val) => {
         <div>
           <ComboboxInput
           class="w-full ps-2 pr-6 truncate rounded border-2 ComboboxInput"
-          :id="id"
+          :id="thisid"
           @change="query = $event.target.value"
           :placeholder="placeholder"
           @focus="onFocus"
