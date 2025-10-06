@@ -27,7 +27,7 @@ class Tipos extends Model
     }
     public function rutas_archivo()
     {
-        return $this->hasOne(RutasTiposArchivo::class, 'tipo_id');
+        return $this->hasMany(RutasTiposArchivo::class, 'tipo_id');
     }
     public function archivos_orden_servicio()
     {
@@ -35,5 +35,8 @@ class Tipos extends Model
     }
     public function presupuestos(){
         return $this->hasMany(Presupuestos::class,'tipo_id');
+    }
+    public function usuarios_taller(){
+        return $this->hasMany(UsuariosTaller::class,'tipo_id');
     }
 }

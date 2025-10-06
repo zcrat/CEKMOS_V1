@@ -13,6 +13,7 @@ const props = withDefaults(defineProps<{
   placeholder?: string
   label?: string
   timeout?: number
+  OnBlur?: () => void
 }>(), {
   timeout: 500,
   placeholder: 'Buscar...'
@@ -48,7 +49,7 @@ watch(search, () => {
 <template>
     
     <div class="relative">
-      <InputBasic :id="props.id" ref="inputRef" :label="props.label" type="text" v-model="search" :OnFocus="()=>isactive=true" :OnBlur="()=>isactive=false"  :placeholder="props.placeholder"/>
+      <InputBasic :id="props.id" ref="inputRef" :label="props.label" type="text" v-model="search" :OnFocus="()=>isactive=true" :OnBlur="()=>{isactive=false; props.OnBlur?.()}"  :placeholder="props.placeholder"/>
       <div v-if="posibleitems.length > 0 && isactive" class="absolute bg-white border flex flex-col w-full z-10" >
         <button v-for="value in posibleitems" @mousedown.prevent="changesearch(value)" class="p-2 text-start">{{value}}</button>
       </div>

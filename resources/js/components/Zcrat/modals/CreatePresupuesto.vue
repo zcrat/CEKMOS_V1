@@ -7,14 +7,14 @@ import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
 import ButtonTogglePYR from '@/components/Zcrat/Inputs/ButtonTogglePYR.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
 import axios from 'axios'
-import { ref, watch ,reactive, onMounted} from 'vue' 
+import { ref, watch ,reactive, onMounted, watchEffect} from 'vue' 
 import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
-import {type NuevoPresupuesto, type option } from '@/utils/interfaces/generales'
+import {type NuevoPresupuesto, type option,type Vehiculo } from '@/utils/interfaces/generales'
 import Combobox from '@/components/Zcrat/Elements/ZdCombobox.vue'
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
 import Select from '@/components/Zcrat/Elements/Select.vue';
 import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
-
+import debounce from 'lodash/debounce';
 const props = defineProps<{show: boolean}>()
 const emit = defineEmits(['update:show'])
 const optionstipos=ref<option[]>([{value:1,label:'Correctivo'},{value:2,label:'Preventivo'},{value:3,label:'Ambos'}])
@@ -45,6 +45,23 @@ const GetModulosDisponibles = async () => {
     console.error(error)
   } 
 }
+
+
+
+const sumarDiasSinDomingo=(fecha: Date, dias: number): Date=> {
+  const resultado = new Date(fecha);
+  let diasSumados = 0;
+
+  while (diasSumados < dias) {
+    resultado.setDate(resultado.getDate() + 1);
+    if (resultado.getDay() !== 0) {
+      diasSumados++;
+    }
+  }
+
+  return resultado;
+}
+
 const presupuesto = reactive<NuevoPresupuesto>({
   orden_servicio: '',
   folio: '',
@@ -74,24 +91,37 @@ const presupuesto = reactive<NuevoPresupuesto>({
   año: null,
   vigencia: null,
   modulo_orden:''
-})
+});
 
-
-
-function sumarDiasSinDomingo(fecha: Date, dias: number): Date {
-  const resultado = new Date(fecha);
-  let diasSumados = 0;
-
-  while (diasSumados < dias) {
-    resultado.setDate(resultado.getDate() + 1);
-    if (resultado.getDay() !== 0) {
-      diasSumados++;
+const GetDatosVehiculo = async (filter:string,value:string) => {
+  try {
+    const Vehiculo:Vehiculo|null = await axios.get(route('Vehiculo.Get.Datos'),{params:{filter,value}})
+    if(Vehiculo){
+      presupuesto.economico=Vehiculo.economico;
+      presupuesto.placas=Vehiculo.placas;
+      presupuesto.vin=Vehiculo.vin;
+      presupuesto.marca=Vehiculo.marca??'';
+      presupuesto.modelo=Vehiculo.modelo??'';
+      presupuesto.año=Vehiculo.año;
     }
-  }
-
-  return resultado;
+  } catch (error: any) {
+    console.error(error)
+  } 
 }
+const debouncedGetDatosVehiculo = debounce(GetDatosVehiculo, 500);
 
+watch(() => presupuesto.economico, (nuevoEconomico, anteriorEconomico) => {
+  console.log('Economico changed:', nuevoEconomico);
+  if (nuevoEconomico && nuevoEconomico !== anteriorEconomico) {
+    debouncedGetDatosVehiculo('economico', nuevoEconomico);
+  }
+});
+
+watch(() => presupuesto.placas, (nuevasPlacas, anterioresPlacas) => {
+  if (nuevasPlacas && nuevasPlacas !== anterioresPlacas) {
+    debouncedGetDatosVehiculo('placas', nuevasPlacas);
+  }
+});
 </script>
 
 <template>
@@ -101,7 +131,7 @@ function sumarDiasSinDomingo(fecha: Date, dias: number): Date {
       <Combobox endpoint="Combobox.Ordenes_Servicio" label="Orden De Servicio" id="ordenservicio" v-model="presupuesto.orden_servicio"  placeholder="Buscar, Crear o Automatica"/>
       <InputBasic id="folio" label="folio" type="text" v-model="presupuesto.folio" placeholder="Automatico O Ingresar"/>
       <InputBasic id="ordenseguimiento" label="Orden De Seguimiento" type="text" v-model="presupuesto.orden_seguimiento" placeholder="Automatico O Ingresar"/>
-      <Combobox id="ubicacion" label="Ubicacion" v-model="presupuesto.ubicacion" endpoint="Combobox.Ordenes_Servicio" placeholder="Buscar o Crear"/>
+      <Combobox id="ubicacion" label="Ubicacion" v-model="presupuesto.ubicacion" endpoint="Combobox.ubicaciones" placeholder="Buscar o Crear"/>
       <Datapicker label="Fecha Estimada" v-model="presupuesto.estimacion" :clearable="false" :time="true" :range="false" class="w-full"/>
       <InputBasic id="kilometraje" label="Kilometraje" type="number" v-model="presupuesto.kilometraje" placeholder="ej. 392.31"/>
       <Select id="gasolina" :canempty="true" v-model="presupuesto.gasolina" label="Gasolina" :options="optionsgasolima"></Select>
@@ -113,10 +143,10 @@ function sumarDiasSinDomingo(fecha: Date, dias: number): Date {
     </div>
     <Subtitle>Empleados Encargados</Subtitle>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2" >
-      <Combobox endpoint="Combobox.Ordenes_Servicio" label="Administrador de Trasportes" id="administradortrasporte" v-model="presupuesto.administrador"  placeholder="Buscar o Crear "/>
-      <Combobox endpoint="Combobox.Ordenes_Servicio" label="Jefe De Procesos" id="jefeproceso" v-model="presupuesto.jefe"  placeholder="Buscar o Crear"/>
-      <Combobox endpoint="Combobox.Ordenes_Servicio" label="Trabajador" id="trabajador" v-model="presupuesto.trabajador"  placeholder="Buscar o Crear"/>
-      <Combobox endpoint="Combobox.Ordenes_Servicio" label="Tecnico" id="tecnico" v-model="presupuesto.tecnico"  placeholder="Buscar o Crear"/>
+      <Combobox endpoint="Combobox.Administradores_Trasporte" label="Administrador de Trasportes" id="administradortrasporte" v-model="presupuesto.administrador"  placeholder="Buscar o Crear "/>
+      <Combobox endpoint="Combobox.Jefes_Procesos" label="Jefe De Procesos" id="jefeproceso" v-model="presupuesto.jefe"  placeholder="Buscar o Crear"/>
+      <Combobox endpoint="Combobox.Trabajadores" label="Trabajador" id="trabajador" v-model="presupuesto.trabajador"  placeholder="Buscar o Crear"/>
+      <Combobox endpoint="Combobox.Tecnicos" label="Tecnico" id="tecnico" v-model="presupuesto.tecnico"  placeholder="Buscar o Crear"/>
     </div>
     <Subtitle>Notas</Subtitle>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2" >
@@ -127,8 +157,8 @@ function sumarDiasSinDomingo(fecha: Date, dias: number): Date {
     </div>
     <Subtitle>Datos Vehiculo</Subtitle>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-      <Combobox endpoint="Combobox.Ordenes_Servicio" label="Economico" id="economico" v-model="presupuesto.economico"  placeholder="Buscar o Crear Economico" :timeout="1"/>
-      <Combobox endpoint="Combobox.Ordenes_Servicio" label="Placas" id="placas" v-model="presupuesto.placas"  placeholder="Buscar o Crear PLacas"/>
+      <Combobox endpoint="Combobox.Vehiculo.Economico" label="Economico" id="economico" v-model="presupuesto.economico"  placeholder="Buscar o Crear Economico" :timeout="1"/>
+      <Combobox endpoint="Combobox.Vehiculo.Placas" label="Placas" id="placas" v-model="presupuesto.placas"  placeholder="Buscar o Crear PLacas"/>
       <InputBasic id="Vin" label="Vin" type="text" v-model="presupuesto.vin" placeholder="Ej.JJSOE18P388988750 "/>
       <InputBasic id="Año" label="Año" type="number" v-model="presupuesto.año"  placeholder="ej. 2024"/>
       <InputBasic id="Marca" label="Marcas" type="text" v-model="presupuesto.marca" classname="uppercase" placeholder="ej. AUDI"/>

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('placas'); 
             $table->year('año'); 
-            $table->string('economomico'); 
+            $table->string('economico'); 
             $table->string('vin'); 
             $table->foreignId('tipo_id')->constrained('tipos');
             $table->foreignId('color_id')->constrained('colores');

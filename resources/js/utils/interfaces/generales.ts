@@ -71,6 +71,8 @@ export interface Vehiculo {
   tipo_id:number|null,
   color_id:number|null,
   modelo_id:number|null
+  marca?:string,
+  modelo?:string,
 }
 export interface ResponsablesNombres {
   administrador: string,
