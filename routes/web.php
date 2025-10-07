@@ -43,7 +43,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
 
     Route::get('ComboBox/OrdenesServicio',[ComboboxController::class,'GetOrdenesServicio'])->name('Combobox.Ordenes_Servicio');
     Route::get('ComboBox/Ubicacion',[ComboboxController::class,'GetUbicaciones'])->name('Combobox.Ubicaciones');
-    Route::get('ComboBox/AdministradoresTrasporte',[ComboboxController::class,'GetAdministradoresTrasporte'])->name('Combobox.Ad ministradores_Trasporte');
+    Route::get('ComboBox/AdministradoresTrasporte',[ComboboxController::class,'GetAdministradoresTrasporte'])->name('Combobox.Administradores_Trasporte');
     Route::get('ComboBox/JefesProceso',[ComboboxController::class,'GetJefesProceso'])->name('Combobox.Jefes_Procesos');
     Route::get('ComboBox/Trabajadores',[ComboboxController::class,'GetTrabajadores'])->name('Combobox.Trabajadores');
     Route::get('ComboBox/Tecnicos',[ComboboxController::class,'GetTecnicos'])->name('Combobox.Tecnicos');

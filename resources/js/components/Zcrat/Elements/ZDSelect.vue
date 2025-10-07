@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/vue'
-import { CheckIcon } from '@heroicons/vue/20/solid'
 import axios from 'axios'
 import { useDebounceFn } from '@vueuse/core'
-interface Option {
-  value: number | string
-  label: string
-}
+import { type option } from '@/utils/interfaces/generales'
 
 const props = withDefaults(defineProps<{
   id:string
   endpoint: string
-  new_option?: Option | null
+  new_option?: option | null
   placeholder?:string
   label?: string
   timeout?: number
@@ -21,8 +17,8 @@ const props = withDefaults(defineProps<{
   placeholder:'Buscar...'
 })
 const selected = defineModel<string | number |null>()
-const options = ref<Option[]>([])
-const optionselect = ref<Option | null>(null)
+const options = ref<option[]>([])
+const optionselect = ref<option | null>(null)
 const loading = ref(false)
 const query = ref('')
 const isOpen = ref(false)
@@ -107,7 +103,7 @@ watch(selected, (val) => {
           :placeholder="placeholder"
           @focus="onFocus"
           @blur="isOpen = false"
-          :displayValue="(option: unknown) => (option as Option | null)?.label ?? ''"
+          :displayValue="(option: unknown) => (option as option | null)?.label ?? ''"
           />
         <button
           v-if="optionselect"

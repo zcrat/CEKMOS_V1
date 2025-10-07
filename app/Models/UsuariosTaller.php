@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class UsuariosTaller extends Model
 {
     use SoftDeletes;
-    protected $table = 'usuarios_tallers';
+    protected $table = 'usuarios_taller';
 
     protected $fillable = [
         'nombre',

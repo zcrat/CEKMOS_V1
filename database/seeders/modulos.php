@@ -107,22 +107,22 @@ class modulos extends Seeder
         }
         
         $asignaciones = [
-            ['modulo_id' => 1, 'zona_id' => 2,  'contrato_id' => 11, 'descripcion' => 'Asignación #1',  'clave' => 'MOR',  'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 2,  'contrato_id' => 2,  'descripcion' => 'Asignación #2',  'clave' => 'MOR',   'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 3,  'contrato_id' => 10, 'descripcion' => 'Asignación #3',  'clave' => 'JIQ', 'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 3,  'contrato_id' => 3,  'descripcion' => 'Asignación #4',  'clave' => 'JIQ',  'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 4,  'contrato_id' => 4,  'descripcion' => 'Asignación #6',  'clave' => 'ZAC',  'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 5,  'contrato_id' => 12, 'descripcion' => 'Asignación #7',  'clave' => 'BAJ', 'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 5,  'contrato_id' => 5,  'descripcion' => 'Asignación #8',  'clave' => 'BAJ',  'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 6,  'contrato_id' => 7,  'descripcion' => 'Asignación #9',  'clave' => 'DIV',  'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 9,  'contrato_id' => 9,  'descripcion' => 'Asignación #10', 'clave' => 'APAT',  'año' => 2025],
-            ['modulo_id' => 2, 'zona_id' => 11, 'contrato_id' => 8,  'descripcion' => 'Asignación #11', 'clave' => 'CFB', 'año' => 2025],
-            ['modulo_id' => 2, 'zona_id' => 12, 'contrato_id' => 8,  'descripcion' => 'Asignación #12', 'clave' => 'CFOR', 'año' => 2025],
-            ['modulo_id' => 2, 'zona_id' => 13, 'contrato_id' => 8,  'descripcion' => 'Asignación #13', 'clave' => 'PG', 'año' => 2025],
-            ['modulo_id' => 3, 'zona_id' => 11, 'contrato_id' => 8,  'descripcion' => 'Asignación #14', 'clave' => 'ECO', 'año' => 2025],
-            ['modulo_id' => 3, 'zona_id' => 12, 'contrato_id' => 8,  'descripcion' => 'Asignación #15', 'clave' => 'EFOR', 'año' => 2025],
-            ['modulo_id' => 3, 'zona_id' => 14, 'contrato_id' => 8,  'descripcion' => 'Asignación #16', 'clave' => 'EDEN', 'año' => 2025],
-            ['modulo_id' => 3, 'zona_id' => 10, 'contrato_id' => 8,  'descripcion' => 'Asignación #17', 'clave' => 'ALT', 'año' => 2025],
+            ['modulo_id' => 1, 'zona_id' => 5,  'contrato_id' => 12, 'descripcion' => 'CFE BAJIO DIESEL',  'clave' => 'BAJ', 'año' => 2025],    
+            ['modulo_id' => 1, 'zona_id' => 5,  'contrato_id' => 5,  'descripcion' => 'CFE BAJIO GASOLINA',  'clave' => 'BAJ',  'año' => 2025],
+            ['modulo_id' => 1, 'zona_id' => 2,  'contrato_id' => 11, 'descripcion' => 'CFE MORELIA DIESEL',  'clave' => 'MOR',  'año' => 2025],
+            ['modulo_id' => 1, 'zona_id' => 2,  'contrato_id' => 2,  'descripcion' => 'CFE MORELIA GASOLINA',  'clave' => 'MOR',   'año' => 2025],
+            ['modulo_id' => 1, 'zona_id' => 6,  'contrato_id' => 7,  'descripcion' => 'CFE DIVISIONALES GASOLINA',  'clave' => 'DIV',  'año' => 2025],
+            ['modulo_id' => 1, 'zona_id' => 4,  'contrato_id' => 4,  'descripcion' => 'CFE ZACAPU GASOLINA',  'clave' => 'ZAC',  'año' => 2025],
+            ['modulo_id' => 1, 'zona_id' => 3,  'contrato_id' => 10, 'descripcion' => 'CFE JIQUILPAN DIESEL',  'clave' => 'JIQ', 'año' => 2025],
+            ['modulo_id' => 1, 'zona_id' => 3,  'contrato_id' => 3,  'descripcion' => 'CFE JIQUILPAN GASOLINA',  'clave' => 'JIQ',  'año' => 2025],
+            ['modulo_id' => 1, 'zona_id' => 9,  'contrato_id' => 9,  'descripcion' => 'CFE APATZINGAN DIESEL', 'clave' => 'APAT',  'año' => 2025],
+            ['modulo_id' => 2, 'zona_id' => 13, 'contrato_id' => 8,  'descripcion' => 'CFB GENERALES', 'clave' => 'PG', 'año' => 2025],
+            ['modulo_id' => 2, 'zona_id' => 11, 'contrato_id' => 8,  'descripcion' => 'CFB LOCALES', 'clave' => 'CFB', 'año' => 2025],
+            ['modulo_id' => 2, 'zona_id' => 12, 'contrato_id' => 8,  'descripcion' => 'CFB FORANEOS', 'clave' => 'CFOR', 'año' => 2025],
+            ['modulo_id' => 3, 'zona_id' => 10, 'contrato_id' => 8,  'descripcion' => 'ECO ALTOZANO', 'clave' => 'ALT', 'año' => 2025],
+            ['modulo_id' => 3, 'zona_id' => 14, 'contrato_id' => 8,  'descripcion' => 'ECO EDENRED', 'clave' => 'EDEN', 'año' => 2025],
+            ['modulo_id' => 3, 'zona_id' => 11, 'contrato_id' => 8,  'descripcion' => 'ECO LOCALES', 'clave' => 'ECO', 'año' => 2025],
+            ['modulo_id' => 3, 'zona_id' => 12, 'contrato_id' => 8,  'descripcion' => 'ECO FORANEOS', 'clave' => 'EFOR', 'año' => 2025],
         ];
         foreach ($asignaciones as $data) {
             ModuloOrdenesServicio::create($data);

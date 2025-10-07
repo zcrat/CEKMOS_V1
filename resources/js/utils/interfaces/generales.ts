@@ -7,6 +7,7 @@ export interface option{
   label:string;
 }
 
+
 export interface presupuestos{
   id:number;
   folio:string;
@@ -119,4 +120,10 @@ export interface NuevoPresupuesto {
   modulo_orden: number|string,
   //datos posibles
   vigencia: Date|null,
+ }
+ export interface datagetpresupuestos{
+    presupuesto: NuevoPresupuesto | null;
+    empresa: option;
+    cliente: option;
+    vehiculo_concepto: option;
  }
