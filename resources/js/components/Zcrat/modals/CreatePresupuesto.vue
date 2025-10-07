@@ -100,8 +100,8 @@ const GetDatosVehiculo = async (filter:string,value:string) => {
       presupuesto.economico=Vehiculo.economico;
       presupuesto.placas=Vehiculo.placas;
       presupuesto.vin=Vehiculo.vin;
-      presupuesto.marca=Vehiculo.marca??'';
-      presupuesto.modelo=Vehiculo.modelo??'';
+      presupuesto.marca=Vehiculo.modelo?.marca?.descripcion??'';
+      presupuesto.modelo=Vehiculo.modelo?.descripcion??'';
       presupuesto.año=Vehiculo.año;
     }
   } catch (error: any) {

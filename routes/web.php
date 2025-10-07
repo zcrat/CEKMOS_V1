@@ -9,6 +9,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\select2controller;
 use App\Http\Controllers\selectcontroller;
 use App\Http\Controllers\ComboboxController;
+use App\Http\Controllers\VehiculoController;
 Route::get('/', function () {
   return redirect('/login');
 
@@ -48,4 +49,6 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('ComboBox/Tecnicos',[ComboboxController::class,'GetTecnicos'])->name('Combobox.Tecnicos');
     Route::get('ComboBox/Vehiculo/Economico',[ComboboxController::class,'GetVehiculoEconomico'])->name('Combobox.Vehiculo.Economico');
     Route::get('ComboBox/Vehiculo/Placas',[ComboboxController::class,'GetVehiculoPlacas'])->name('Combobox.Vehiculo.Placas');
+
+    Route::get('vehiculo/get/datos',[VehiculoController::class,'GetDatos'])->name('Vehiculo.Get.Datos');
 });
