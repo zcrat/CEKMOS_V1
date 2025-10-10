@@ -80,8 +80,8 @@ const presupuesto = reactive<NuevoPresupuesto>({
   tecnico: '',
   descripcion_mo: '',
   indicaciones_cliente: '',
-  garantia:'',
-  observaciones: '',//tiempo de entrega
+  garantia:'LO ESTIPULADO EN EL CONTRATO',
+  observaciones: 'DE ACUERDO A LO DIFICIL DE LA FALLA PARA SU REPARACION',//tiempo de entrega
   tipo_id:3,//correctivo, preventivo,ambos
   vehiculo_concepto_id: null,
   economico: '',
@@ -120,13 +120,13 @@ const GetDatosVehiculo = async (filter:string,value:string) => {
     }
   } 
 }
-const GetDatosPresupuesto = async (orden:string) => {
+const GetDatosPresupuesto = async (orden_servicio:string) => {
   if (abortgetpresupuesto.value) {
     abortgetpresupuesto.value.abort();
   }
   abortgetpresupuesto.value = new AbortController();
   try {
-    const Presupuesto:datagetpresupuestos|null = await axios.get(route('Vehiculo.Get.Datos'),{params:{orden},signal: abortgetpresupuesto.value?.signal, })
+    const Presupuesto:datagetpresupuestos|null = await axios.get(route('Presupuesto.Get.Data_Orden'),{params:{orden_servicio},signal: abortgetpresupuesto.value?.signal, })
     if(Presupuesto){
       Object.assign(presupuesto, Presupuesto.presupuesto);
       empresa.value=Presupuesto.empresa;
@@ -164,7 +164,7 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
     classname:'bg-blue-600 text-white',
     onClick:()=>{},
     disabled:Object.entries(presupuesto)
-    .filter(([key]) => !['orden_servicio','folio','orden_seguimiento'].includes(key))
+    .filter(([key]) => !['orden_servicio','folio','orden_seguimiento','vigencia'].includes(key))
     .some(([_,value]) => value === null || value === '')}})
 
 </script>

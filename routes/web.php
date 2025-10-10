@@ -10,6 +10,7 @@ use App\Http\Controllers\select2controller;
 use App\Http\Controllers\selectcontroller;
 use App\Http\Controllers\ComboboxController;
 use App\Http\Controllers\VehiculoController;
+use App\Http\Controllers\presupuestosController;
 Route::get('/', function () {
   return redirect('/login');
 
@@ -51,4 +52,6 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('ComboBox/Vehiculo/Placas',[ComboboxController::class,'GetVehiculoPlacas'])->name('Combobox.Vehiculo.Placas');
 
     Route::get('vehiculo/get/datos',[VehiculoController::class,'GetDatos'])->name('Vehiculo.Get.Datos');
+
+    Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('Presupuesto.Get.Data_Orden');
 });
