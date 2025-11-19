@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import { Dialog, DialogPanel, DialogOverlay, DialogTitle } from '@headlessui/vue'
-    import {buttonconfirmed} from '@/utils/interfaces/modals'
+    import {buttonconfirmed} from '@/types/modals'
     import { computed } from 'vue'
 
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {option} from '@/utils/interfaces/generales'
+import {option} from '@/types/generales'
 const props = defineProps<{
   label?: string
   id: string

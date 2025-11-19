@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineProps } from 'vue'
-import { TitleColumn, Row } from '@/utils/interfaces/tablecomponent'
+import { TitleColumn, Row } from '@/types/tablecomponent'
 
 
 defineProps<{

@@ -3,7 +3,7 @@
 import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
 import Inputbasic from '@/components/Zcrat/Inputs/form/InputBasic.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
-import {buttonconfirmed} from '@/utils/interfaces/modals'
+import {buttonconfirmed} from '@/types/modals'
 import { reactive, computed, watchEffect } from 'vue' 
 
 interface NewEmployee {

@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/vue'
 import axios from 'axios'
 import { useDebounceFn } from '@vueuse/core'
-import { type option } from '@/utils/interfaces/generales'
+import { type option } from '@/types/generales'
 
 const props = withDefaults(defineProps<{
   id:string

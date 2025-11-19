@@ -6,7 +6,7 @@ import MyBasicToast from '@/utils/ToastNotificationBasic'
 import axios from 'axios'
 import { ref, watch } from 'vue' 
 import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
-import type { modulosorden } from '@/utils/interfaces/generales'
+import type { modulosorden } from '@/types/generales'
 
 
 const props = defineProps<{ show: boolean , id: number | null }>()

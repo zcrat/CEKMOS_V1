@@ -19,4 +19,6 @@ class VehiculoController extends Controller
         $vehiculo=Vehiculos::where($filtro,'LIKE','%'.$search.'%')->with('marca','modelo')->first();
         return response()->json($vehiculo);
     }
+
+    
 }

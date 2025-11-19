@@ -4,65 +4,37 @@
 import InputBasic from '../Inputs/form/InputBasic.vue'
 import Textarea from '../Inputs/form/Textarea.vue'
 import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
-import axios from 'axios'
+import Create from '@/services/presupuesto/create'
 import { ref, watch ,reactive, onMounted,computed} from 'vue' 
 import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
-import {type NuevoPresupuesto, type option,type Vehiculo, type datagetpresupuestos} from '@/utils/interfaces/generales'
-import {type buttonconfirmed} from '@/utils/interfaces/modals'
+import {type NuevoPresupuesto, type option,type Vehiculo, type datagetpresupuestos} from '@/types/generales'
+import {type buttonconfirmed} from '@/types/modals'
 import Combobox from '@/components/Zcrat/Elements/ZdCombobox.vue'
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
 import Select from '@/components/Zcrat/Elements/Select.vue';
 import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
 import debounce from 'lodash/debounce';
-
+import GetNivelesGasolina from '@/utils/functions/select2/NivelesGasolina';
+import GetModulosDisponibles  from '@/utils/functions/select2/ModulosCortana';
+import { sumarDiasSinDomingo } from '@/utils/functions/generales/fechas';
+import { useVehiculoFetcher } from '@/composables/useVehiculoFetchers';
+import { usePresupuestoFetcher } from '@/composables/usePresupuestoFetcher'
 const props = defineProps<{show: boolean}>()
 const emit = defineEmits(['update:show'])
-const optionstipos=ref<option[]>([{value:1,label:'Correctivo'},{value:2,label:'Preventivo'},{value:3,label:'Ambos'}])
+const optionstipos=ref<option[]>([{value:5,label:'Correctivo'},{value:6,label:'Preventivo'},{value:7,label:'Ambos'}])
 const optionsgasolima=ref<option[]>([])
 const empresa=ref<option|undefined>(undefined)
 const cliente=ref<option|undefined>(undefined)
 const vehiculoconcepto=ref<option|undefined>(undefined)
 const modulosdisponibles=ref<option[]>([])
+
 const updateVisibility = (val: boolean) => {
   emit('update:show', val)
 }
-const abortgetvehiculo=ref<AbortController|null>(null);
-const abortgetpresupuesto=ref<AbortController|null>(null);
-let cancelgetvehiculodata=false;
-onMounted(() => {
-  GetNivelesGasolina();
-  GetModulosDisponibles();
+onMounted(async () => {
+ optionsgasolima.value = await GetNivelesGasolina();
+ modulosdisponibles.value=await GetModulosDisponibles();
 });
-
-const GetNivelesGasolina = async () => {
-  try {
-    const response = await axios.get(route('select.niveles.combustible'))
-    optionsgasolima.value = response.data.options
-  } catch (error: any) {
-    console.error(error)
-  } 
-}
-const GetModulosDisponibles = async () => {
-  try {
-    const response = await axios.get(route('select.modulos.disponibles.usuario'))
-    modulosdisponibles.value = response.data.options
-  } catch (error: any) {
-    console.error(error)
-  } 
-}
-const sumarDiasSinDomingo=(fecha: Date, dias: number): Date=> {
-  const resultado = new Date(fecha);
-  let diasSumados = 0;
-
-  while (diasSumados < dias) {
-    resultado.setDate(resultado.getDate() + 1);
-    if (resultado.getDay() !== 0) {
-      diasSumados++;
-    }
-  }
-
-  return resultado;
-}
 const presupuesto = reactive<NuevoPresupuesto>({
   orden_servicio: '',
   folio: '',
@@ -93,76 +65,50 @@ const presupuesto = reactive<NuevoPresupuesto>({
   vigencia: null,
   modulo_orden:''
 });
-const GetDatosVehiculo = async (filter:string,value:string) => {
-  if (abortgetvehiculo.value) {
-    abortgetvehiculo.value.abort();
-  }
-
-  abortgetvehiculo.value = new AbortController();
-
-  try {
-    const Vehiculo:Vehiculo|null = await axios.get(route('Vehiculo.Get.Datos'),{params:{filter,value},signal: abortgetvehiculo.value?.signal, })
-    if(Vehiculo){
-      cancelgetvehiculodata = true;
-      if(filter==='economico') presupuesto.placas=Vehiculo.placas;
-      if(filter==='placas') presupuesto.economico=Vehiculo.economico;
-      presupuesto.vin=Vehiculo.vin;
-      presupuesto.marca=Vehiculo.modelo?.marca?.descripcion??'';
-      presupuesto.modelo=Vehiculo.modelo?.descripcion??'';
-      presupuesto.año=Vehiculo.año;
-      cancelgetvehiculodata = false;
-    }
-  } catch (error: any) {
-    if (axios.isCancel(error)) {
-      console.log('Solicitud cancelada');
-    } else {
-      console.error('Error al obtener datos del vehículo:', error);
-    }
-  } 
-}
-const GetDatosPresupuesto = async (orden_servicio:string) => {
-  if (abortgetpresupuesto.value) {
-    abortgetpresupuesto.value.abort();
-  }
-  abortgetpresupuesto.value = new AbortController();
-  try {
-    const Presupuesto:datagetpresupuestos|null = await axios.get(route('Presupuesto.Get.Data_Orden'),{params:{orden_servicio},signal: abortgetpresupuesto.value?.signal, })
-    if(Presupuesto){
-      Object.assign(presupuesto, Presupuesto.presupuesto);
-      empresa.value=Presupuesto.empresa;
-      cliente.value=Presupuesto.cliente;
-      vehiculoconcepto.value=Presupuesto.vehiculo_concepto;
-    }
-  } catch (error: any) {
-    if (axios.isCancel(error)) {
-      console.log('Solicitud cancelada');
-    } else {
-      console.error('Error al obtener datos del vehículo:', error);
-    }
-  } 
-}
-const debouncedGetDatosVehiculo = debounce(GetDatosVehiculo, 500);
-
+const cancelgetvehiculodata = ref(false);
+const { fetchvehiculo } = useVehiculoFetcher(presupuesto,cancelgetvehiculodata);
+const { fetchDatosPresupuesto } = usePresupuestoFetcher(presupuesto,empresa,cliente,vehiculoconcepto);
+const buscarVehiculo = async (campo:string,value:string) => {
+  await fetchvehiculo(campo, value);
+};
+const buscardatospresupuesto = async (value:string) => {
+  await fetchDatosPresupuesto(value);
+};
+const debouncedGetDatosVehiculo = debounce(buscarVehiculo, 500);
 watch(() => presupuesto.economico, (nuevoEconomico, anteriorEconomico) => {
   if (nuevoEconomico && nuevoEconomico !== anteriorEconomico && !cancelgetvehiculodata) {
     debouncedGetDatosVehiculo('economico', nuevoEconomico);
   }
 });
-
 watch(() => presupuesto.placas, (nuevasPlacas, anterioresPlacas) => {
   if (nuevasPlacas && nuevasPlacas !== anterioresPlacas && !cancelgetvehiculodata) {
     debouncedGetDatosVehiculo('placas', nuevasPlacas);
   }
 });
 watch(() => presupuesto.orden_servicio, (nuevaorden) => {
-  GetDatosPresupuesto(nuevaorden);
+  buscardatospresupuesto(nuevaorden);
 });
 
 const buttonconfirm=computed<buttonconfirmed>(()=>{ 
   return {
     text:'Crear Presupuesto',
     classname:'bg-blue-600 text-white',
-    onClick:()=>{},
+    onClick:()=>{
+      Create(presupuesto).then((res)=>{
+        if(res.status){
+          updateVisibility(false);
+          window.location.href=route('Presupuesto.Editar',{presupuesto:res.data.id});
+        }else{
+          if(res.code===422){
+            console.error('Error de validacion al crear el presupuesto');
+          }else if(res.code!=0){
+            console.error('Error inesperado al crear el presupuesto');
+          }else{
+            console.error('Error de conexion al crear el presupuesto');
+          }
+        }
+      });
+    },
     disabled:Object.entries(presupuesto)
     .filter(([key]) => !['orden_servicio','folio','orden_seguimiento','vigencia'].includes(key))
     .some(([_,value]) => value === null || value === '')}})

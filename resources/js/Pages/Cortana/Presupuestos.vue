@@ -10,7 +10,7 @@ import estatusfilter from '@/components/Zcrat/Filters/estatusfilter.vue';
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
 import ModulosFilter from '@/components/Zcrat/Filters/ModulosFilter.vue';
 import empresasselect from '@/components/Zcrat/Filters/empresasselect.vue'
-import { modulosorden,presupuestos} from '@/utils/interfaces/generales';
+import { modulosorden,presupuestos} from '@/types/generales';
 import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import axios from 'axios'
 import MyBasicToast from '@/utils/ToastNotificationBasic'

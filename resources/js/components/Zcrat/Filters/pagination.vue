@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import { ref, computed, watch, toRefs} from 'vue';
-    import { paginationprops } from '../../../utils/interfaces/generales';
+    import { paginationprops } from '../../../types/generales';
 
     const props = defineProps<paginationprops>();
     const pages=ref<number>(8);

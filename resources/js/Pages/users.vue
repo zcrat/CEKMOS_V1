@@ -5,7 +5,7 @@ import Table from '@/components/Zcrat/Elements/Table.vue'
 import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
 import axios from 'axios'
 import {ref} from 'vue'
-import { UsersTable} from '@/utils/interfaces/users';
+import { UsersTable} from '@/types/users';
 import Button  from "@/components/Zcrat/Inputs/Button.vue";
 import ChangePermissionsUser from '@/components/Zcrat/modals/ChangePermissionsUser.vue'
 import ChangeModulosServicio from '@/components/Zcrat/modals/ChangeModulosServicio.vue'

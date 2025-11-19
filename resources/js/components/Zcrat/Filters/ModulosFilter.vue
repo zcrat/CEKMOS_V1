@@ -3,8 +3,8 @@
   import Poper from '@/components/Zcrat/Elements/poper.vue' 
   import { computed } from 'vue';
 import { ref } from 'vue';
-import type {ComponentInterface} from '@/utils/interfaces/tablecomponent'
-import { modulosorden} from '@/utils/interfaces/generales';
+import type {ComponentInterface} from '@/types/tablecomponent'
+import { modulosorden} from '@/types/generales';
 
 const props = defineProps<{
     Listado:modulosorden[]
