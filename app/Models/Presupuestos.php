@@ -23,29 +23,23 @@ class Presupuestos extends Model
     ];
 
     // Relaciones
-    public function orden_servicio()
-    {
+    public function orden_servicio(){
         return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
     }
-
-    public function factura()
-    {
+    public function factura(){
         return $this->belongsTo(Facturas::class,'factura_id');
     }
-
-    public function tipo()
-    {
+    public function tipo(){
         return $this->belongsTo(Tipos::class,'tipo_id');
     }
-
-    public function estatus()
-    {
+    public function estatus(){
         return $this->belongsTo(Estatus::class,'estatus_id');
     }
-
-    public function pago()
-    {
+    public function pago(){
         return $this->hasOne(PagosPresupuestos::class,'presupuestos_id');
+    }
+    public function archivos(){
+        return $this->hasMany(Archivos::class,'presupuesto_id');
     }
 
 }

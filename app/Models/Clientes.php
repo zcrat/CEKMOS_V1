@@ -31,8 +31,7 @@ class Clientes extends Model
     public function empresa(){
         return $this->belongsTo(Empresas::class,'empresa_id');
     }
-    public function ordenes_servicios()
-    {
+    public function ordenes_servicios(){
         return $this->hasMany(OrdenesServicio::class, 'cliente_id');
     }
 }

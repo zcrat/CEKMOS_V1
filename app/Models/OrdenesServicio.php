@@ -30,6 +30,9 @@ class OrdenesServicio extends Model
         'diagnostico' => 'datetime',
     ];
 
+    public function archivos(){
+        return $this->hasMany(Archivos::class,'orden_servicio_id');
+    }
     public function modulo_ordenes_servicio()
     {
         return $this->belongsTo(ModuloOrdenesServicio::class, 'modulo_orden_id');
@@ -53,9 +56,6 @@ class OrdenesServicio extends Model
     public function cliente()
     {
         return $this->belongsTo(Clientes::class, 'cliente_id');
-    }
-    public function archivos(){
-        return $this->hasMany(ArchivosOrdenServicio::class,'orden_servicio_id');
     }
     public function entrada(){
         return $this->hasOne(DatosEntrada::class,'orden_servicio_id');

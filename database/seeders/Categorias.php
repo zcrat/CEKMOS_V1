@@ -16,10 +16,11 @@ class Categorias extends Seeder
             ['descripcion' => 'Usuarios Taller'],
             ['descripcion' => 'Presupuestos'],
             ['descripcion' => 'Vehiculos'],
-            ['descripcion' => 'Notificaciones'],
-            ['descripcion' => 'Archivos Orden Servicio'],
-            ['descripcion' => 'Rutas Tipos Archivo'],
+            ['descripcion' => 'Archivos'],
+            ['descripcion' => 'Acciones'],
             ['descripcion' => 'Facturas'],
+            ['descripcion' => 'Conceptos_Presupuesto'],
+            ['descripcion' => 'Notificaciones'],
         ];
         foreach ($categorias as $data) {
             CategoriasModel::create($data);

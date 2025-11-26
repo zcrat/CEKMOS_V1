@@ -10,7 +10,7 @@ class Colores extends Model
     use SoftDeletes;
     protected $table = 'colores';
     protected $fillable = [
-    'descripcion',
+        'descripcion',
     ];
 
     public function vehiculos(){

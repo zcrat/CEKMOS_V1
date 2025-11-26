@@ -11,8 +11,7 @@ class Estados extends Model
     protected $fillable = [
         'descripcion',
     ];
-    public function ciudades()
-    {
+    public function ciudades(){
         return $this->hasMany(Ciudades::class, 'estado_id');
     }
 }

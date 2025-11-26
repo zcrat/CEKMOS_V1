@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-class RegimenesFiscalesModel extends Model
+class RegimenesFiscales extends Model
 {
     use SoftDeletes;
     protected $table = 'regimes_fiscales';
@@ -19,8 +19,7 @@ class RegimenesFiscalesModel extends Model
     ];
     protected $casts = [];
 
-    public function cfdi_disponibles()
-    {
+    public function cfdi_disponibles(){
         return $this->hasMany(CFDDisponiblesModel::class,'regimen_fiscal_id','clave');
     }
     public function empleados()

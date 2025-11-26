@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rutas_tipos_archivos', function (Blueprint $table) {
+        Schema::create('categorias_sat', function (Blueprint $table) {
             $table->id();
             $table->string('descripcion');
-            $table->foreignId('tipo_id')->constrained('tipos')->unique();
+            $table->int('codigo_sat');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rutas_tipos_archivos');
+        Schema::dropIfExists('categorias_sats');
     }
 };

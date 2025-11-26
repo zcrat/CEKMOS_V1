@@ -20,8 +20,7 @@ class CFDIModel extends Model
         'persona_moral'=>'boolean',
      ];
     
-    public function regimenes_fiscales_disponibles()
-    {
+    public function regimenes_fiscales_disponibles(){
         return $this->hasMany(CFDDisponiblesModel::class,'uso_cfdi_id','id');
     }
 }

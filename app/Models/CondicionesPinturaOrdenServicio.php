@@ -36,8 +36,7 @@ class CondicionesPinturaOrdenServicio extends Model
     ];
 
     // Relación principal
-    public function orden_servicio()
-    {
+    public function orden_servicio(){
         return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
     }
 

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('pdf');
             $table->text('acuse')->nullable();
             $table->foreignId('estatus_id')->constrained('estatus');
+            $table->foreignId('tipo_id')->constrained('tipos');
             $table->decimal('monto',10,2);
             $table->string('folio');
             $table->timestamps();

@@ -31,7 +31,7 @@ class Empresas extends Model
         return $this->belongsTo(Ciudades::class,'ciudad_id');
     }
     public function regimen(){
-        return $this->belongsTo(RegimenesFiscalesModel::class,'regimen_id');
+        return $this->belongsTo(RegimenesFiscales::class,'regimen_id');
     }
     public function clientes(){
         return $this->hasMany(Clientes::class,'empresa_id');

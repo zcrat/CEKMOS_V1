@@ -12,17 +12,14 @@ class Ciudades extends Model
         'descripcion',
         'estado_id'
     ];
-    public function estado()
-    {
+    public function estado(){
         return $this->belongsTo(Estados::class, 'estado_id');
     }
-    public function empresas()
-    {
-        return $this->hasMany(Empresas::class, 'ciudad_id');
-    }
-    public function clientes()
-    {
+    public function clientes(){
         return $this->hasMany(Clientes::class, 'ciudad_id');
     }
-
+    public function empresas(){
+        return $this->hasMany(Empresas::class, 'ciudad_id');
+    }
+    
 }

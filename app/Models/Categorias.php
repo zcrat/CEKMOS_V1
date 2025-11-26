@@ -9,15 +9,13 @@ class Categorias extends Model
     use SoftDeletes;
     protected $table = 'categorias';
     protected $fillable = [
-    'descripcion',
+        'descripcion',
     ];
 
-    public function tipos()
-    {
+    public function tipos(){
         return $this->hasMany(Tipos::class, 'categoria_id');
     }
-    public function estatus()
-    {
+    public function estatus(){
         return $this->hasMany(Estatus::class, 'categoria_id');
     }
 }

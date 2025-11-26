@@ -4,25 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-class ArchivosOrdenServicio extends Model
+class Archivos extends Model
 {
     use SoftDeletes;
-    protected $table = 'archivos_orden_servicios';
+    protected $table = 'archivos';
 
     protected $fillable = [
         'nombre',
         'orden_servicio_id',
+        'presupuesto_id',
         'tipo_id',
     ];
-
-    // Relaciones
-    public function orden_servicio()
-    {
+    public function orden_servicio(){
         return $this->belongsTo(OrdenesServicio::class, 'orden_servicio_id');
     }
-
-    public function tipo()
-    {
+    public function presupuesto(){
+        return $this->belongsTo(Presupuestos::class, 'presupuesto_id');
+    }
+    public function tipo(){
         return $this->belongsTo(Tipos::class, 'tipo_id');
     }
 

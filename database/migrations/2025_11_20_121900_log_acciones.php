@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rutas_tipos_archivos', function (Blueprint $table) {
+        Schema::create('log_acciones', function (Blueprint $table) {
             $table->id();
-            $table->string('descripcion');
-            $table->foreignId('tipo_id')->constrained('tipos')->unique();
+            $table->text('que_hizo');
+            $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
+            $table->foreignId('presupuesto_id')->constrained('presupuestos')->nullable();
+            $table->foreignId('tipo_id')->constrained('tipos');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rutas_tipos_archivos');
+        Schema::dropIfExists('log_acciones');
     }
-};
+};      

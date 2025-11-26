@@ -12,31 +12,31 @@ class Tipos extends Model
         'descripcion',
         'categoria_id'
     ];
-    public function categoria()
-    {
+    public function archivos(){
+        return $this->hasMany(Archivos::class, 'tipo_id');
+    }
+    public function categoria(){
         return $this->belongsTo(Categorias::class, 'categoria_id');
     }
-
-    public function notificaciones()
-    {
-        return $this->hasMany(Notificaciones::class, 'tipo_id');
-    }
-    public function vehiculos()
-    {
-        return $this->hasMany(Vehiculos::class, 'tipo_id');
-    }
-    public function rutas_archivo()
-    {
-        return $this->hasMany(RutasTiposArchivo::class, 'tipo_id');
-    }
-    public function archivos_orden_servicio()
-    {
-        return $this->hasMany(ArchivosOrdenServicio::class, 'tipo_id');
+    public function usuarios_taller(){
+        return $this->hasMany(UsuariosTaller::class,'tipo_id');
     }
     public function presupuestos(){
         return $this->hasMany(Presupuestos::class,'tipo_id');
     }
-    public function usuarios_taller(){
-        return $this->hasMany(UsuariosTaller::class,'tipo_id');
+    public function vehiculos(){
+        return $this->hasMany(Vehiculos::class, 'tipo_id');
+    }
+    public function rutas_archivo(){
+        return $this->hasOne(RutasTiposArchivo::class, 'tipo_id');
+    }
+    public function facturas(){
+        return $this->hasMany(Facturas::class, 'tipo_id');
+    }
+    public function conceptos_presupuesto(){
+        return $this->hasMany(ConceptosPresupuestos::class, 'tipo_id');
+    }
+    public function notificaciones(){
+        return $this->hasMany(Notificaciones::class, 'tipo_id');
     }
 }
