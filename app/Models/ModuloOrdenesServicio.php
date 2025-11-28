@@ -38,4 +38,7 @@ class ModuloOrdenesServicio extends Model
     public function conceptos_presupuestos(){
         return $this->hasMany(ConceptosPresupuestos::class,'modulo_orden_servicio_id');
     }
+    public function usuarios_orden(){
+        return $this->hasMany(ModulosPerUser::class, 'modulo_orden_id');
+    }
 }

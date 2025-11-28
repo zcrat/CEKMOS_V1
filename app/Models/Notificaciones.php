@@ -16,11 +16,10 @@ class Notificaciones extends Model
         'tipo_id',
         'read_at',
     ];
-
+    protected $casts = ['read_at'=>'datetime'];
     public function user(){
       return $this->belongsTo(User::class,'user_id');
     }
-
     public function tipo(){
       return $this->belongsTo(Tipos::class,'tipo_id');
     }

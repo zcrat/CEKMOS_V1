@@ -43,7 +43,7 @@ class OrdenesServicio extends Model
     }
     public function vehiculo_concepto()
     {
-        return $this->belongsTo(VehiculosConceptos::class, 'tipo_vehiculo_concepto_id');
+        return $this->belongsTo(VehiculosConceptos::class, 'vehiculo_concepto_id');
     }
     public function user()
     {
@@ -78,7 +78,7 @@ class OrdenesServicio extends Model
     {
         return $this->hasOne(ExterioresOrdenServicio::class,'orden_servicio_id');
     }
-    public function inventarios()
+    public function inventario()
     {
         return $this->hasOne(InventarioOrdenServicio::class,'orden_servicio_id');
     }
@@ -89,6 +89,8 @@ class OrdenesServicio extends Model
     public function pedidos_almacen(){
         return $this->hasMany(PedidosOrdenesAlmacen::class,'orden_servicio_id');
     }
-
+    public function log_acciones(){
+        return $this->hasMany(LogAccionesOS::class,'orden_servicio_id');
+    }
 
 }

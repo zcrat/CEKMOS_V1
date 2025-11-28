@@ -39,4 +39,7 @@ class Tipos extends Model
     public function notificaciones(){
         return $this->hasMany(Notificaciones::class, 'tipo_id');
     }
+    public function log_acciones(){
+        return $this->hasMany(LogAccionesOS::class,'tipo_id');
+    }
 }

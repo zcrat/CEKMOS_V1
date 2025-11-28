@@ -17,28 +17,23 @@ class ResponsablesOrdenServicio extends Model
     ];
 
     // Relaciones con alias
-    public function administrador_transporte()
-    {
+    public function administrador_transporte(){
         return $this->belongsTo(UsuariosTaller::class, 'administrador_transporte_id');
     }
 
-    public function jefe_de_proceso()
-    {
+    public function jefe_de_proceso(){
         return $this->belongsTo(UsuariosTaller::class, 'jefe_de_proceso_id');
     }
 
-    public function trabajador()
-    {
+    public function trabajador(){
         return $this->belongsTo(UsuariosTaller::class, 'trabajador_id');
     }
 
-    public function tecnico()
-    {
+    public function tecnico(){
         return $this->belongsTo(UsuariosTaller::class, 'tecnico_id');
     }
 
-    public function orden_servicio()
-    {
+    public function orden_servicio(){
         return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
     }
 

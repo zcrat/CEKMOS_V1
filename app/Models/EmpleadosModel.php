@@ -21,6 +21,6 @@ class EmpleadosModel extends Model
 
     public function regimen_fiscal()
     {
-        return $this->belongsTo(RegimenesFiscalesModel::class, 'regimen_fiscal_id');
+        return $this->belongsTo(RegimenesFiscales::class, 'regimen_fiscal_id');
     }
 }

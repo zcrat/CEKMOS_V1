@@ -40,4 +40,7 @@ class ConceptosPresupuestos extends Model
     public function modulo_orden_servicio(){
         return $this->belongsTo(ModuloOrdenesServicio::class,'modulo_orden_servicio_id');
     }
+    public function presupuestos_asignados(){
+        return $this->hasMany(ConceptosPerPresupuesto::class,'concepto_presupuesto_id');
+    }
 }

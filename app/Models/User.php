@@ -68,9 +68,24 @@ protected $dateFormat = 'Y-m-d H:i:s.v'; // Formato compatible con SQL Server
         ];
     }
     public function modulos_orden(){
-        return $this->hasMany(ModulosPerUser::class, 'user_id','id');
+        return $this->hasMany(ModulosPerUser::class, 'user_id');
     }
     public function clientes(){
-        return $this->hasMany(Clientes::class,'user_id','id'); 
+        return $this->hasMany(Clientes::class,'user_id'); 
+    }
+    public function empresas(){
+        return $this->hasMany(Empresas::class,'user_id'); 
+    }
+    public function facturas(){
+        return $this->hasMany(Facturas::class,'user_id'); 
+    }
+    public function notifications(){
+        return $this->hasMany(Notificaciones::class,'user_id'); 
+    }
+    public function ordenes_servicio(){
+        return $this->hasMany(OrdenesServicio::class,'user_id'); 
+    }
+    public function conceptos_presupuestos(){
+        return $this->hasMany(ConceptosPerPresupuesto::class,'user_id');
     }
 }

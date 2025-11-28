@@ -19,7 +19,6 @@ class PedidosOrdenesAlmacen extends Model
         'pedido_entregado' => 'datetime',
     ];
 
-    // Relaciones
     public function orden_servicio()
     {
         return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');

@@ -21,8 +21,8 @@ return new class extends Migration
             $table->foreignId('tipo_id')->constrained('tipos');
             $table->foreignId('vehiculo_concepto_id')->constrained('vehiculos_conceptos');
             $table->foreignId('modulo_orden_servicio_id')->constrained('modulo_ordenes_servicios');
-            $table->foreignId('categoria_sat')->constrained('categorias_sat');
-            $table->foreignId('unidad_sat')->constrained('unidades_sat');
+            $table->foreignId('categoria_sat_id')->constrained('categorias_sat');
+            $table->foreignId('unidad_sat_id')->constrained('unidades_sat');
             $table->timestamps();
         });
     }

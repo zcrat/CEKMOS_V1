@@ -35,11 +35,17 @@ class Presupuestos extends Model
     public function estatus(){
         return $this->belongsTo(Estatus::class,'estatus_id');
     }
-    public function pago(){
-        return $this->hasOne(PagosPresupuestos::class,'presupuestos_id');
+    public function pagos(){
+        return $this->hasMany(PagosPresupuestos::class,'presupuestos_id');
     }
     public function archivos(){
         return $this->hasMany(Archivos::class,'presupuesto_id');
+    }
+    public function log_acciones(){
+        return $this->hasMany(LogAccionesOS::class,'presupuesto_id');
+    }
+    public function conceptos_presupuesto(){
+        return $this->hasMany(ConceptosPerPresupuesto::class,'presupuesto_id');
     }
 
 }
