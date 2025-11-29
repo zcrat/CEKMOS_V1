@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BandasInspeccionVehicular extends Model
 {
+     protected $table = 'bandas_inspeccion_vehicular';
     protected $fillable = [
         'accesorios',
         'bandas_direccion_hidraulica',
