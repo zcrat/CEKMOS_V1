@@ -10,7 +10,6 @@ interface ApiResponse {
   loading: Ref<boolean>,
   items: Ref<any[]>,
   totalItems: Ref<number>,
-  totalpages: Ref<number>,
   api: string,
   params?:any
 ) => {
@@ -22,7 +21,6 @@ interface ApiResponse {
     });
     items.value = response.data.items ?? []
     totalItems.value = response.data.totalItems ?? 0
-    totalpages.value = response.data.totalpages ?? 0
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status

@@ -33,12 +33,17 @@
     }
     const search=()=>{
         if(api.value){
-            GetElements(loading,items,totalItems,totalPages,api.value,{currentPage:currentPage.value,itemsPerPage:itemsPerPage.value,...params.value });
+            GetElements(loading,items,totalItems,api.value,{currentPage:currentPage.value,itemsPerPage:itemsPerPage.value,...params.value });
         }
     }
     watch([currentPage], () => {
         search();
     }, { immediate: true });
+
+    watch([itemsPerPage,totalItems], () => {
+        totalPages.value= Math.ceil(totalItems.value/itemsPerPage.value)
+    }, { immediate: true });
+
     watch([itemsPerPage], () => {
         if (currentPage.value !== 1 && (params.value || itemsPerPage.value)) {
             currentPage.value = 1
@@ -46,6 +51,7 @@
             search()
         }
     })
+
     watch(params, () => {
         if (currentPage.value !== 1) {
             currentPage.value = 1;

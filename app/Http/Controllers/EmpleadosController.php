@@ -15,6 +15,32 @@ class EmpleadosController extends Controller
         
         return Inertia::render('Admin/Employees');
     }
+    public  function Read(Request $request){
+        
+        $currentpage=$request->currentPage ?? 1;
+        $itemsperpage=$request->itemsPerPage ?? 10;
+        $elements=EmpleadosModel::with('regimen_fiscal');
+        
+        if($request->filled('search')){
+            $search= '%'.$request->search.'%';
+            $elements=$elements->whereRaw("CONCAT(nombre,'',paterno,'',materno) LIKE ? OR CURP LIKE ? OR RFC LIKE ?",[$search,$search,$search]);
+        }
+        $totalItems=(clone $elements)->count();
+        $elements=$elements->skip(($currentpage-1)*$itemsperpage)->take($itemsperpage)->get();
+        $items=$elements->map(function ($item){
+            return[
+                'id'=>$item->id,
+                'name'=>$item->nombre,
+                'lastname1'=>$item->paterno,
+                'lastname2'=>$item->materno,
+                'curp'=>$item->curp,
+                'rfc'=>$item->rfc,
+                'regimen_fiscal'=>$item->regimen_fiscal? ($item->regimen_fiscal->clave .'-'. $item->regimen_fiscal->descripcion ) : ' ',
+                'domicilio_fiscal'=>$item->domicilio_fiscal,
+            ];
+        });
+        return response()->json(compact('items','totalItems'));
+    }
     public function Create(Request $request){
        
         return response()->json(['message' => 'server is working']);

@@ -66,7 +66,7 @@ SearchData(currentPage.value,itemsPerPage.value);
                 
         </template>
         <template #content>
-            <Pagination :onSearch="SearchData" :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
+            <Pagination :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
             <Table v-if="items.length>=1" :titles="[
                 {title:'opciones',classname:'uppercase'},
                 {title:'Folio',classname:'uppercase'},

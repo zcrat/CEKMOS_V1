@@ -1,25 +1,21 @@
 <!-- Vista que usa ModalExample.vue -->
 <script setup lang="ts">
-import Search from '@/components/Zcrat/Inputs/Search.vue';
-import AppLayout from '@/Layouts/AppLayout.vue';
-import Table from '@/components/Zcrat/Elements/Table.vue'
 import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
-import axios from 'axios'
-import {ref,Component} from 'vue'
+import {DataColumn} from '@/types/tablecomponent'
+import {ref,} from 'vue'
 import { Employee} from '@/types/users';
 import Button  from "@/components/Zcrat/Inputs/Button.vue";
 import BasicModal from '@/components/Zcrat/modals/BasicModal.vue'
-import MyBasicToast from '@/utils/ToastNotificationBasic'
+import TableWithPagination from '@/components/Zcrat/TableWithPagination.vue';
 
-const rows = ref<Employee[]>([])
-const loading = ref<boolean>(false)
+
 const ModalView = ref<number|null>(null)
 const iduser = ref<number | null>(null)
 
-const CraeteOptions=(row:Employee):Component=>{
+const CraeteOptions=(row:Employee):DataColumn=>{
 
   return {
-    Dropdown,
+    element:Dropdown,
     props: {
         father: {
             element: Button,
@@ -43,54 +39,48 @@ const CraeteOptions=(row:Employee):Component=>{
 </script>
 
 <template>
-  <AppLayout title="Empleados" description="Bienvenido al sistema CEKMOS" :loanding="loading">
-        <template #filtering>
-          <div class="flex flex-row justify-start py-4 w-full">
-            <ButtonComponent
-              text="nuevo"
-              icon="fa-solid fa-circle-plus"
-              :onClick="() => (ModalView = 1)"
-            />
-            <Search Classdiv="sm:w-[20rem] w-full" />
-          </div>
-        </template>
-        <template #content>
-            <Table  :titles="[
-                    'Nombre',
-                    'Paterno',
-                    'Materno',
-                    'CURP',
-                    'RFC',
-                    'Regimen Fiscal',
-                    'Domicilio Fiscal'
-                ]"
-                :rows="rows.map(function(row){return {
-                    classname:'bg-grey-300',
-                    columns:[
-                        row.name,
-                        row.lastname1,
-                        row.lastname2,
-                        {element:row.curp,classname:'uppercase'},
-                        {element:row.rfc,classname:'uppercase'},
-                        row.regimen_fiscal,
-                        row.domicilio_fiscal,
-                        
-
-                        {element: CraeteOptions(row)
-                        }
-                                            ]
-                }})" 
-                
-                classname="tabla"></Table>
-        </template>
-    </AppLayout>
-
+  <TableWithPagination
+    titlePage="Empleados"
+    :Actions="CraeteOptions"
+    :titles="[
+              'Nombre',
+              'Paterno',
+              'Materno',
+              'CURP',
+              'RFC',
+              'Regimen Fiscal',
+              'Domicilio Fiscal'
+            ]"
+    :keys="[
+          'name',
+          'lastname1',
+          'lastname2',
+          'curp',
+          'rfc',
+          'regimen_fiscal',
+          'domicilio_fiscal',
+    ]"
+    
+    api="employees.read"
+  >
+    
+    <template #filtering1>
+      <Button
+        text="nuevo"
+        icon="fa-solid fa-circle-plus"
+        :onClick="() => (ModalView = 1)"
+      />
+    </template>
+  </TableWithPagination>
+  
     <BasicModal 
       :modelValue="ModalView===0" 
       :close="()=>{ModalView=null}"
       :buttonconfirm="{
         text:'Si, Eliminar',
-        onClick:()=>{ModalView=null},
+        onClick:()=>{if(ModalView){
+          ModalView+=1;
+        }},
         classname:'bg-red-600 font-bold text-white'}" >
         <h2 class="text-center text-lg">¿Realmente Deseas Eliminar al Trabajador?</h2>
     </BasicModal>

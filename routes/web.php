@@ -34,6 +34,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('/User/Read/Notifications',[UsersController::class,"ReadNotification"])->name('readnotification');
 
     Route::get('/employees',[EmpleadosController::class,'View'])->name('employees');
+    Route::get('/employees/read',[EmpleadosController::class,'read'])->name('employees.read');
     Route::post('/employees/create',[EmpleadosController::class,'create'])->name('employees.create');
 
     Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
