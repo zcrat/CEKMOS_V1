@@ -42,4 +42,7 @@ class Tipos extends Model
     public function log_acciones(){
         return $this->hasMany(LogAccionesOS::class,'tipo_id');
     }
+    public function hojas_conceptos(){
+        return $this->hasMany(HojaConceptos::class,'tipo_id');
+    }
 }

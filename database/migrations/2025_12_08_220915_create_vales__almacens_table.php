@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pagos_presupuestos', function (Blueprint $table) {
+        Schema::create('vales_almacen', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('fecha_pagado');
-            $table->decimal('importe',10,2);
-            $table->string('nombre')->default('Sin Especificar');
-            $table->text('descripcion')->default('General');
-            $table->foreignId('presupuestos_id')->constrained('presupuestos');
+            $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
+            $table->string('destino');
+            $table->string('motor');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pagos_presupuestos');
+        Schema::dropIfExists('vales_almacen');
     }
 };

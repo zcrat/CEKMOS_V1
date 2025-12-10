@@ -9,10 +9,10 @@
       buttonconfirm?:buttonconfirmed
       modaltitle?:string
       position?: 'start' | 'center' | 'end'
+      close:()=>void
     }>(), {
       position: 'start'
     })
-    const emit = defineEmits(['update:modelValue'])
 
     const classtitleposition = computed(() => {
       switch (props.position) {
@@ -24,9 +24,7 @@
           return 'text-left'
       }
     })
-    const close = () => {
-        emit('update:modelValue', false)
-    }
+
 </script>
 <template>
     <Dialog :open="modelValue" class="relative z-50">

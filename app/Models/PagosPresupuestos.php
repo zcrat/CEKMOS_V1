@@ -11,6 +11,8 @@ class PagosPresupuestos extends Model
     protected $table = 'pagos_presupuestos';
 
     protected $fillable = [
+        'nombre',
+        'descripcion',
         'fecha_pagado',
         'importe',
         'presupuestos_id',

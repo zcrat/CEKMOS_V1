@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
 import { TitleColumn, Row } from '@/types/tablecomponent'
 
 
 defineProps<{
   classname?: string
   rows: Row[]
-  titles: TitleColumn[]
+  titles: (TitleColumn | string)[]
 }>()
 </script>
 
@@ -19,9 +18,9 @@ defineProps<{
         <th
           v-for="(col, index) in titles"
           :key="index"
-          :class="col.classname"
+          :class="typeof(col)!=='string' ? col.classname : ''"
         >
-          {{ col.title }}
+          {{ typeof(col)!=='string' ? col.title : col}}
         </th>
       </tr>
     </thead>
@@ -34,9 +33,11 @@ defineProps<{
         <td
           v-for="(col, colnum) in row.columns"
           :key="'col_' + index + '_' + colnum"
-          :class="col.classname"
+          :class=" typeof col === 'object' ? col.classname : ' uppercase'"
         >
-        <span v-if="typeof col.element === 'string'" v-html="col.element"></span>
+        <span v-if="(typeof col !== 'object')" v-html="col"></span>
+        
+        <span v-else-if="(typeof col.element !== 'object')" v-html="col.element"></span>
 
         <component
             v-else

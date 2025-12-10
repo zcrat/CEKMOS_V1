@@ -28,6 +28,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'usuario',
         'email',
         'password',
     ];
@@ -87,6 +88,9 @@ protected $dateFormat = 'Y-m-d H:i:s.v'; // Formato compatible con SQL Server
     }
     public function conceptos_presupuestos(){
         return $this->hasMany(ConceptosPerPresupuesto::class,'user_id');
+    }
+    public function vales_almacen(){
+        return $this->hasMany(ValesAlmacen::class,'user_id');
     }
     public function caja_movimientos(){
         return $this->hasMany(CajaMovimientos::class,'user_id');

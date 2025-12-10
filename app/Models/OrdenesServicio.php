@@ -92,5 +92,10 @@ class OrdenesServicio extends Model
     public function log_acciones(){
         return $this->hasMany(LogAccionesOS::class,'orden_servicio_id');
     }
-
+    public function vales_almacen(){
+        return $this->hasMany(ValesAlmacen::class,'orden_servicio_id');
+    }
+    public function hoja_conceptos(){
+        return $this->hasMany(HojaConceptos::class,'orden_servicio_id');
+    }
 }

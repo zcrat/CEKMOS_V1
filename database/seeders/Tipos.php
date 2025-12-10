@@ -26,9 +26,7 @@ class Tipos extends Seeder
             ['descripcion' => 'Camion', 'categoria_id' => 3],
             ['descripcion' => 'Maquinaria', 'categoria_id' => 3],
             ['descripcion' => 'Motos', 'categoria_id' => 3],
-            ['descripcion' => 'Fotos Nuevas', 'categoria_id' => 4],
-            ['descripcion' => 'Fotos Instaladas', 'categoria_id' => 4],
-            ['descripcion' => 'Fotos Viejas', 'categoria_id' => 4],
+            ['descripcion' => 'Fotos Generales', 'categoria_id' => 4],
             ['descripcion' => 'Reporte Anomalías', 'categoria_id' => 4],
             ['descripcion' => 'Entrada', 'categoria_id' => 4],
             ['descripcion' => 'Orden Servicio', 'categoria_id' => 4],
@@ -68,6 +66,10 @@ class Tipos extends Seeder
             ['descripcion' => 'Critica', 'categoria_id' => 8],
             ['descripcion' => 'Personalizada', 'categoria_id' => 8],
             ['descripcion' => 'Zonas', 'categoria_id' => 7],
+            ['descripcion' => 'Partes', 'categoria_id' => 9],
+            ['descripcion' => 'Mano Obra', 'categoria_id' => 9],
+            ['descripcion' => 'Sub-Contratados', 'categoria_id' => 9],
+            ['descripcion' => 'Otros', 'categoria_id' => 9],
         ];
         foreach ($usuarios_taller as $data) {
             TiposModel::create($data);

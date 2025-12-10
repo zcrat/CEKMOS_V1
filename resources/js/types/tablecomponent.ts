@@ -6,14 +6,14 @@ export interface TitleColumn {
 }
 
 export interface DataColumn {
-  element: string | Component |number
+  element: string| number| Component
   props?: Record<string, any>
   classname?: string
 }
 
 export interface Row {
   classname?: string
-  columns: DataColumn[]
+  columns: (DataColumn | string | number )[]
 }
 export interface  ComponentInterface {
     element: Component;
