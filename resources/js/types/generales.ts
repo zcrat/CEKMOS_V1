@@ -1,3 +1,4 @@
+import { Ref } from "vue";
 export interface modulosorden{
   id:number;
   descripcion:string;
@@ -20,14 +21,11 @@ export interface presupuestos{
 }
 
 export interface paginationprops {
-    onSearch: (currentPage: number, perPage: number) => void
-    totalItems: number;
-    totalPages: number;
-    currentPage: number;
-    itemsPerPage: number;
-    clases?: string;
-    chnagesItems?:boolean;
-    }
+  api: string,
+  params: Record<string, any>
+  clases?: string;
+  chnagesItems?:boolean;
+}
 export interface DatosPresupuestos {
   observaciones: string,
   descripcion_mo: string,
@@ -127,3 +125,8 @@ export interface NuevoPresupuesto {
     cliente: option;
     vehiculo_concepto: option;
  }
+  export interface PaginationProps {
+    loading: Ref<boolean>,
+    items: Ref<any[]>,
+    params?:any
+  }

@@ -1,12 +1,20 @@
 <script setup lang="ts">
     import { ref, computed, watch, toRefs} from 'vue';
     import { paginationprops } from '../../../types/generales';
-
+    import GetElements from "@/services/GetElements"
     const props = defineProps<paginationprops>();
     const pages=ref<number>(8);
 
-    const { currentPage, totalPages, totalItems } = toRefs(props)
-    const itemsPerPage=ref<number>(props.itemsPerPage);
+    const {params,api} = toRefs(props)
+
+    const currentPage = defineModel<number>('currentPage', { default: 1 })
+    const totalPages = defineModel<number>('totalPages', { default: 0 })
+    const itemsPerPage = defineModel<number>('itemsPerPage', { default: 10 })
+    const totalItems = defineModel<number>('totalItems', { default: 0 })
+    const loading = defineModel<boolean>('loading',{default:false})
+
+    const items = defineModel<any[]>({default:[]})
+
 
     const visiblePages = computed(() => {
         const visible: number[] = [];
@@ -20,13 +28,32 @@
         }
         return visible;
     });
-
-    watch(itemsPerPage, (value) => {
-        props.onSearch(1, value);
-    });
-    const setPage=(currentPage:number)=>{
-            props.onSearch(currentPage,itemsPerPage.value);
+    const setPage=(val:number)=>{
+        currentPage.value=val;
     }
+    const search=()=>{
+        if(api.value){
+            GetElements(loading,items,totalItems,totalPages,api.value,{currentPage:currentPage.value,itemsPerPage:itemsPerPage.value,...params.value });
+        }
+    }
+    watch([currentPage], () => {
+        search();
+    }, { immediate: true });
+    watch([itemsPerPage], () => {
+        if (currentPage.value !== 1 && (params.value || itemsPerPage.value)) {
+            currentPage.value = 1
+        } else {
+            search()
+        }
+    })
+    watch(params, () => {
+        if (currentPage.value !== 1) {
+            currentPage.value = 1;
+        } else {
+            search();
+        }
+    }, { deep: true });
+
 
 </script>
 <template>
@@ -57,7 +84,7 @@
             </button>
 
             <button  :class="currentPage === totalPages ?'PageActive':'PageInactive'" @click="()=>setPage(totalPages)">{{totalPages}}</button>
-            <button  :disabled="currentPage === totalPages" class='PageInactive' @click="()=>setPage(totalPages)"><font-awesome-icon icon="fa-solid fa-right-long "/></button>
+            <button  :disabled="currentPage === totalPages" class='PageInactive' @click="()=>setPage(currentPage+1)"><font-awesome-icon icon="fa-solid fa-right-long "/></button>
         </div> 
       </div> 
 </template>

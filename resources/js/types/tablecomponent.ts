@@ -6,7 +6,7 @@ export interface TitleColumn {
 }
 
 export interface DataColumn {
-  element: string | Component
+  element: string | Component |number
   props?: Record<string, any>
   classname?: string
 }

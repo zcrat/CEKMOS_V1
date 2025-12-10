@@ -38,20 +38,31 @@ function toggleNavsmartphone() {
             <NavLink :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
             <NavLink :href="route('users')" :active="route().current('users')"><font-awesome-icon icon="fa-solid fa-users " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
             <NavLink :href="route('employees')" :active="route().current('employees')"><font-awesome-icon icon="fa-solid fa-address-book " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Empleados</span></NavLink>
-                <Dropdown :align="IsRow?'right':'left-up' " width="48">
-                    <template #trigger>
-                        <ButtonLink :active="route().current('Cortana.Presupuesto.Vista')"><font-awesome-icon icon="fa-solid fa-address-book " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Cortana</span></ButtonLink>
-                    </template>
-                    
-                    <template #content>
-                        <DropdownLink :href="route('Cortana.Presupuesto.Vista')">
-                            Presupuestos
-                        </DropdownLink>
-                        <DropdownLink :href="route('Cortana.Presupuesto.Vista')">
-                            Recepciones Vehiculares
-                        </DropdownLink>
-                    </template>
-                </Dropdown>
+            <Dropdown :align="IsRow?'right':'left-up' " width="48">
+                <template #trigger>
+                    <ButtonLink :active="route().current('Cortana.Presupuesto.Vista')"><font-awesome-icon icon="fa-solid fa-address-book " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Cortana</span></ButtonLink>
+                </template>
+                
+                <template #content>
+                    <DropdownLink :href="route('Cortana.Presupuesto.Vista')">
+                        Presupuestos
+                    </DropdownLink>
+                    <DropdownLink :href="route('Cortana.Presupuesto.Vista')">
+                        Recepciones Vehiculares
+                    </DropdownLink>
+                </template>
+            </Dropdown>
+            <Dropdown :align="IsRow?'right':'left-up' " width="48">
+                <template #trigger>
+                    <ButtonLink :active="route().current('Admin.Caja')"><font-awesome-icon icon="fa-solid fa-user " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Administracion</span></ButtonLink>
+                </template>
+                
+                <template #content>
+                    <DropdownLink :href="route('Admin.Caja')">
+                        Caja Movimientos
+                    </DropdownLink>
+                </template>
+            </Dropdown>
         </div>
         <Notification :classname="IsRow?'sm:ms-2':'sm:mb-2'" :IsRow="IsRow"></Notification>
         <div class="ms-3 relative hidden sm:block">

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CajaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -9,6 +10,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\select2controller;
 use App\Http\Controllers\selectcontroller;
 use App\Http\Controllers\ComboboxController;
+use App\Http\Controllers\MigrateDataBaseOld;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\presupuestosController;
 Route::get('/', function () {
@@ -55,4 +57,9 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
 
     Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('Presupuesto.Get.Data_Orden');
     Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('Presupuesto.Create');
-});
+
+    Route::get('Admin/Caja',[CajaController::class,'View'])->name('Admin.Caja');
+    Route::get('Admin/Caja/Read',[CajaController::class,'Read'])->name('Admin.Caja.Read');
+  });
+  
+  Route::get('migrar/caja',[MigrateDataBaseOld::class,'migrateCaja']);

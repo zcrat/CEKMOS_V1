@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\RegimenesFiscalesModel;
+use App\Models\RegimenesFiscales;
 
 class regimenes extends Seeder
 {
@@ -40,7 +40,7 @@ class regimenes extends Seeder
         ];
 
         foreach ($regimenes as $r) {
-            RegimenesFiscalesModel::create([
+            RegimenesFiscales::create([
                 'clave' => $r['id'],
                 'descripcion' => substr($r['nombre'], strpos($r['nombre'], '-') + 2),
                 'persona_fisica' => in_array($r['id'], ['605','606','607','608','611','612','614','615','616','621','625','626']),

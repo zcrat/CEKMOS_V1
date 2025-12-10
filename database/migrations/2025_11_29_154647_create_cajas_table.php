@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categorias_sat', function (Blueprint $table) {
+        Schema::create('caja_movimientos', function (Blueprint $table) {
             $table->id();
-            $table->string('descripcion');
-            $table->string('codigo_sat');
+            $table->text('descripcion');
+            $table->decimal('ingreso',10,2);
+            $table->decimal('egreso',10,2);
+            $table->timestamp('fecha');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categorias_sat');
+        Schema::dropIfExists('caja_movimientos');
     }
 };

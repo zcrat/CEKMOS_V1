@@ -25,9 +25,9 @@ return new class extends Migration
             $table->foreignId('tren_transmision_id')->constrained('tren_transmision_inspeccion_vehicular');
             $table->foreignId('frenos_id')->constrained('frenos_inspeccion_vehicular');
             $table->foreignId('electrico_id')->constrained('electrico_inspeccion_vehicular');
-            $table->foreignId('revision_luces_espias_id')->constrained('revision_luces_espias_inspeccion_vehicular');
+            $table->foreignId('luces_espias_id')->constrained('luces_espias_inspeccion_vehicular');
             $table->foreignId('mangueras_id')->constrained('mangueras_inspeccion_vehicular');
-            $table->foreignId('user_id')->constrained('user_inspeccion_vehicular');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });
