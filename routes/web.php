@@ -13,10 +13,18 @@ use App\Http\Controllers\ComboboxController;
 use App\Http\Controllers\MigrateDataBaseOld;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\presupuestosController;
+use App\Http\Controllers\PruebasController;
 Route::get('/', function () {
   return redirect('/login');
 
 });
+Route::get('/trasformar',[PruebasController::class,"TransformDataToImport"]);
+Route::get('/trasformar2',[PruebasController::class,"TransformDataToImport2"]);
+Route::get('/trasformar3',[PruebasController::class,"TransformDataToImport3"]);
+Route::get('/trasformar5',[PruebasController::class,"TransformDataToImport5"]);
+Route::get('/trasformar6',[PruebasController::class,"TransformDataToImport6"]);
+Route::get('/trasformar7',[PruebasController::class,"TransformDataToImport7"]);
+Route::get('/trasformar8',[PruebasController::class,"TransformDataToImport8"]);
 
 Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])->group(function () {
     Route::get('/dashboard', function () { return Inertia::render('Dashboard');})->name('dashboard');
@@ -41,6 +49,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('Cortana.Presupuesto.Items');
 
     Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');
+    Route::get('select2/regimenes/fiscales',[select2controller::class,'RegimenesFiscales'])->name('Select2.Regimenes.Fiscales');
     
     Route::get('select/niveles/combustible',[selectcontroller::class,'NivelesCombustible'])->name('select.niveles.combustible');
     Route::get('select/modulos/orden',[selectcontroller::class,'ModulosOrden'])->name('select.modulos.disponibles.usuario');
