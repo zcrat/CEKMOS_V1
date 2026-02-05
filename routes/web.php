@@ -21,10 +21,13 @@ Route::get('/', function () {
 Route::get('/trasformar',[PruebasController::class,"TransformDataToImport"]);
 Route::get('/trasformar2',[PruebasController::class,"TransformDataToImport2"]);
 Route::get('/trasformar3',[PruebasController::class,"TransformDataToImport3"]);
+Route::get('/trasformar4',[PruebasController::class,"TransformDataToImport4"]);
 Route::get('/trasformar5',[PruebasController::class,"TransformDataToImport5"]);
 Route::get('/trasformar6',[PruebasController::class,"TransformDataToImport6"]);
 Route::get('/trasformar7',[PruebasController::class,"TransformDataToImport7"]);
 Route::get('/trasformar8',[PruebasController::class,"TransformDataToImport8"]);
+Route::get('/trasformar9',[PruebasController::class,"TransformDataToImport9"]);
+Route::get('/trasformar10',[PruebasController::class,"TransformDataToImport10"]);
 
 Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])->group(function () {
     Route::get('/dashboard', function () { return Inertia::render('Dashboard');})->name('dashboard');
