@@ -7,6 +7,7 @@ import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
 
 const props = defineProps({
     title: String,
+    description: String,
     loading: Boolean
 });
 const title=computed(() => props.title);
@@ -63,7 +64,7 @@ onMounted(() => {
             <footer class="h-12 p-4 justify-center rounded-md bg-blue-100 border border-black my-2">
               <span class="flex flex-nowrap justify-between w-full text-xs">
                 <div class="flex flex-row gap-2">
-                  <strong>Copyright © 2025-2026</strong> Zcrat Developer. <p>All rights reserved.</p>
+                  <strong>{{ description }} Copyright © 2025-2026</strong> Zcrat Developer. <p>All rights reserved.</p>
                 </div>
                 <strong>Version 1</strong>
               </span>

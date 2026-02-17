@@ -91,7 +91,7 @@ watch(selected, (val) => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full">
+  <div class="flex flex-col w-full" >
     <label for="" v-if="props.label">{{ props.label }}</label>
     <Combobox v-model="optionselect">
       <div class="relative">
@@ -114,7 +114,7 @@ watch(selected, (val) => {
           ✕
         </button>
       </div>
-      <ComboboxOptions v-show="isOpen" static class="absolute border-2 border-gray-500 w-full rounded-md bg-white z-50">
+      <ComboboxOptions v-show="isOpen" static class="absolute border-2 border-gray-500 w-full rounded-md bg-white z-50 overflow-auto max-h-[15rem]">
         <div v-if="options.length === 0 && !loading">Sin Resultados</div>
         <div v-if="options.length === 0 && loading">Cargando...</div>
         <ComboboxOption

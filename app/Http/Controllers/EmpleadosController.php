@@ -43,22 +43,20 @@ class EmpleadosController extends Controller
     }
     public function Create(Request $request){
        
-        return response()->json(['message' => 'server is working']);
-    
         $request->validate([
-            'nombre' => ['required', 'string'],
-            'peterno' => ['required', 'string'],
+            'name' => ['required', 'string'],
+            'paterno' => ['required', 'string'],
             'materno' => ['nullable', 'string'],
-            'curp' => ['required', 'string','unique', 'size:18'],
-            'rfc' => ['required', 'string', 'unique','size:13'],
-            'regimen_fiscal_id' => ['required', 'exists:regimes_fiscales,id'],
-            'domicilio_fiscal' => ['required', 'string', 'size:13'],
+            'curp' => ['required', 'string','unique:empleados,curp', 'size:18'],
+            'rfc' => ['required', 'string', 'unique:empleados,rfc','size:13'],
+            'regimen_fiscal' => ['required', 'exists:regimes_fiscales,clave'],
+            'domicilio_fiscal' => ['required', 'string'],
         ], [
-            'nombre.required' => 'El nombre es obligatorio.',
-            'nombre.string' => 'El nombre debe ser una cadena de texto.',
+            'name.required' => 'El nombre es obligatorio.',
+            'name.string' => 'El nombre debe ser una cadena de texto.',
 
-            'peterno.required' => 'El apellido paterno es obligatorio.',
-            'peterno.string' => 'El apellido paterno debe ser una cadena de texto.',
+            'paterno.required' => 'El apellido paterno es obligatorio.',
+            'paterno.string' => 'El apellido paterno debe ser una cadena de texto.',
 
             'materno.string' => 'El apellido materno debe ser una cadena de texto si se proporciona.',
 
@@ -72,8 +70,8 @@ class EmpleadosController extends Controller
             'rfc.string' => 'El RFC debe ser una cadena de texto.',
             'rfc.size' => 'El RFC debe tener exactamente 13 caracteres.',
 
-            'regimen_fiscal_id.required' => 'Debes seleccionar un régimen fiscal.',
-            'regimen_fiscal_id.exists' => 'El régimen fiscal seleccionado no es válido.',
+            'regimen_fiscal.required' => 'Debes seleccionar un régimen fiscal.',
+            'regimen_fiscal.exists' => 'El régimen fiscal seleccionado no es válido.',
 
             'domicilio_fiscal.required' => 'El domicilio fiscal es obligatorio.',
             'domicilio_fiscal.string' => 'El domicilio fiscal debe ser una cadena de texto.',
@@ -81,19 +79,19 @@ class EmpleadosController extends Controller
         ]);
         try {
             EmpleadosModel::Create([
-                'nombre' =>  $request->nombre,
-                'peterno' => $request->peterno,
-                'materno' =>  $request->materno,
+                'nombre' =>  $request->name,
+                'paterno' => $request->paterno,
+                'materno' =>  $request->materno ?? "",
                 'curp' =>  $request->curp,
                 'rfc' =>  $request->rfc,
-                'regimen_fiscal_id' =>  $request->regimen_fiscal_id,
+                'regimen_fiscal_id' =>  $request->regimen_fiscal,
                 'domicilio_fiscal' =>  $request->domicilio_fiscal,
             ]);
             $message='Creado Exitosamente';
             return response()->json(compact('message'));
         } catch (\Exception $e) {
             Log::error($e);
-            return response()->json(['message'=>$e->getmessage()]);
+            return response()->json(['message'=>$e->getmessage()],500);
         }
     }
     public function Update(Request $request){

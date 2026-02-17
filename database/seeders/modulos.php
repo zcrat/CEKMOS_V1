@@ -56,17 +56,34 @@ class modulos extends Seeder
             'serie_factura'=>'KMG',
             'serie_p_factura'=>'CP',  
         ]);
+        Emisor::create([
+            'n_certificado'=>'00001000000706999754',
+            'archivo_cer'=>'GAPK7310075M6.cer',
+            'archivo_key'=>'GAPK7310075M6.key',
+            'clave_key'=>'cpJesusgro16',
+            'rfc'=>'GAPK7310075M6',
+            'nombre'=>'KARWORKS SOLUTIONS',
+            'logotipo'=>'kws_factura.png',
+            'regimen'=>'626',
+            'codigo'=>'58000',
+            'serie_factura'=>'KMG',
+            'serie_p_factura'=>'CP',  
+        ]);
         ModulosModel::create([
             'descripcion' => 'CFE',
             'emisor_id' => 1,
         ]);
         ModulosModel::create([
             'descripcion' => 'CFB',
-            'emisor_id' => 1,
+            'emisor_id' => 2,
         ]);
         ModulosModel::create([
             'descripcion' => 'ECO',
             'emisor_id' => 2,
+        ]);
+        ModulosModel::create([
+            'descripcion' => 'KARWORKS',
+            'emisor_id' => 4,
         ]);
         $zonas=['ZAMORA',
                 'MORELIA',
@@ -101,6 +118,12 @@ class modulos extends Seeder
             ['descripcion' => 'DIESEL JIQUILPAN', 'numero' => '801145925', 'monto' => 502825.49],
             ['descripcion' => 'DIESEL MORELIA', 'numero' => '801143473', 'monto' => 1800958.76],
             ['descripcion' => 'DIESEL BAJIO', 'numero' => '801153268', 'monto' => 822661.32],
+            ['descripcion' => 'kaws 1', 'numero' => '00000000', 'monto' => 822661.32],
+            ['descripcion' => 'kaws 2', 'numero' => '00000000', 'monto' => 822661.32],
+            ['descripcion' => 'kaws 3', 'numero' => '00000000', 'monto' => 822661.32],
+            ['descripcion' => 'kaws 4', 'numero' => '00000000', 'monto' => 822661.32],
+            ['descripcion' => 'kaws 5', 'numero' => '00000000', 'monto' => 822661.32],
+            ['descripcion' => 'kaws 6', 'numero' => '00000000', 'monto' => 822661.32],
         ];
         foreach ($contratos as $data) {
             Contratos::create($data);

@@ -1,3 +1,4 @@
+import Employees from "@/Pages/Admin/Employees.vue";
 import { Ref } from "vue";
 export interface modulosorden{
   id:number;
@@ -118,6 +119,15 @@ export interface NuevoPresupuesto {
   modulo_orden: number|string,
   //datos posibles
   vigencia: Date|null,
+ }
+ export interface FormEmployee{
+  name:string,
+  paterno:string,
+  materno:string|null,
+  rfc:string,
+  curp:string,
+  regimen_fiscal:string,
+  domicilio_fiscal:string
  }
  export interface datagetpresupuestos{
     presupuesto: NuevoPresupuesto | null;

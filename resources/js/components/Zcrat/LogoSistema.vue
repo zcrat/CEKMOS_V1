@@ -7,5 +7,5 @@ defineProps({
 });
 </script>
 <template>
-     <img src="/storage/Logos/Sistema/Logo_CEKMOS.png" :class="ClassName"/>
+     <img src="/storage/Logos/Sistema/logo.png" :class="ClassName"/>
 </template>

@@ -7,7 +7,7 @@ import { Employee} from '@/types/users';
 import Button  from "@/components/Zcrat/Inputs/Button.vue";
 import BasicModal from '@/components/Zcrat/modals/BasicModal.vue'
 import TableWithPagination from '@/components/Zcrat/TableWithPagination.vue';
-
+import CreateEmployee from '@/components/Zcrat/modals/CreateEmployee.vue'
 
 const ModalView = ref<number|null>(null)
 const iduser = ref<number | null>(null)
@@ -60,7 +60,6 @@ const CraeteOptions=(row:Employee):DataColumn=>{
           'regimen_fiscal',
           'domicilio_fiscal',
     ]"
-    
     api="employees.read"
   >
     
@@ -72,7 +71,10 @@ const CraeteOptions=(row:Employee):DataColumn=>{
       />
     </template>
   </TableWithPagination>
-  
+    <CreateEmployee
+      :show="ModalView===1"
+      :close="()=>{ModalView=null}"
+    />
     <BasicModal 
       :modelValue="ModalView===0" 
       :close="()=>{ModalView=null}"

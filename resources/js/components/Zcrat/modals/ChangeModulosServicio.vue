@@ -4,7 +4,7 @@ import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
 import ButtonTogglePYR from '@/components/Zcrat/Inputs/ButtonTogglePYR.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
 import axios from 'axios'
-import { ref, watch } from 'vue' 
+import { ref, watch,computed } from 'vue' 
 import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
 import type { modulosorden } from '@/types/generales'
 
@@ -67,17 +67,21 @@ watch(
     }
   }
 )
+const show = computed({
+  get: () => props.show,
+  set: (value: boolean) => emit('update:show', value)
+})
 </script>
 
 <template>
-  <BaseModal modaltitle="Administrar Modulos Por Usuario" :position="'center'" :modelValue="props.show" @update:modelValue="updateVisibility" >
+  <BaseModal modaltitle="Administrar Modulos Por Usuario" :position="'center'" v-model:modelValue="show" @update:modelValue="updateVisibility" >
     <Loanding v-if="loanding" :text="accion"/>
      <div v-else class="p-2 gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full sm:w-[auto] border-solid border-4 rounded border-blue-300">
         <template v-for="modulo in allmodulos" :key="modulo.id">
           <ButtonTogglePYR 
             :isnew="!usermodulos.includes(modulo.id.toString())" 
             :text="modulo.descripcion"  
-            :onClick="()=>{ToggleModulo(modulo.id)}"
+            @toggle="()=>{ToggleModulo(modulo.id)}"
           />
         </template>
       </div>

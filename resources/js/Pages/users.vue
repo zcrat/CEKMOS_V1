@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Search from '@/components/Zcrat/Inputs/Search.vue';
-import AppLayout from '@/Layouts/AppLayout.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
 import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
 import axios from 'axios'
@@ -55,7 +55,7 @@ GetElements() // ✅ ahora inject ya existe
 </script>
 
 <template>
-    <AppLayout title="Usuarios" description="Bienvenido al sistema CEKMOS" :loanding="loading">
+    <AppLayout title="Usuarios" description="Bienvenido al sistema CEKMOS" :loading="loading">
         <template #filtering>
             <div class="flex flex-row justify-start py-4  w-full">
                 <Search Classdiv="sm:w-[20rem] w-full"/>
@@ -107,7 +107,7 @@ GetElements() // ✅ ahora inject ya existe
     </AppLayout>
     <ChangePermissionsUser v-model:show="ModalExampleShoW"  :id="iduser" />
     <ChangeModulosServicio v-model:show="ModalEditModuls"  :id="iduser" />
-    <BasicModal v-model:modelValue="openconfirmation" :buttonconfirm="{text:'Si, Eliminar',onClick:()=>{DeleteUser(),openconfirmation=false},classname:'bg-red-600 font-bold text-white'}" >
+    <BasicModal v-model:modelValue="openconfirmation" :buttonconfirm="{text:'Si, Eliminar',onClick:()=>{DeleteUser(),openconfirmation=false},classname:'bg-red-600 font-bold text-white'} " @close="()=>{openconfirmation=false}">
         <h2 class="text-center text-lg">¿Realmente Deseas Eliminar al Usuario?</h2>
     </BasicModal>
 </template>

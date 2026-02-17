@@ -88,7 +88,7 @@ watch(
           <ButtonTogglePYR 
             :isnew="!userroles.includes(role)" 
             :text="role"  
-            :onClick="()=>{ToggleRolesOrPermission(role, true)}"
+             @toggle="()=>{ToggleRolesOrPermission(role, true)}"
           />
         </template>
       </div>
@@ -98,7 +98,7 @@ watch(
           <ButtonTogglePYR 
             :isnew="!userpermisos.includes(permiso)" 
             :text="permiso"  
-            :onClick="()=>{ToggleRolesOrPermission(permiso, false)}" 
+            @toggle="()=>{ToggleRolesOrPermission(permiso, false)}" 
           />
         </template>
       </div>

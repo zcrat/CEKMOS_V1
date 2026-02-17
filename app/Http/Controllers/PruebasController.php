@@ -633,7 +633,7 @@ class PruebasController extends Controller
 
                     if (empty(array_filter($cells))) continue;
                     $num=($cells[0] ?? '').'-'.($cells[1] ?? '');
-                    $des=$cells[3] ?? '';
+                    $des=$cells[3] ?? ' No registrada en los archivos';
                     $sat=$this->GetCatNum($cells[2],false);
                     $cat=$this->GetCatNum($cells[2]);
                     $m=5;
@@ -1148,7 +1148,7 @@ class PruebasController extends Controller
             $cat='10';
             $sat='272';
         }
-        if(str_contains($cat,'Llantas nuevas')){
+        if(str_contains($cat,'Llantas')  ){
             $cat='14';
             $sat='115';
         }

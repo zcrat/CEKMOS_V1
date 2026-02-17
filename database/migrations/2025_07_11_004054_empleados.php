@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('rfc', 13)->unique();;
             $table->string('regimen_fiscal_id', 3); // ⚠️ importante que coincida con el tipo
             $table->foreign('regimen_fiscal_id')->references('clave')->on('regimes_fiscales');
-            $table->integer('domicilio_fiscal');
+            $table->string('domicilio_fiscal');
             $table->timestamps();
             $table->softDeletes();
         });
