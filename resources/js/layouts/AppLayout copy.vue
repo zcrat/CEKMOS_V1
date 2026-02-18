@@ -22,10 +22,6 @@ const switchToTeam = (team) => {
         preserveState: false,
     });
 };
-
-const logout = () => {
-    router.post(route('logout'));
-};
 </script>
 
 <template>

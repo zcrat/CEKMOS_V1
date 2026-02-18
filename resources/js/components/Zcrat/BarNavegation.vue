@@ -5,8 +5,7 @@ import DropdownLink from '@/components/DropdownLink.vue';
 import ButtonLink from '@/components/Zcrat/Inputs/ButtonLink.vue';
 import LogoSistema from '@/components/Zcrat/LogoSistema.vue';
 import Notification from '@/components/Zcrat/Notification.vue';
-import { defineEmits } from 'vue';
-
+import {router } from '@inertiajs/vue3';
 interface Props {
   ClassNav?: string;
   IsRow: boolean;
@@ -21,6 +20,9 @@ function toggleNav() {
 function toggleNavsmartphone() {
     emit('toggle_smartphone_active');
 }
+const logout = () => {
+    router.post(route('logout'));
+};
 </script>
 <template>
     <nav :class="['border-b border-gray-100 w-full h-[4rem]', props.ClassNav, IsRow ?'':'sm:h-full sm:w-[5rem]' ]">
@@ -91,7 +93,7 @@ function toggleNavsmartphone() {
                 <div class="border-t border-gray-200" />
                 
                 <!-- Authentication -->
-                <form>
+                <form @submit.prevent="logout">
                     <DropdownLink as="button">
                         Cerrar Sesión
                     </DropdownLink>

@@ -25,7 +25,7 @@ export interface paginationprops {
   api: string,
   params: Record<string, any>
   clases?: string;
-  chnagesItems?:boolean;
+  changesItems?:boolean;
 }
 export interface DatosPresupuestos {
   observaciones: string,

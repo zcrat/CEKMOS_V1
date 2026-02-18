@@ -13,6 +13,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-         $this->call([users::class,regimenes::class,modulos::class,asignarrolesypermisos::class,Categorias::class,Tipos::class,Estatus::class,NivelesCombustible::class]);
+         $this->call([Categorias::class,Tipos::class,asignarrolesypermisos::class,users::class,regimenes::class,modulos::class,Estatus::class,NivelesCombustible::class]);
     }
 }

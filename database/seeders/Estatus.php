@@ -21,7 +21,7 @@ class Estatus extends Seeder
             ['descripcion' => 'Pendiente De Factura', 'categoria_id' => 2],
             ['descripcion' => 'Aprobacion Denegada', 'categoria_id' => 2],
             ['descripcion' => 'Pago Denegado', 'categoria_id' => 2],
-            ['descripcion' => 'Registrada', 'categoria_id' => 6],
+            ['descripcion' => 'Solo Terminados', 'categoria_id' => 2],
             ['descripcion' => 'Petición de cancelación realizada exitosamente', 'categoria_id' => 6],
             ['descripcion' => 'Cancelacion exitosa', 'categoria_id' => 6],
             ['descripcion' => 'Solicitud realizada anteriormente, espere 72 horas...', 'categoria_id' => 6],

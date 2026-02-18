@@ -73,11 +73,11 @@ const CraeteOptions=(row:Employee):DataColumn=>{
   </TableWithPagination>
     <CreateEmployee
       :show="ModalView===1"
-      :close="()=>{ModalView=null}"
+      @close="()=>{ ModalView=null}"
     />
     <BasicModal 
       :modelValue="ModalView===0" 
-      :close="()=>{ModalView=null}"
+      @close="()=>{ModalView=null}"
       :buttonconfirm="{
         text:'Si, Eliminar',
         onClick:()=>{if(ModalView){

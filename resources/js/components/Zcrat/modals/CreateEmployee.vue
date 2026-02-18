@@ -11,7 +11,10 @@ import {type FormEmployee, type option} from '@/types/generales'
 import {type buttonconfirmed} from '@/types/modals'
 import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
 
-const props = defineProps<{show: boolean,close:()=>void}>()
+const props = defineProps<{show: boolean}>()
+const emit = defineEmits<{
+  (e: 'close'): void
+}>()
 const regimen_fiscal=ref<option|undefined>(undefined)
 const Employee = reactive<FormEmployee>({
   name:'',
@@ -29,7 +32,7 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
     onClick:()=>{
       Create(Employee).then((res)=>{
         if(res.status){
-          props.close
+          emit('close')
           window.location.href=route('Presupuesto.Editar',{presupuesto:res.data.id});
         }else{
           if(res.code===422){
@@ -54,7 +57,7 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
   <BaseModal 
     modaltitle="Nuevo Empleado" 
     :position="'center'" 
-    :close="props.close" 
+    @close="emit('close')" 
     :modelValue="props.show" 
     :buttonconfirm="buttonconfirm" >
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2" >

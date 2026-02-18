@@ -1,25 +1,24 @@
-<script setup>
+<script setup lang="ts">
 import NavLink from '@/components/NavLink.vue';
 import Dropdown from '@/components/Dropdown.vue';
 import DropdownLink from '@/components/DropdownLink.vue';
 import LogoSistema from '@/components/Zcrat/LogoSistema.vue';
-import { defineEmits } from 'vue';
 
-const props = defineProps({
-    ClassNav: {
-    type: String,
-    default: '', 
-  },
-    barnav_active: {
-        type: Boolean,
-        required: true, 
-    }
-});
+import {router } from '@inertiajs/vue3';
+interface Props {
+  ClassNav?: string
+  barnav_active: boolean
+}
 
+const props = defineProps<Props>()
+
+const logout = () => {
+    router.post(route('logout'));
+};
 
 </script>
 <template>
-    <nav :class="['z-[2] border-b border-gray-100 w-[8rem] h-[calc(100vh-4.5rem)] top-[4.5rem]  absolute transform transition duration-300 ease-in-out',barnav_active ? 'translate-x-0 left-2':'-translate-x-full left-0'] ">
+    <nav :class="['z-[2] border-b border-gray-100 w-[8rem] h-[calc(100vh-4.5rem)] top-[4.5rem]  absolute transform transition duration-300 ease-in-out',props.barnav_active ? 'translate-x-0 left-2':'-translate-x-full left-0'] ">
         <div :class="[
             'flex h-full bg-[#176cb3] rounded-md flex-col items-start justify-between max-w-full relative ',
              'sm:flex-col sm:me-2 sm:mb-0'

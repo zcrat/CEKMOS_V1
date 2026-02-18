@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppLayout from '@/Layouts/AppLayout.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3'
 import { ref,computed} from 'vue'
 import Search from '@/components/Zcrat/Inputs/Search.vue';
@@ -21,28 +21,13 @@ const itemsPerPage=ref<number>(10)
 const totalPages=ref<number>(0)
 const totalItems=ref<number>(0)
 const items=ref<presupuestos[]>([])
+const search = ref<string>('');
 
 const prefacturasactive = false;
 const loading = ref<boolean>(false);
 const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
 const Listado  = ref<modulosorden[]>([{id:1,descripcion:'CFE 2025 MORELIA GASOLINA'},{id:2,descripcion:'CFE 2025 MORELIA DiSEL'},{id:2,descripcion:'CFE 2025 BAJIO DiSEL'}])
 const ShowNuevo = ref<boolean>(false)
-const SearchData=async (currentPage:number,itemsPerPage:number)=>{
-    try {
-        loading.value=true;
-        const response = await axios.get(route('Cortana.Presupuesto.Items'),{params:{currentPage,itemsPerPage}})
-        items.value=response.data.items;
-    } catch (error : any) {
-        if (error.response?.status === 500) {
-            MyBasicToast.error(error.response.data.message || 'Error del servidor')
-        } else {
-        console.error('Error:', error)
-        }
-    }finally{
-        loading.value=false
-    }
-}
-SearchData(currentPage.value,itemsPerPage.value);
 
 </script>
 
@@ -55,7 +40,7 @@ SearchData(currentPage.value,itemsPerPage.value);
         </template>
         <template #filtering>
             <div class="flex gap-2  flex-row">
-                <Search Classdiv="sm:w-[30rem] w-full" placeholder="Buscar Por Folio, PLacas, Economico o Order De Servicio" />
+                <Search Classdiv="sm:w-[30rem] w-full" placeholder="Buscar Por Folio, PLacas, Economico o Order De Servicio" v-model="search"/>
                 <empresasselect/>
             </div>
                 <div class="flex gap-2 items-end justify-between sm:justify-start">
@@ -66,7 +51,7 @@ SearchData(currentPage.value,itemsPerPage.value);
                 
         </template>
         <template #content>
-            <Pagination :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
+            <Pagination api="Cortana.Presupuesto.Items" :params="{'search':search}" :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
             <Table v-if="items.length>=1" :titles="[
                 {title:'opciones',classname:'uppercase'},
                 {title:'Folio',classname:'uppercase'},

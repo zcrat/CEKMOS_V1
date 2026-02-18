@@ -64,7 +64,7 @@
 </script>
 <template>
     <div :class="'flex gap-2 flex-wrap items-center w-full my-2 '+(props.clases ? props.clases : '')">
-        <select v-if="props.chnagesItems && totalItems>1"
+        <select v-if="props.changesItems && totalItems>1"
             name="ElementsPerPage"
             id="ElementsPerPage"
             v-model="itemsPerPage"
