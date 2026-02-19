@@ -4,7 +4,21 @@ import { Head } from '@inertiajs/vue3';
 import BarNavegation from '@/components/Zcrat/BarNavegation.vue';
 import BarNavegation_Smartphone from '@/components/Zcrat/BarNavegation_Smartphone.vue';
 import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
-
+import { useEcho } from '@laravel/echo-vue';
+import axios from 'axios' 
+onMounted(async () => {
+    try{
+    const response = await axios.get(route('userid'))
+    userId.value = response.data;
+    const { listen } = useEcho(
+      `App.Models.User.${userId.value}`,
+      '.DataUserEvent'
+    );
+  listen();
+} catch (error) {
+  console.error(error);
+}
+});
 const props = defineProps({
     title: String,
     description: String,
@@ -22,6 +36,7 @@ const showingNavigationtop = ref<boolean>(
 
 
 const Barnav_smartphone_active = ref(false);
+const userId = ref<string | null>(null);
 const checkWidth = () => {
   isSmOrLarger.value = window.matchMedia('(min-width: 640px)').matches
 }
@@ -44,8 +59,8 @@ onMounted(() => {
 
 <template>
         <Head :title="title" />
-        <div :class="['min-h-screen relative h-screen bg-gray-100 pt-2 px-2 flex flex-col overflow-auto',showingNavigationtop ? '' : 'sm:flex-row' ]">
-            <BarNavegation :IsRow="showingNavigationtop" @toggle="toggleshowingNavigationtop()" @toggle_smartphone_active="Barnav_smartphone_active = !Barnav_smartphone_active"/>
+        <div  v-if="userId !== null" :class="['min-h-screen relative h-screen bg-gray-100 pt-2 px-2 flex flex-col overflow-auto',showingNavigationtop ? '' : 'sm:flex-row' ]">
+            <BarNavegation :IdUser="userId" :IsRow="showingNavigationtop" @toggle="toggleshowingNavigationtop()" @toggle_smartphone_active="Barnav_smartphone_active = !Barnav_smartphone_active"/>
             <BarNavegation_Smartphone v-if="!isSmOrLarger" :barnav_active="Barnav_smartphone_active"/>
 
             <main class="flex flex-col flex-1">

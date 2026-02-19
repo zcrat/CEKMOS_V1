@@ -39,7 +39,7 @@ const GetElements=async ()=>{
 }
 const DeleteUser=async ()=>{
     try {
-        await axios.post(route('delete.user'),{id:iduser})
+        await axios.post(route('delete.user'),{id:iduser.value})
         MyBasicToast.success('Eliminado Correctamente')
         GetElements()
     } catch (error : any) {

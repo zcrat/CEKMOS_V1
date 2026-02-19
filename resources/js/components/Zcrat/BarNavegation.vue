@@ -9,6 +9,7 @@ import {router } from '@inertiajs/vue3';
 interface Props {
   ClassNav?: string;
   IsRow: boolean;
+  IdUser:string
 }
 
 const props = defineProps<Props>();
@@ -66,7 +67,7 @@ const logout = () => {
                 </template>
             </Dropdown>
         </div>
-        <Notification :classname="IsRow?'sm:ms-2':'sm:mb-2'" :IsRow="IsRow"></Notification>
+        <Notification :classname="IsRow?'sm:ms-2':'sm:mb-2'" :IsRow="IsRow" :IdUser="IdUser"></Notification>
         <div class="ms-3 relative hidden sm:block">
             <Dropdown :align="IsRow?'right':'left-up' " width="48">
             <template #trigger>

@@ -11,6 +11,7 @@ class Tipos extends Seeder
      * Run the database seeds.
      */
     public function run(): void
+    
     {
         $usuarios_taller = [
             ['descripcion' => 'Administrador de Transporte', 'categoria_id' => 1],
@@ -70,6 +71,10 @@ class Tipos extends Seeder
             ['descripcion' => 'Mano Obra', 'categoria_id' => 9],
             ['descripcion' => 'Sub-Contratados', 'categoria_id' => 9],
             ['descripcion' => 'Otros', 'categoria_id' => 9],
+            ['descripcion' => 'Se elimino un usuario', 'categoria_id' => 10],
+            ['descripcion' => 'se actualizo un usuario', 'categoria_id' => 10],
+            ['descripcion' => 'se actualizo roles de un usuario', 'categoria_id' => 10],
+            ['descripcion' => 'se actualizo permisos de un usuario', 'categoria_id' => 10],
         ];
         foreach ($usuarios_taller as $data) {
             TiposModel::create($data);

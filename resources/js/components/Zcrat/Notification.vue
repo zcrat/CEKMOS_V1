@@ -5,10 +5,13 @@ import { ref,onMounted} from 'vue'
 
 import { useEcho } from '@laravel/echo-vue';
 import axios from 'axios' 
-const props = defineProps<{
+
+interface Props {
     classname?:string
     IsRow:boolean
-}>();
+    IdUser:string
+}
+const props = defineProps<Props>();
 interface Notification {
     id: number;
     type: string;
@@ -24,11 +27,10 @@ const notificaciones: Ref<Notification[]> = ref([]);
 const countnotificaciones = ref(0);
 const shownotifications = ref(5);
 const hasmore = ref(false);
-const userId = 1;
 onMounted(async () => {
     try{
     const { listen } = useEcho(
-    `App.Models.User.${userId}`,
+    `App.Models.User.${props.IdUser}`,
     ".NewNotifications",
     (notification:{notificacion:Notification}) => {
         countnotificaciones.value += 1;

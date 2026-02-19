@@ -14,9 +14,10 @@ use App\Http\Controllers\MigrateDataBaseOld;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\presupuestosController;
 use App\Http\Controllers\PruebasController;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Http\Request;
 Route::get('/', function () {
   return redirect('/login');
-
 });
 Route::get('/trasformar',[PruebasController::class,"TransformDataToImport"]);
 Route::get('/trasformar2',[PruebasController::class,"TransformDataToImport2"]);
@@ -28,11 +29,18 @@ Route::get('/trasformar7',[PruebasController::class,"TransformDataToImport7"]);
 Route::get('/trasformar8',[PruebasController::class,"TransformDataToImport8"]);
 Route::get('/trasformar9',[PruebasController::class,"TransformDataToImport9"]);
 Route::get('/trasformar10',[PruebasController::class,"TransformDataToImport10"]);
-
+Route::get('/userid', function (Request $request) {
+    return Crypt::encrypt($request->user()->id);
+  })->name('userid');
+Route::middleware(['auth:sanctum',config('jetstream.auth_session')])->group(function () {
+  
+});
 Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])->group(function () {
     Route::get('/dashboard', function () { return Inertia::render('Dashboard');})->name('dashboard');
 
     Route::get('/users', function () {return Inertia::render('users');})->name('users');
+
+
 
     Route::get('/Get/Users',[UsersController::class,"ReadUsers"])->name('getusers');
     Route::get('/Get/Permisos/User',[UsersController::class,"GetPermisos"])->name('getpermisosuser');

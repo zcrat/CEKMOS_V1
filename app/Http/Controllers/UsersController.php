@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Notificaciones;
 use App\Models\ModulosPerUser;
 use \App\Notifications\SeendNotification;
+use Illuminate\Support\Facades\Crypt;
+
 class UsersController extends Controller
 {
     public  function ReadUsers(Request $request){
@@ -25,13 +27,17 @@ class UsersController extends Controller
                 'email'=>$item->email,
                 'varified'=>$item->email_verified_at != null ? true:false,
                 'date'=>Carbon::parse($item->created_at)->format('Y-m-d H:i:s'),
-                'id'=>$item->id,
+                'id'=>Crypt::encrypt($item->id),
             ];
         });
         return response()->json(compact('elements'));
     }
     public function GetPermisos(Request $request){
         $id=$request->id;
+        $id=Crypt::decrypt($id);
+        if(!$id){
+            return response()->json(['message'=>'ID de usuario no válido'],400);
+        }
         $user=User::find($id);
         if(!$user){
             return response()->json(['message'=>'Usuario no encontrado'],404);
@@ -40,6 +46,10 @@ class UsersController extends Controller
     }
     public function GetModulos(Request $request){
         $id=$request->id;
+        $id=Crypt::decrypt($id);
+        if(!$id){
+            return response()->json(['message'=>'ID de usuario no válido'],400);
+        }
         $user=User::with('modulos_orden')->find($id);
         if(!$user){
             return response()->json(['message'=>'Usuario no encontrado'],404);
@@ -62,6 +72,10 @@ class UsersController extends Controller
         ]);
 
         $id=$request->id;
+        $id=Crypt::decrypt($id);
+        if(!$id){
+            return response()->json(['message'=>'ID de usuario no válido'],400);
+        }
         $permisos=$request->permisos;
         $user=User::find($id);
         $user->givePermissionTo($permisos);
@@ -80,6 +94,10 @@ class UsersController extends Controller
             'role.exists' => 'El rol no existe.',
         ]);
         $id=$request->id;
+        $id=Crypt::decrypt($id);
+        if(!$id){
+            return response()->json(['message'=>'ID de usuario no válido'],400);
+        }
         $role=$request->role;
         $user=User::find($id);
         if($user->hasRole($role)){
@@ -98,6 +116,7 @@ class UsersController extends Controller
         return $this->GetRolesAndPermission($user);
     }
     public function TogglePermiso(Request $request){
+        
         $request->validate([
             'id' => ['required','exists:users,id'],
             'permiso' => ['required','string','exists:permissions,name'],
@@ -110,6 +129,10 @@ class UsersController extends Controller
             'permiso.exists' => 'El permiso no existe.',
         ]);
         $id=$request->id;
+        $id=Crypt::decrypt($id);
+        if(!$id){
+            return response()->json(['message'=>'ID de usuario no válido'],400);
+        }
         $permiso=$request->permiso;
         $user=User::find($id);
         if($user->hasPermissionTo($permiso)){
@@ -144,6 +167,10 @@ class UsersController extends Controller
         ]);
         $user=$request->user;
         $modulo=$request->modulo;
+        $user=Crypt::decrypt($user);
+        if(!$user){
+            return response()->json(['message'=>'ID de usuario no válido'],400);
+        }
         $exist=ModulosPerUser::withTrashed()->where('user_id',$user)->where('modulo_orden_id',$modulo)->first();
         if ($exist) {
             if (isset($exist->deleted_at)) {
@@ -169,10 +196,17 @@ class UsersController extends Controller
             'id.required' => 'El ID del usuario es obligatorio.',
             'id.exists' => 'El usuario no existe.',
         ]);
-        if($request->id === $request->user()->id){
+        $id=$request->id;
+        $id=Crypt::decrypt($id);
+        if(!$id){
+            return response()->json(['message'=>'ID de usuario no válido'],400);
+        }
+        if($id === $request->user()->id){
             return response()->json(['message'=>'No Puedes Eliminar Tu Propio Perfil'],500);
         }
-        $user=User::findorfail($request->id);
+        
+        $user=User::find($id);
+        $user->tokens()->delete();
         $user->delete();
          return response()->json(['message' => 'Usuario eliminado correctamente.'], 200);
     }
@@ -191,7 +225,6 @@ class UsersController extends Controller
         return response()->json(compact('usermodulos', 'allmodulos'));
     }
     private function GetRolesAndPermission($user){
-
         $userpermisos=$user->getAllPermissions();
         $userpermisos=$userpermisos->map(function ($item){
             return $item->name;
