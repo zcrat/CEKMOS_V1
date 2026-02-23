@@ -27,17 +27,14 @@ class UsersController extends Controller
                 'email'=>$item->email,
                 'varified'=>$item->email_verified_at != null ? true:false,
                 'date'=>Carbon::parse($item->created_at)->format('Y-m-d H:i:s'),
-                'id'=>Crypt::encrypt($item->id),
+                'id'=>$item->id,
             ];
         });
         return response()->json(compact('elements'));
     }
     public function GetPermisos(Request $request){
         $id=$request->id;
-        $id=Crypt::decrypt($id);
-        if(!$id){
-            return response()->json(['message'=>'ID de usuario no válido'],400);
-        }
+        
         $user=User::find($id);
         if(!$user){
             return response()->json(['message'=>'Usuario no encontrado'],404);
@@ -46,10 +43,7 @@ class UsersController extends Controller
     }
     public function GetModulos(Request $request){
         $id=$request->id;
-        $id=Crypt::decrypt($id);
-        if(!$id){
-            return response()->json(['message'=>'ID de usuario no válido'],400);
-        }
+        
         $user=User::with('modulos_orden')->find($id);
         if(!$user){
             return response()->json(['message'=>'Usuario no encontrado'],404);
@@ -72,10 +66,7 @@ class UsersController extends Controller
         ]);
 
         $id=$request->id;
-        $id=Crypt::decrypt($id);
-        if(!$id){
-            return response()->json(['message'=>'ID de usuario no válido'],400);
-        }
+        
         $permisos=$request->permisos;
         $user=User::find($id);
         $user->givePermissionTo($permisos);
@@ -94,10 +85,7 @@ class UsersController extends Controller
             'role.exists' => 'El rol no existe.',
         ]);
         $id=$request->id;
-        $id=Crypt::decrypt($id);
-        if(!$id){
-            return response()->json(['message'=>'ID de usuario no válido'],400);
-        }
+        
         $role=$request->role;
         $user=User::find($id);
         if($user->hasRole($role)){
@@ -129,10 +117,7 @@ class UsersController extends Controller
             'permiso.exists' => 'El permiso no existe.',
         ]);
         $id=$request->id;
-        $id=Crypt::decrypt($id);
-        if(!$id){
-            return response()->json(['message'=>'ID de usuario no válido'],400);
-        }
+        
         $permiso=$request->permiso;
         $user=User::find($id);
         if($user->hasPermissionTo($permiso)){
@@ -167,10 +152,6 @@ class UsersController extends Controller
         ]);
         $user=$request->user;
         $modulo=$request->modulo;
-        $user=Crypt::decrypt($user);
-        if(!$user){
-            return response()->json(['message'=>'ID de usuario no válido'],400);
-        }
         $exist=ModulosPerUser::withTrashed()->where('user_id',$user)->where('modulo_orden_id',$modulo)->first();
         if ($exist) {
             if (isset($exist->deleted_at)) {
@@ -190,17 +171,14 @@ class UsersController extends Controller
     }
     public function DeleteUser(Request $request){
         $request->validate([
-            'id' => ['required','exists:users,id'],
+            'id' => ['required','string','exists:users,id'],
         ],
         [
             'id.required' => 'El ID del usuario es obligatorio.',
             'id.exists' => 'El usuario no existe.',
         ]);
         $id=$request->id;
-        $id=Crypt::decrypt($id);
-        if(!$id){
-            return response()->json(['message'=>'ID de usuario no válido'],400);
-        }
+        
         if($id === $request->user()->id){
             return response()->json(['message'=>'No Puedes Eliminar Tu Propio Perfil'],500);
         }
@@ -208,6 +186,8 @@ class UsersController extends Controller
         $user=User::find($id);
         $user->tokens()->delete();
         $user->delete();
+        event(new \App\Events\DataUserEvent($id,'delete'));
+        event(new \App\Events\UsersEvents($id,'delete'));
          return response()->json(['message' => 'Usuario eliminado correctamente.'], 200);
     }
     private function GetModulosPerUser($user){

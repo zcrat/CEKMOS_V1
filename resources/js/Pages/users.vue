@@ -11,16 +11,28 @@ import ChangePermissionsUser from '@/components/Zcrat/modals/ChangePermissionsUs
 import ChangeModulosServicio from '@/components/Zcrat/modals/ChangeModulosServicio.vue'
 import BasicModal from '@/components/Zcrat/modals/BasicModal.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
-
+import { useEcho } from '@laravel/echo-vue';
 const rows = ref<UsersTable[]>([])
 const loading = ref<boolean>(false)
 const ModalExampleShoW = ref(false)
 const ModalEditModuls = ref(false)
 const openconfirmation = ref(false)
 const iduser = ref<number | null>(null)
-
+interface DataEvent {
+    message: string;
+    tipo: number;
+    id_user: number;
+};
 console.log("Componente cargado");
-
+useEcho(
+  `UsersEvents`,
+  '.Events',
+  (data: DataEvent) => {
+    if (data.tipo === 58) {
+      rows.value = rows.value.filter(user => user.id !== data.id_user);
+    }
+  }
+)
 
 const GetElements=async ()=>{
     try {
@@ -41,7 +53,6 @@ const DeleteUser=async ()=>{
     try {
         await axios.post(route('delete.user'),{id:iduser.value})
         MyBasicToast.success('Eliminado Correctamente')
-        GetElements()
     } catch (error : any) {
         if (error.response?.status) {
             MyBasicToast.error(error.response.data.message || 'Error del servidor')

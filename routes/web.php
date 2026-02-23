@@ -30,19 +30,21 @@ Route::get('/trasformar8',[PruebasController::class,"TransformDataToImport8"]);
 Route::get('/trasformar9',[PruebasController::class,"TransformDataToImport9"]);
 Route::get('/trasformar10',[PruebasController::class,"TransformDataToImport10"]);
 Route::get('/userid', function (Request $request) {
-    return Crypt::encrypt($request->user()->id);
+    return $request->user()->id;
   })->name('userid');
 Route::middleware(['auth:sanctum',config('jetstream.auth_session')])->group(function () {
   
 });
 Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])->group(function () {
+    Route::middleware(['permission:ver_usuarios_sitema'])->group(function () {
+      Route::get('/users', function () {return Inertia::render('users');})->name('users');
+      Route::get('/Get/Users',[UsersController::class,"ReadUsers"])->name('getusers');
+    });
     Route::get('/dashboard', function () { return Inertia::render('Dashboard');})->name('dashboard');
 
-    Route::get('/users', function () {return Inertia::render('users');})->name('users');
 
 
 
-    Route::get('/Get/Users',[UsersController::class,"ReadUsers"])->name('getusers');
     Route::get('/Get/Permisos/User',[UsersController::class,"GetPermisos"])->name('getpermisosuser');
     Route::get('/Get/Modulos/User',[UsersController::class,"GetModulos"])->name('get.modulos.user');
     Route::post('/Delete/User',[UsersController::class,"DeleteUser"])->name('delete.user');
@@ -56,7 +58,9 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('/employees/read',[EmpleadosController::class,'read'])->name('employees.read');
     Route::post('/employees/create',[EmpleadosController::class,'create'])->name('employees.create');
 
+    Route::get('cortana/recepciones/vehiculares',[CortanaController::class,'PresupuestosVista'])->name('Cortana.OrdenesServicio.Vista');
     Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
+
     Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('Cortana.Presupuesto.Items');
 
     Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');

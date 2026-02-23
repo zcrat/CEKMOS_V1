@@ -6,6 +6,14 @@ const props = defineProps({
         type: String,
         default: 'right',
     },
+    classtrigger: {
+        type: String,
+        default: '',
+    },
+    classcontent: {
+        type: String,
+        default: '',
+    },
     width: {
         type: String,
         default: 'auto',
@@ -67,9 +75,9 @@ const alignmentClasses = computed(() => {
 </script>
 
 <template>
-    <div :class="['relative w-fit']">
-        <div @click="open = ! open">
-            <slot name="trigger" />
+    <div :class="[props.classcontent,'relative w-fit']">
+        <div @click="open = ! open" :class="props.classtrigger">
+             <slot name="trigger" />
         </div>
 
         <!-- Full Screen Dropdown Overlay -->
