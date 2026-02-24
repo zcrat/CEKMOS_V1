@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import Checkbox from '@/components/Zcrat/Inputs/form/Checkbox.vue'
+  import Checkbox from '@/components/Zcrat/Inputs/form/CheckboxFilter.vue'
   import Poper from '@/components/Zcrat/Elements/poper.vue' 
   import { computed } from 'vue';
 import { ref } from 'vue';
