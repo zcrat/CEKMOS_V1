@@ -5,7 +5,7 @@ const props = defineProps<{
   classname?: string
   classlabel?: string
   classdiv?: string
-  label?: string
+  label: string
   value: string | number
   checked: boolean
   id: string
@@ -15,19 +15,12 @@ const props = defineProps<{
 const handleChange = (event: Event) => {
   emit('change', props.value)
 }
-</script>
+</script><i class="fa-regular fa-square-check"></i>
 <template>
   <div :class="['flex flex-row justify-start items-center gap-x-2 p-2', classdiv]" @onClick="handleChange">
-    <input
-      :id="id"
-      :name="name"
-      type="checkbox"
-      :checked="checked"
-      :disabled="true"
-      :class="classname ?? 'rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500'"
-    >
-    <label v-if="label" :class="classlabel ?? ''" :for="id">
+    <font-awesome-icon :icon="checked? 'fa-solid fa-square-check':'fa-regular fa-square-check'" :class="'sm:text-[1.3rem]'"/>
+    <h4 :class="classlabel ?? ''">
       {{ label }}
-    </label>
+    </h4>
   </div>
 </template>
