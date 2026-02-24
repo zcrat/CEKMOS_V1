@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3'
-import { ref,computed} from 'vue'
+import { ref,computed, watch} from 'vue'
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
 import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
@@ -22,12 +22,18 @@ const totalPages=ref<number>(0)
 const totalItems=ref<number>(0)
 const items=ref<presupuestos[]>([])
 const search = ref<string>('');
+const estatus = ref<string[]>([]);
 
 const prefacturasactive = false;
 const loading = ref<boolean>(false);
 const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
-const Listado  = ref<modulosorden[]>([{id:1,descripcion:'CFE 2025 MORELIA GASOLINA'},{id:2,descripcion:'CFE 2025 MORELIA DiSEL'},{id:2,descripcion:'CFE 2025 BAJIO DiSEL'}])
+const Listado  = ref<modulosorden[]>([])
 const ShowNuevo = ref<boolean>(false)
+
+watch(estatus, (newVal, oldVal) => {
+  console.log("Estatus cambió:", oldVal, "→", newVal)
+}, { deep: true })
+
 
 </script>
 
@@ -44,14 +50,14 @@ const ShowNuevo = ref<boolean>(false)
                 <empresasselect/>
             </div>
                 <div class="flex gap-2 items-end justify-between sm:justify-start">
-                    <estatusfilter />
+                    <estatusfilter v-model:selectedIds="estatus"/>
                     <ModulosFilter :Listado="Listado" />
                     <Datapicker />
                 </div>
                 
         </template>
         <template #content>
-            <Pagination api="Cortana.Presupuesto.Items" :params="{'search':search}" :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
+            <Pagination api="Cortana.Presupuesto.Items" :params="{'search':search,'estatus':estatus}" :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
             <Table v-if="items.length>=1" :titles="[
                 {title:'opciones',classname:'uppercase'},
                 {title:'Folio',classname:'uppercase'},

@@ -6,14 +6,32 @@ import ButtonLink from '@/components/Zcrat/Inputs/ButtonLink.vue';
 import LogoSistema from '@/components/Zcrat/LogoSistema.vue';
 import Notification from '@/components/Zcrat/Notification.vue';
 import {router } from '@inertiajs/vue3';
+import { useEcho } from '@laravel/echo-vue';
+import MyBasicToast from '@/utils/ToastNotificationBasic';
+import { useAuth } from '@/composables/useAuth';
+const { can,canAny } = useAuth();
+interface DataEvent {
+    message: string;
+    tipo: number;
+}
 interface Props {
   ClassNav?: string;
   IsRow: boolean;
-  IdUser:string
+  IdUser:number
 }
-
 const props = defineProps<Props>();
+useEcho(
+  `Data.User.${props.IdUser}`,
+  '.DataUserEvent',
+  (data: DataEvent) => {
+    console.log('Evento recibido:', data.message, data.tipo)
 
+    if (data.tipo === 58) {
+      MyBasicToast.success('Se Te Ha Revocado El Acceso')
+      window.location.reload()
+    }
+  }
+)
 const emit = defineEmits(['toggle','toggle_smartphone_active']);
 function toggleNav() {
   emit('toggle');
@@ -38,31 +56,34 @@ const logout = () => {
             </div>
         
         <div :class="'flex-grow justify-start gap-x-2 gap-y-4 hidden sm:flex '+(IsRow?'flex-row':'flex-col')">
-            <NavLink :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
-            <NavLink :href="route('users')" :active="route().current('users')"><font-awesome-icon icon="fa-solid fa-users " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
-            <NavLink :href="route('employees')" :active="route().current('employees')"><font-awesome-icon icon="fa-solid fa-address-book " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Empleados</span></NavLink>
-            <Dropdown :align="IsRow?'right':'left-up' " width="48">
+            <NavLink  :title="IsRow ? '' : 'Inicio'" :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
+            <NavLink v-if="can('ver_usuarios_sitema')" :title="IsRow ? '' : 'Usuarios'" :href="route('users')" :active="route().current('users')"><font-awesome-icon icon="fa-solid fa-users " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
+            <NavLink v-if="can('ver_empleados')" :title="IsRow ? '' : 'Empleados'" :href="route('employees')" :active="route().current('employees')"><font-awesome-icon icon="fa-solid fa-address-book " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Empleados</span></NavLink>
+            <Dropdown :align="IsRow?'right':'left-up' " width="48" v-if="canAny(['ver_presupuestos','ver_ordenes_servicio'])">
                 <template #trigger>
-                    <ButtonLink :active="route().current('Cortana.Presupuesto.Vista')"><font-awesome-icon icon="fa-solid fa-address-book " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Cortana</span></ButtonLink>
+                    <ButtonLink :title="IsRow ? '' : 'Ordenes'"  :active="route().current('Cortana.Presupuesto.Vista')"><font-awesome-icon icon="fa-solid fa-table-list" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Ordenes</span></ButtonLink>
                 </template>
                 
                 <template #content>
-                    <DropdownLink :href="route('Cortana.Presupuesto.Vista')">
+                    <DropdownLink v-if="can('ver_presupuestos')" :href="route('Cortana.Presupuesto.Vista')">
                         Presupuestos
                     </DropdownLink>
-                    <DropdownLink :href="route('Cortana.Presupuesto.Vista')">
-                        Recepciones Vehiculares
+                    <DropdownLink v-if="can('ver_ordenes_servicio')" :href="route('Cortana.OrdenesServicio.Vista')">
+                    <font-awesome-icon icon="fa-solid fa-truck-pickup" :class="IsRow?'':'sm:text-[1.3rem]'"/> Recepciones Vehiculares
                     </DropdownLink>
                 </template>
             </Dropdown>
-            <Dropdown :align="IsRow?'right':'left-up' " width="48">
+            <Dropdown v-if="canAny(['administrar_caja'])" :align="IsRow?'right':'left-up' " width="48">
                 <template #trigger>
-                    <ButtonLink :active="route().current('Admin.Caja')"><font-awesome-icon icon="fa-solid fa-user " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Administracion</span></ButtonLink>
+                    <ButtonLink :title="IsRow ? '' : 'Admin'" :active="route().current('Admin.Caja')">
+                        <font-awesome-icon icon="fa-solid fa-user-gear" :class="IsRow?'':'sm:text-[1.3rem]'"/>
+                        <span :class="IsRow?'':'sm:hidden'" >&nbsp;Admin</span>
+                    </ButtonLink>
                 </template>
                 
                 <template #content>
-                    <DropdownLink :href="route('Admin.Caja')">
-                        Caja Movimientos
+                    <DropdownLink v-if="can('administrar_caja')" :href="route('Admin.Caja')">
+                       Caja Movimientos
                     </DropdownLink>
                 </template>
             </Dropdown>
@@ -91,7 +112,7 @@ const logout = () => {
                     Mi Perfil
                 </DropdownLink>
                 
-                <div class="border-t border-gray-200" />
+                <div class="border-t border-gray-200"></div>
                 
                 <!-- Authentication -->
                 <form @submit.prevent="logout">

@@ -19,30 +19,26 @@ use Illuminate\Http\Request;
 Route::get('/', function () {
   return redirect('/login');
 });
-Route::get('/trasformar',[PruebasController::class,"TransformDataToImport"]);
-Route::get('/trasformar2',[PruebasController::class,"TransformDataToImport2"]);
-Route::get('/trasformar3',[PruebasController::class,"TransformDataToImport3"]);
-Route::get('/trasformar4',[PruebasController::class,"TransformDataToImport4"]);
-Route::get('/trasformar5',[PruebasController::class,"TransformDataToImport5"]);
-Route::get('/trasformar6',[PruebasController::class,"TransformDataToImport6"]);
-Route::get('/trasformar7',[PruebasController::class,"TransformDataToImport7"]);
-Route::get('/trasformar8',[PruebasController::class,"TransformDataToImport8"]);
-Route::get('/trasformar9',[PruebasController::class,"TransformDataToImport9"]);
-Route::get('/trasformar10',[PruebasController::class,"TransformDataToImport10"]);
+
 Route::get('/userid', function (Request $request) {
-    return Crypt::encrypt($request->user()->id);
+    return $request->user()->id;
   })->name('userid');
 Route::middleware(['auth:sanctum',config('jetstream.auth_session')])->group(function () {
   
 });
 Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])->group(function () {
+    Route::middleware(['permission:ver_usuarios_sitema'])->group(function () {
+      Route::get('/users', function () {return Inertia::render('users');})->name('users');
+      Route::get('/Get/Users',[UsersController::class,"ReadUsers"])->name('getusers');
+    });
+    Route::middleware(['permission:ver_presupuestos'])->group(function () {
+      Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
+      Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('Cortana.Presupuesto.Items');
+      Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('Presupuesto.Get.Data_Orden');
+      Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('Presupuesto.Create');
+    });
     Route::get('/dashboard', function () { return Inertia::render('Dashboard');})->name('dashboard');
 
-    Route::get('/users', function () {return Inertia::render('users');})->name('users');
-
-
-
-    Route::get('/Get/Users',[UsersController::class,"ReadUsers"])->name('getusers');
     Route::get('/Get/Permisos/User',[UsersController::class,"GetPermisos"])->name('getpermisosuser');
     Route::get('/Get/Modulos/User',[UsersController::class,"GetModulos"])->name('get.modulos.user');
     Route::post('/Delete/User',[UsersController::class,"DeleteUser"])->name('delete.user');
@@ -51,20 +47,18 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::post('/Toggle/Permisos/User',[UsersController::class,"TogglePermiso"])->name('toggle.permiso');
     Route::get('/User/Notifications',[UsersController::class,"GetNotificaciones"])->name('getnotifications');
     Route::get('/User/Read/Notifications',[UsersController::class,"ReadNotification"])->name('readnotification');
-
     Route::get('/employees',[EmpleadosController::class,'View'])->name('employees');
     Route::get('/employees/read',[EmpleadosController::class,'read'])->name('employees.read');
     Route::post('/employees/create',[EmpleadosController::class,'create'])->name('employees.create');
-
-    Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
-    Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('Cortana.Presupuesto.Items');
-
+    Route::get('cortana/recepciones/vehiculares',[CortanaController::class,'PresupuestosVista'])->name('Cortana.OrdenesServicio.Vista');
+    
     Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');
     Route::get('select2/regimenes/fiscales',[select2controller::class,'RegimenesFiscales'])->name('Select2.Regimenes.Fiscales');
-    
     Route::get('select/niveles/combustible',[selectcontroller::class,'NivelesCombustible'])->name('select.niveles.combustible');
     Route::get('select/modulos/orden',[selectcontroller::class,'ModulosOrden'])->name('select.modulos.disponibles.usuario');
 
+    Route::get('select/estatus',[selectcontroller::class,'EstatusIdsPerCategory'])->name('select.status');
+    
     Route::get('ComboBox/OrdenesServicio',[ComboboxController::class,'GetOrdenesServicio'])->name('Combobox.Ordenes_Servicio');
     Route::get('ComboBox/Ubicacion',[ComboboxController::class,'GetUbicaciones'])->name('Combobox.Ubicaciones');
     Route::get('ComboBox/AdministradoresTrasporte',[ComboboxController::class,'GetAdministradoresTrasporte'])->name('Combobox.Administradores_Trasporte');
@@ -75,10 +69,6 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('ComboBox/Vehiculo/Placas',[ComboboxController::class,'GetVehiculoPlacas'])->name('Combobox.Vehiculo.Placas');
 
     Route::get('vehiculo/get/datos',[VehiculoController::class,'GetDatos'])->name('Vehiculo.Get.Datos');
-
-    Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('Presupuesto.Get.Data_Orden');
-    Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('Presupuesto.Create');
-
     Route::get('Admin/Caja',[CajaController::class,'View'])->name('Admin.Caja');
     Route::get('Admin/Caja/Read',[CajaController::class,'Read'])->name('Admin.Caja.Read');
   });

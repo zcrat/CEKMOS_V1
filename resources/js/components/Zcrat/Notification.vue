@@ -9,7 +9,7 @@ import axios from 'axios'
 interface Props {
     classname?:string
     IsRow:boolean
-    IdUser:string
+    IdUser:number
 }
 const props = defineProps<Props>();
 interface Notification {
@@ -27,28 +27,7 @@ const notificaciones: Ref<Notification[]> = ref([]);
 const countnotificaciones = ref(0);
 const shownotifications = ref(5);
 const hasmore = ref(false);
-onMounted(async () => {
-    try{
-    const { listen } = useEcho(
-    `App.Models.User.${props.IdUser}`,
-    ".NewNotifications",
-    (notification:{notificacion:Notification}) => {
-        countnotificaciones.value += 1;
-        if (notificaciones.value.length === shownotifications.value ) {
-            hasmore.value = true;
-        }
-        console.log(notification);
-        notificaciones.value = [
-            { ...notification.notificacion, show: false },
-            ...notificaciones.value.slice(0, shownotifications.value - 1)
-        ];
-    }
-  );
-  listen();
-} catch (error) {
-  console.error(error);
-}
-});
+
 
 const getnotificaciones = async () => {
     try {

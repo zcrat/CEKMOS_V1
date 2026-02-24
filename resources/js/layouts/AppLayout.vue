@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref,onMounted,computed, watchEffect } from 'vue';
+import { ref,onMounted,computed} from 'vue';
 import { Head } from '@inertiajs/vue3';
 import BarNavegation from '@/components/Zcrat/BarNavegation.vue';
 import BarNavegation_Smartphone from '@/components/Zcrat/BarNavegation_Smartphone.vue';
 import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
-import { useEcho } from '@laravel/echo-vue';
+
 import axios from 'axios' 
-const userId = ref<string | null>(null)
+
+const userId = ref<number | null>(null)
 
 onMounted(async () => {
   try {
@@ -14,21 +15,7 @@ onMounted(async () => {
     userId.value = data
   } catch (error) {
     console.error(error)
-    window.location.href = route('login')
   }
-})
-
-watchEffect(() => {
-  if (!userId.value) return
-  useEcho(
-    `Data.User.${userId.value}`,
-    '.UserEvents',
-    (event: any) => {
-      if (event.tipo === 58) {
-        window.location.href = route('login')
-      }
-    }
-  )
 })
 const props = defineProps({
     title: String,
