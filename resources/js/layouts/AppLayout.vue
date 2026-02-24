@@ -1,24 +1,35 @@
 <script setup lang="ts">
-import { ref,onMounted,computed } from 'vue';
+import { ref,onMounted,computed, watchEffect } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import BarNavegation from '@/components/Zcrat/BarNavegation.vue';
 import BarNavegation_Smartphone from '@/components/Zcrat/BarNavegation_Smartphone.vue';
 import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
 import { useEcho } from '@laravel/echo-vue';
 import axios from 'axios' 
+const userId = ref<string | null>(null)
+
 onMounted(async () => {
-    try{
-    const response = await axios.get(route('userid'))
-    userId.value = response.data;
-    const { listen } = useEcho(
-      `App.Models.User.${userId.value}`,
-      '.DataUserEvent'
-    );
-  listen();
-} catch (error) {
-  console.error(error);
-}
-});
+  try {
+    const { data } = await axios.get(route('userid'))
+    userId.value = data
+  } catch (error) {
+    console.error(error)
+    window.location.href = route('login')
+  }
+})
+
+watchEffect(() => {
+  if (!userId.value) return
+  useEcho(
+    `Data.User.${userId.value}`,
+    '.UserEvents',
+    (event: any) => {
+      if (event.tipo === 58) {
+        window.location.href = route('login')
+      }
+    }
+  )
+})
 const props = defineProps({
     title: String,
     description: String,
@@ -36,7 +47,7 @@ const showingNavigationtop = ref<boolean>(
 
 
 const Barnav_smartphone_active = ref(false);
-const userId = ref<string | null>(null);
+
 const checkWidth = () => {
   isSmOrLarger.value = window.matchMedia('(min-width: 640px)').matches
 }

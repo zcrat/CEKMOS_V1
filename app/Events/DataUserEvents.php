@@ -8,14 +8,14 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class DataUser implements ShouldBroadcastNow
+class DataUserEvents implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $userId;
     public $typedata;
 
-    public function __construct(int $userId, string $typedata)
+    public function __construct(string $userId, string $typedata='none')
     {
         $this->userId = $userId;
         $this->typedata = $typedata;
@@ -40,7 +40,7 @@ class DataUser implements ShouldBroadcastNow
         }elseif($this->typedata=='permisos'){
             return ['message' => 'Se Actualizaron Los Permisos De Tu Usuario','tipo'=> 61];
         }else{
-            return ['message' => 'Se Actualizo Tu Usuario','tipo'=> 59];
+            return ['message' => 'Se Actualizo Tu Usuario','tipo'=> 0];
         }
     }
 

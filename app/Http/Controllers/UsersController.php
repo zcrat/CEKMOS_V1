@@ -190,7 +190,7 @@ class UsersController extends Controller
     }
     public function DeleteUser(Request $request){
         $request->validate([
-            'id' => ['required','exists:users,id'],
+            'id' => ['required','string'],
         ],
         [
             'id.required' => 'El ID del usuario es obligatorio.',
@@ -208,6 +208,7 @@ class UsersController extends Controller
         $user=User::find($id);
         $user->tokens()->delete();
         $user->delete();
+        event(new \App\Events\DataUserEvents(Crypt::encrypt($id),'delete'));
          return response()->json(['message' => 'Usuario eliminado correctamente.'], 200);
     }
     private function GetModulosPerUser($user){
