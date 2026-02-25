@@ -12,11 +12,13 @@ import ChangeModulosServicio from '@/components/Zcrat/modals/ChangeModulosServic
 import BasicModal from '@/components/Zcrat/modals/BasicModal.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
 import { useEcho } from '@laravel/echo-vue';
+import { OrderKeyProp } from '@/types/tablecomponent';
 const rows = ref<UsersTable[]>([])
 const loading = ref<boolean>(false)
 const ModalExampleShoW = ref(false)
 const ModalEditModuls = ref(false)
 const openconfirmation = ref(false)
+const OrderKey = ref<OrderKeyProp | null>(null)
 const iduser = ref<number | null>(null)
 interface DataEvent {
     message: string;
@@ -37,7 +39,9 @@ useEcho(
 const GetElements=async ()=>{
     try {
         loading.value=true;
-        const response = await axios.get(route('getusers'))
+        const response = await axios.get(route('getusers'),{params:{
+            'order':OrderKey
+        }})
         rows.value=response.data.elements;
     } catch (error : any) {
         if (error.response?.status === 500) {
@@ -77,9 +81,10 @@ GetElements() // ✅ ahora inject ya existe
                     {title:'nombre',classname:'uppercase'},
                     {title:'correo',classname:'uppercase'},
                     {title:'verificado',classname:'uppercase'},
-                    {title:'creado',classname:'uppercase'},
+                    {title:'creado',classname:'uppercase','CanOrder':{key:'created_at','types':'ambos'}},
                     {title:'opciones',classname:'uppercase'}
                 ]"
+                v-model:OrderKey="OrderKey"
                 :rows="rows.map(function(row){return {
                     classname:'bg-grey-300',
                     columns:[

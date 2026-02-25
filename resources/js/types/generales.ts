@@ -1,4 +1,3 @@
-import Employees from "@/Pages/Admin/Employees.vue";
 import { Ref } from "vue";
 export interface modulosorden{
   id:number;
@@ -13,6 +12,7 @@ export interface option{
 export interface presupuestos{
   id:number;
   folio:string;
+  orden:string;
   empresa:string;
   economico:string;
   placas:string;

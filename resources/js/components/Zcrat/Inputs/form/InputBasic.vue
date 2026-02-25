@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineModel, watch,ref } from 'vue'
+import {watch,ref } from 'vue'
 
 const modelValue = defineModel<string | number |null>()
 const inputEl = ref<HTMLInputElement | null>(null)

@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { usePage } from '@inertiajs/vue3'
-import { ref,computed, watch} from 'vue'
+import {ref} from 'vue'
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
 import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
 import Button from '@/components/Zcrat/Inputs/Button.vue';
 import MultiOptionFilter from '@/components/Zcrat/Filters/MultiOptionFilter.vue';
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
-import ModulosFilter from '@/components/Zcrat/Filters/ModulosFilter.vue';
 import empresasselect from '@/components/Zcrat/Filters/empresasselect.vue'
-import { modulosorden,presupuestos} from '@/types/generales';
+import {presupuestos} from '@/types/generales';
 import Pagination from '@/components/Zcrat/Filters/pagination.vue';
-import axios from 'axios'
-import MyBasicToast from '@/utils/ToastNotificationBasic'
 import Nuevo from '@/components/Zcrat/modals/CreatePresupuesto.vue';
-
+import { OrderKeyProp } from '@/types/tablecomponent';
 const currentPage=ref<number>(1)
 const itemsPerPage=ref<number>(10)
 const totalPages=ref<number>(0)
@@ -28,8 +24,9 @@ const modulos = ref<string[]>([]);
 const prefacturasactive = false;
 const loading = ref<boolean>(false);
 const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
-const Listado  = ref<modulosorden[]>([])
+
 const ShowNuevo = ref<boolean>(false)
+const orderBy=ref<null|OrderKeyProp>(null)
 
 </script>
 
@@ -54,21 +51,24 @@ const ShowNuevo = ref<boolean>(false)
         </template>
         <template #content>
             <Pagination api="Cortana.Presupuesto.Items" :params="{'search':search,'estatus':estatus}" :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
-            <Table v-if="items.length>=1" :titles="[
-                {title:'opciones',classname:'uppercase'},
-                {title:'Folio',classname:'uppercase'},
-                {title:'No. Orden',classname:'uppercase'},
-                {title:'Empresa',classname:'uppercase'},
-                {title:'Economico',classname:'uppercase'},
-                {title:'Placas',classname:'uppercase'},
-                {title:'Vin',classname:'uppercase'},
-                {title:'Creacion',classname:'uppercase'},
-                {title:'Estatus',classname:'uppercase'},
+            <Table v-if="items.length>=0" 
+                v-model:OrderKey="orderBy"
+                :titles="[
+                    {title:'opciones',classname:'uppercase'},
+                    {title:'Folio',classname:'uppercase',CanOrder:{'key':'folio',types:'ambos'}},
+                    {title:'No. Orden',classname:'uppercase',CanOrder:{'key':'orden',types:'desc'}},
+                    {title:'Empresa',classname:'uppercase',CanOrder:{'key':'empresa',types:'asc'}},
+                    {title:'Economico',classname:'uppercase'},
+                    {title:'Placas',classname:'uppercase'},
+                    {title:'Vin',classname:'uppercase'},
+                    {title:'Creacion',classname:'uppercase'},
+                    {title:'Estatus',classname:'uppercase'},
                 ]"
                 :rows="items.map(function(row){return {
                     classname:'bg-grey-300',
                     columns:[
                         {element:row.folio, classname:'capitalize'},
+                        {element:row.orden, classname:'capitalize'},
                         {element:row.empresa, classname:'lowercase'},
                         {element:row.economico ? 'Verificado':'Sin Verificar',classname:'uppercase'},
                         {element:row.placas+'', classname:'uppercase'},
@@ -76,21 +76,21 @@ const ShowNuevo = ref<boolean>(false)
                         {element:row.creacion+'', classname:'uppercase'},
                         {element:row.estatus+'', classname:'uppercase'},
                         {element: Dropdown,
-                        props: {
-                            father: {
-                                element: Button,
-                                props: {text:'Opciones'},
-                            },
-                            children: [
-                                {
-                                element: Button,
-                                props: {text:'Editar Roles Y Permisos', onClick:()=>{console.log(row.id)},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
+                            props: {
+                                father: {
+                                    element: Button,
+                                    props: {text:'Opciones'},
                                 },
-                            ]
-                            ,contentClasses:['bg-gray-200']
+                                children: [
+                                    {
+                                    element: Button,
+                                    props: {text:'Editar Roles Y Permisos', onClick:()=>{console.log(row.id)},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
+                                    },
+                                ]
+                                ,contentClasses:['bg-gray-200']
+                            }
                         }
-                        }
-                                            ]
+                    ]
                 }})" 
                 
                     classname="tabla mt-2">
