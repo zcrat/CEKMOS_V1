@@ -11,8 +11,8 @@
           aria-hidden="true"
         />
       </PopoverButton>
-    <PopoverPanel class="absolute z-10 mt-2 ZDLeft">
-      <div class="p-2  flex flex-col w-[15rem] bg-white rounded border border-gray-500 shadow-lg" :class="classname??''">
+    <PopoverPanel class="absolute z-10 mt-2">
+      <div :class="[classname??'','p-2  flex flex-col w-[15rem] bg-white rounded border border-gray-500 shadow-lg sm:max-h-[40vh] max-h-[60vh] overflow-y-auto']">
         <component
         v-for="(child, index) in props.children"
         :key="index"

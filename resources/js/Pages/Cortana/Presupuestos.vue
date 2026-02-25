@@ -6,7 +6,7 @@ import Search from '@/components/Zcrat/Inputs/Search.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
 import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
 import Button from '@/components/Zcrat/Inputs/Button.vue';
-import estatusfilter from '@/components/Zcrat/Filters/estatusfilter.vue';
+import MultiOptionFilter from '@/components/Zcrat/Filters/MultiOptionFilter.vue';
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
 import ModulosFilter from '@/components/Zcrat/Filters/ModulosFilter.vue';
 import empresasselect from '@/components/Zcrat/Filters/empresasselect.vue'
@@ -23,17 +23,13 @@ const totalItems=ref<number>(0)
 const items=ref<presupuestos[]>([])
 const search = ref<string>('');
 const estatus = ref<string[]>([]);
+const modulos = ref<string[]>([]);
 
 const prefacturasactive = false;
 const loading = ref<boolean>(false);
 const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
 const Listado  = ref<modulosorden[]>([])
 const ShowNuevo = ref<boolean>(false)
-
-watch(estatus, (newVal, oldVal) => {
-  console.log("Estatus cambió:", oldVal, "→", newVal)
-}, { deep: true })
-
 
 </script>
 
@@ -50,8 +46,8 @@ watch(estatus, (newVal, oldVal) => {
                 <empresasselect/>
             </div>
                 <div class="flex gap-2 items-end justify-between sm:justify-start">
-                    <estatusfilter v-model:selectedIds="estatus"/>
-                    <ModulosFilter :Listado="Listado" />
+                    <MultiOptionFilter v-model:selectedIds="estatus" api="select.status" :params="{'categoria_id':2}" label="Estatus"/>
+                    <MultiOptionFilter v-model:selectedIds="modulos" api="select.modulos.disponibles.usuario" label="Modulos"/>
                     <Datapicker />
                 </div>
                 

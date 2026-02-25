@@ -17,7 +17,7 @@ const handleChange = (event: Event) => {
 }
 </script><i class="fa-regular fa-square-check"></i>
 <template>
-  <div :class="['flex flex-row justify-start items-center gap-x-2 p-2', classdiv]" @onClick="handleChange">
+  <div :class="['flex flex-row justify-start items-center gap-x-2 p-2 cursor-pointer', classdiv]" @click="handleChange">
     <font-awesome-icon :icon="checked? 'fa-solid fa-square-check':'fa-regular fa-square-check'" :class="'sm:text-[1.3rem]'"/>
     <h4 :class="classlabel ?? ''">
       {{ label }}
