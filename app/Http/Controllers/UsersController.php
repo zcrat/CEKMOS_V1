@@ -18,9 +18,12 @@ use Illuminate\Support\Facades\Crypt;
 class UsersController extends Controller
 {
     public  function ReadUsers(Request $request){
-        $currentpage=$request->page ?? 1;
-        $itemsperpage=$request->itemsperpage ?? 10;
-        $elements=User::skip(($currentpage-1)*$itemsperpage)->take($itemsperpage)->get();
+        $currentpage=$request->currentPage ?? 1;
+        $itemsperpage=$request->itemsPerPage ?? 10;
+        $orderby=$request->order ?? ['key'=>'id','order'=>'desc'];
+
+        $elements=User::orderBy($orderby['key'],$orderby['order'])->paginate($itemsperpage,['*'],'page',$currentpage);
+        $totalElements=$elements->total();
         $elements=$elements->map(function ($item){
             return[
                 'name'=>$item->name,
@@ -30,7 +33,7 @@ class UsersController extends Controller
                 'id'=>$item->id,
             ];
         });
-        return response()->json(compact('elements'));
+        return response()->json(compact('elements','totalElements'));
     }
     public function GetPermisos(Request $request){
         $id=$request->id;

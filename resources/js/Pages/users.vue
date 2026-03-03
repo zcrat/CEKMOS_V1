@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
 import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
 import axios from 'axios'
-import {ref} from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import { UsersTable} from '@/types/users';
 import Button  from "@/components/Zcrat/Inputs/Button.vue";
 import ChangePermissionsUser from '@/components/Zcrat/modals/ChangePermissionsUser.vue'
@@ -13,19 +13,34 @@ import BasicModal from '@/components/Zcrat/modals/BasicModal.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
 import { useEcho } from '@laravel/echo-vue';
 import { OrderKeyProp } from '@/types/tablecomponent';
-const rows = ref<UsersTable[]>([])
-const loading = ref<boolean>(false)
-const ModalExampleShoW = ref(false)
-const ModalEditModuls = ref(false)
-const openconfirmation = ref(false)
-const OrderKey = ref<OrderKeyProp | null>(null)
-const iduser = ref<number | null>(null)
+import Paginationv2,{paginationrefs} from '@/components/Zcrat/Filters/paginationv2.vue';
+import { useDebounceFn } from '@vueuse/core'
 interface DataEvent {
     message: string;
     tipo: number;
     id_user: number;
 };
-console.log("Componente cargado");
+
+const rows = ref<UsersTable[]>([])
+const loading = ref<boolean>(false)
+const modalshow = ref<number>(0)
+const ModalEditModuls = ref(false)
+const openconfirmation = ref(false)
+const OrderKey = ref<OrderKeyProp | null>(null)
+const iduser = ref<number | null>(null)
+
+const pagination = ref<paginationrefs>({
+    currentPage:1,
+    itemsPerPage:10,
+    totalElements:0
+})
+const filters = ref<{
+    search:string
+}>({
+    search:''
+})
+
+
 useEcho(
   `UsersEvents`,
   '.Events',
@@ -36,23 +51,52 @@ useEcho(
   }
 )
 
-const GetElements=async ()=>{
+let controller: AbortController | null = null;
+const GetElements = async () => {
     try {
-        loading.value=true;
-        const response = await axios.get(route('getusers'),{params:{
-            'order':OrderKey
-        }})
-        rows.value=response.data.elements;
-    } catch (error : any) {
-        if (error.response?.status === 500) {
-            MyBasicToast.error(error.response.data.message || 'Error del servidor')
-        } else {
-        console.error('Error:', error)
+        if (controller) {
+            controller.abort();
         }
-    }finally{
-        loading.value=false
+        controller = new AbortController();
+
+        loading.value = true;
+
+        const response = await axios.get(route('getusers'), {
+            params: {
+                order: OrderKey.value,
+                search: filters.value.search,
+                currentPage: pagination.value.currentPage,
+                itemsPerPage: pagination.value.itemsPerPage,
+            },
+            signal: controller.signal, // 👈 importante
+        });
+
+        rows.value = response.data.elements || [];
+        pagination.value.totalElements = response.data.totalElements || 0;
+
+    } catch (error: any) {
+
+        // ✅ Si fue cancelada, no hacer nada
+        if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
+            return;
+        }
+
+        if (error.response?.status === 500) {
+            MyBasicToast.error(error.response.data.message || 'Error del servidor');
+        } else {
+            console.error('Error:', error);
+        }
+
+    }finally {
+        if (!controller?.signal.aborted) {
+            loading.value = false;
+        }
     }
-}
+};
+const debouncedGetElements = useDebounceFn(() => {
+    GetElements()
+}, 400);
+
 const DeleteUser=async ()=>{
     try {
         await axios.post(route('delete.user'),{id:iduser.value})
@@ -65,7 +109,21 @@ const DeleteUser=async ()=>{
         }
     }
 }
-GetElements() // ✅ ahora inject ya existe
+watch([OrderKey,() => filters.value.search,() => pagination.value.itemsPerPage], () => {
+    console.log('cambio')
+    if(pagination.value.currentPage != 1){
+        pagination.value.currentPage=1
+    }else{
+        debouncedGetElements()
+    }
+})
+watch([() => pagination.value.currentPage], () => {
+    debouncedGetElements()
+})
+onMounted(()=>{
+    debouncedGetElements()
+})
+
 
 </script>
 
@@ -73,10 +131,11 @@ GetElements() // ✅ ahora inject ya existe
     <AppLayout title="Usuarios" description="Bienvenido al sistema CEKMOS" :loading="loading">
         <template #filtering>
             <div class="flex flex-row justify-start py-4  w-full">
-                <Search Classdiv="sm:w-[20rem] w-full"/>
+                <Search Classdiv="sm:w-[20rem] w-full"  v-model="filters.search"/>
             </div>
         </template>
         <template #content>
+            <Paginationv2 v-model:currentPage="pagination.currentPage" v-model:itemsPerPage="pagination.itemsPerPage" :totalElements="pagination.totalElements"/>
             <Table  :titles="[
                     {title:'nombre',classname:'uppercase'},
                     {title:'correo',classname:'uppercase'},
@@ -101,15 +160,15 @@ GetElements() // ✅ ahora inject ya existe
                             children: [
                                 {
                                 element: Button,
-                                props: {text:'Editar Roles Y Permisos', onClick:()=>{iduser = row.id; ModalExampleShoW = true},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
+                                props: {text:'Editar Roles Y Permisos', onClick:()=>{iduser = row.id; modalshow = 2},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
                                 },
                                 {
                                 element: Button,
-                                props: {text:'Editar Modulos Visibles', onClick:()=>{iduser = row.id; ModalEditModuls = true},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
+                                props: {text:'Editar Modulos Visibles', onClick:()=>{iduser = row.id; modalshow = 3},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
                                 },
                                 {
                                 element: Button,
-                                props: {text:'Eliminar', onClick:()=>{iduser = row.id; openconfirmation = true},hiddenclases:true, classname:'w-full text-center p-2 '}
+                                props: {text:'Eliminar', onClick:()=>{iduser = row.id; modalshow = 1},hiddenclases:true, classname:'w-full text-center p-2 '}
                                 },
                             ]
                             ,contentClasses:['bg-gray-200']
@@ -121,9 +180,9 @@ GetElements() // ✅ ahora inject ya existe
                 classname="tabla"></Table>
         </template>
     </AppLayout>
-    <ChangePermissionsUser v-model:show="ModalExampleShoW"  :id="iduser" />
-    <ChangeModulosServicio v-model:show="ModalEditModuls"  :id="iduser" />
-    <BasicModal v-model:modelValue="openconfirmation" :buttonconfirm="{text:'Si, Eliminar',onClick:()=>{DeleteUser(),openconfirmation=false},classname:'bg-red-600 font-bold text-white'} " @close="()=>{openconfirmation=false}">
+    <ChangePermissionsUser :show="modalshow === 2"  :id="iduser"  @close="()=>{modalshow=0}"/>
+    <ChangeModulosServicio :show="modalshow === 3"  :id="iduser"  @close="()=>{modalshow=0}"/>
+    <BasicModal :show="modalshow === 1 " :buttonconfirm="{text:'Si, Eliminar',onClick:()=>{DeleteUser(),openconfirmation=false},classname:'bg-red-600 font-bold text-white'} " @close="()=>{modalshow=0}">
         <h2 class="text-center text-lg">¿Realmente Deseas Eliminar al Usuario?</h2>
     </BasicModal>
 </template>

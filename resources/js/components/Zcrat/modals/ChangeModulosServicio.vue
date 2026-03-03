@@ -5,25 +5,26 @@ import ButtonTogglePYR from '@/components/Zcrat/Inputs/ButtonTogglePYR.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
 import axios from 'axios'
 import { ref, watch,computed } from 'vue' 
-import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
+import Loading from '@/components/Zcrat/Elements/Loading.vue';
 import type { modulosorden } from '@/types/generales'
 
 
 const props = defineProps<{ show: boolean , id: number | null }>()
-const loanding = ref<boolean>(true)
+const loading = ref<boolean>(true)
 
 const allmodulos =  ref<modulosorden[]>([])
 const usermodulos =  ref<string[]>([])
 const accion =  ref<string>("Obteniendo Modulos Orden")
 
-const emit = defineEmits(['update:show'])
-
-const updateVisibility = (val: boolean) => {
-  emit('update:show', val)
+function closeModal() {
+  emit('close')
 }
+const emit = defineEmits<{
+  (e: 'close'): void
+}>()
 const GetUserModulos=async ()=>{
     try {
-        loanding.value=true;
+        loading.value=true;
         accion.value="Obteniendo Roles Y Permisos";
         const response = await axios.get(route('get.modulos.user'),
          { params: { id: props.id } }
@@ -37,12 +38,12 @@ const GetUserModulos=async ()=>{
             console.error('Error:', error)
         }
     }finally{
-        loanding.value=false
+        loading.value=false
     }
 }
 const ToggleModulo=async(modulo_id:number)=>{
     try {
-        loanding.value=true;
+        loading.value=true;
         accion.value="Actualizando Modulos Vistos";
         const response = await axios.post(route('toggle.modulo'),
           {user: props.id, modulo: modulo_id }
@@ -56,7 +57,7 @@ const ToggleModulo=async(modulo_id:number)=>{
             console.error('Error:', error)
         }
     }finally{
-        loanding.value=false
+        loading.value=false
     }
 }
 watch(
@@ -67,15 +68,12 @@ watch(
     }
   }
 )
-const show = computed({
-  get: () => props.show,
-  set: (value: boolean) => emit('update:show', value)
-})
+
 </script>
 
 <template>
-  <BaseModal modaltitle="Administrar Modulos Por Usuario" :position="'center'" v-model:modelValue="show" @update:modelValue="updateVisibility" >
-    <Loanding v-if="loanding" :text="accion"/>
+  <BaseModal modaltitle="Administrar Modulos Por Usuario" :position="'center'" :show="show" @close="closeModal">
+    <Loading v-if="loading" :text="accion"/>
      <div v-else class="p-2 gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full sm:w-[auto] border-solid border-4 rounded border-blue-300">
         <template v-for="modulo in allmodulos" :key="modulo.id">
           <ButtonTogglePYR 

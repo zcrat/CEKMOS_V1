@@ -4,16 +4,17 @@ import { computed } from 'vue'
 import type { buttonconfirmed } from '@/types/modals'
 
 const props = withDefaults(defineProps<{
-  modelValue: boolean
+  show: boolean
   buttonconfirm?: buttonconfirmed
   modaltitle?: string
   position?: 'start' | 'center' | 'end'
 }>(), {
   position: 'start'
 })
-
+function closeModal() {
+  emit('close')
+}
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
   (e: 'close'): void
 }>()
 
@@ -28,14 +29,11 @@ const classtitleposition = computed(() => {
   }
 })
 
-function closeModal() {
-  emit('update:modelValue', false)
-  emit('close')
-}
+
 </script>
 <template>
   <Dialog
-    :open="modelValue"
+    :open="show"
     class="relative z-50"
     @close="closeModal"
   >

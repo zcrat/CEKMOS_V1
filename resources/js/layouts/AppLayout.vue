@@ -3,7 +3,7 @@ import { ref,onMounted,computed} from 'vue';
 import { Head } from '@inertiajs/vue3';
 import BarNavegation from '@/components/Zcrat/BarNavegation.vue';
 import BarNavegation_Smartphone from '@/components/Zcrat/BarNavegation_Smartphone.vue';
-import Loanding from '@/components/Zcrat/Elements/Loanding.vue';
+import Loading from '@/components/Zcrat/Elements/Loading.vue';
 
 import axios from 'axios' 
 
@@ -70,7 +70,7 @@ onMounted(() => {
                 <slot name="filtering"/>
               </div>
               <div class="w-full flex-1 flex flex-col">
-                <Loanding v-if="loading" text="Cargando Usuarios"/>
+                <Loading v-if="loading" text="Cargando Usuarios"/>
                 <slot v-else name="content"/>
               </div>
             </div>
