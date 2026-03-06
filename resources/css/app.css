@@ -11,11 +11,13 @@ input{
 :root {
   --micolor: #176cb3;
   --btnprimary: #0479d8;
+  --btnprimaryshadow: #0479d8;
   --color1: #000000;
   --color2: #ffffff;
   --color3: #b30e32;
   --color3a: #c02a4a;
   --color4: #aaaaaa;
+  --color5: #aaaaaa;
 }
 .multiselect__input {
   @apply px-3 py-2 border rounded focus:outline-none;

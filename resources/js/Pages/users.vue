@@ -14,7 +14,11 @@ import MyBasicToast from '@/utils/ToastNotificationBasic'
 import { useEcho } from '@laravel/echo-vue';
 import { OrderKeyProp } from '@/types/tablecomponent';
 import Paginationv2,{paginationrefs} from '@/components/Zcrat/Filters/paginationv2.vue';
-import { useDebounceFn } from '@vueuse/core'
+import GetElementsFuntion from '@/utils/functions/GetElements';
+import MessageEmpty from '@/components/Zcrat/Elements/MessageEmpty.vue';
+import ButtonNewElement from '@/components/Zcrat/Elements/ButtonNewElement.vue';
+import UserRegister from '@/components/Zcrat/modals/UserRegister.vue';
+
 interface DataEvent {
     message: string;
     tipo: number;
@@ -29,16 +33,25 @@ const openconfirmation = ref(false)
 const OrderKey = ref<OrderKeyProp | null>(null)
 const iduser = ref<number | null>(null)
 
-const pagination = ref<paginationrefs>({
-    currentPage:1,
-    itemsPerPage:10,
-    totalElements:0
-})
+
 const filters = ref<{
     search:string
 }>({
     search:''
 })
+const pagination:paginationrefs = {
+    currentPage:ref(1),
+    itemsPerPage:ref(10),
+    totalElements:ref(0)
+}
+const modalactive=ref<number>(0)
+
+const {debouncedGetElements,GetElements} = GetElementsFuntion({loading,
+    params:() => ({ order: OrderKey.value,
+            search: filters.value.search,
+            currentPage: pagination.currentPage.value,
+            itemsPerPage: pagination.itemsPerPage.value
+        }),rows,totalRows:pagination.totalElements,api:'getusers'})
 
 
 useEcho(
@@ -50,53 +63,6 @@ useEcho(
     }
   }
 )
-
-let controller: AbortController | null = null;
-const GetElements = async () => {
-    try {
-        if (controller) {
-            controller.abort();
-        }
-        controller = new AbortController();
-
-        loading.value = true;
-
-        const response = await axios.get(route('getusers'), {
-            params: {
-                order: OrderKey.value,
-                search: filters.value.search,
-                currentPage: pagination.value.currentPage,
-                itemsPerPage: pagination.value.itemsPerPage,
-            },
-            signal: controller.signal, // 👈 importante
-        });
-
-        rows.value = response.data.elements || [];
-        pagination.value.totalElements = response.data.totalElements || 0;
-
-    } catch (error: any) {
-
-        // ✅ Si fue cancelada, no hacer nada
-        if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
-            return;
-        }
-
-        if (error.response?.status === 500) {
-            MyBasicToast.error(error.response.data.message || 'Error del servidor');
-        } else {
-            console.error('Error:', error);
-        }
-
-    }finally {
-        if (!controller?.signal.aborted) {
-            loading.value = false;
-        }
-    }
-};
-const debouncedGetElements = useDebounceFn(() => {
-    GetElements()
-}, 400);
-
 const DeleteUser=async ()=>{
     try {
         await axios.post(route('delete.user'),{id:iduser.value})
@@ -109,40 +75,44 @@ const DeleteUser=async ()=>{
         }
     }
 }
-watch([OrderKey,() => filters.value.search,() => pagination.value.itemsPerPage], () => {
+watch([OrderKey,() => filters.value.search,pagination.itemsPerPage], () => {
     console.log('cambio')
-    if(pagination.value.currentPage != 1){
-        pagination.value.currentPage=1
+    if(pagination.currentPage.value != 1){
+        pagination.currentPage.value = 1
     }else{
         debouncedGetElements()
     }
 })
-watch([() => pagination.value.currentPage], () => {
+watch([pagination.currentPage], () => {
+    console.log(pagination.currentPage.value)
     debouncedGetElements()
 })
 onMounted(()=>{
-    debouncedGetElements()
+    GetElements()
 })
 
 
 </script>
 
 <template>
+    <UserRegister :show="modalactive == 1" @close="modalactive=0"/>
     <AppLayout title="Usuarios" description="Bienvenido al sistema CEKMOS" :loading="loading">
         <template #filtering>
-            <div class="flex flex-row justify-start py-4  w-full">
+            <div class="flex flex-row justify-start py-4 gap-2 w-full">
+                <ButtonNewElement @click="()=>{modalactive=1}"/>
                 <Search Classdiv="sm:w-[20rem] w-full"  v-model="filters.search"/>
             </div>
         </template>
         <template #content>
-            <Paginationv2 v-model:currentPage="pagination.currentPage" v-model:itemsPerPage="pagination.itemsPerPage" :totalElements="pagination.totalElements"/>
+            <Paginationv2 v-model:currentPage="pagination.currentPage.value" v-model:itemsPerPage="pagination.itemsPerPage.value" :totalElements="pagination.totalElements.value"/>
             <Table  :titles="[
-                    {title:'nombre',classname:'uppercase'},
-                    {title:'correo',classname:'uppercase'},
+                    {title:'nombre',classname:'uppercase',CanOrder:{key:'name','types':'ambos'}},
+                    {title:'correo',classname:'uppercase',CanOrder:{key:'email','types':'ambos'}},
                     {title:'verificado',classname:'uppercase'},
-                    {title:'creado',classname:'uppercase','CanOrder':{key:'created_at','types':'ambos'}},
+                    {title:'creado',classname:'uppercase',CanOrder:{key:'created_at','types':'ambos'}},
                     {title:'opciones',classname:'uppercase'}
                 ]"
+                v-if="pagination.totalElements.value > 0"
                 v-model:OrderKey="OrderKey"
                 :rows="rows.map(function(row){return {
                     classname:'bg-grey-300',
@@ -177,7 +147,8 @@ onMounted(()=>{
                                             ]
                 }})" 
                 
-                classname="tabla"></Table>
+                classname="tabla"/>
+                <MessageEmpty v-else/>
         </template>
     </AppLayout>
     <ChangePermissionsUser :show="modalshow === 2"  :id="iduser"  @close="()=>{modalshow=0}"/>

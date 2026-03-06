@@ -15,27 +15,14 @@ const props = defineProps<{
   classdiv?: string
   placeholder?: string
   label?: string
+  errors?: string[]
   icon?: string
-  type?: 'text' | 'number'
+  type?: 'text' | 'number' | 'password' | 'email'
   OnFocus?: ()=>void
   OnBlur?: ()=>void
 }>()
 
-// 👇 Si el input es tipo "number", forzamos el valor como número
-watch(modelValue, (val) => {
-  if (val === '' || val === null) {
-      modelValue.value = null
-  }else if (props.type === 'number') {
-    if (typeof val === 'string') {
-      const numeric = Number(val)
-      if (!isNaN(numeric)) {
-        modelValue.value = numeric
-      } else {
-        modelValue.value = null
-      }
-    }
-  }
-})
+
 
 </script>
 
@@ -60,5 +47,9 @@ watch(modelValue, (val) => {
         class="absolute start-0 px-2 top-[50%] transform -translate-y-[50%] text-[1.25em]"
       />
     </div>
+    <div v-if="props.errors">
+      <h4  v-for="value in props.errors" class="text-red-500 font-light capitalize italic ">* {{ value }}</h4>
+    </div>
+    
   </div>
 </template>

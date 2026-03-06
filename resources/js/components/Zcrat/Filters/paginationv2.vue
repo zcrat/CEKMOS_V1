@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, computed, watch, toRefs} from 'vue';
+    import { ref, computed, watch, toRefs, Ref} from 'vue';
 
     interface PaginationProps {
         totalElements: number
@@ -9,9 +9,9 @@
     }
     export interface paginationrefs
     {
-        currentPage:number
-        itemsPerPage:number
-        totalElements:number
+        currentPage:Ref<number>
+        itemsPerPage:Ref<number>
+        totalElements:Ref<number>
     }
     const props = withDefaults(defineProps<PaginationProps>(), {
         loading: false,

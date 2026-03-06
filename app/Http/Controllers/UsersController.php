@@ -14,15 +14,21 @@ use App\Models\Notificaciones;
 use App\Models\ModulosPerUser;
 use \App\Notifications\SeendNotification;
 use Illuminate\Support\Facades\Crypt;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 class UsersController extends Controller
 {
     public  function ReadUsers(Request $request){
         $currentpage=$request->currentPage ?? 1;
         $itemsperpage=$request->itemsPerPage ?? 10;
+        $search=$request->search ?? '';
         $orderby=$request->order ?? ['key'=>'id','order'=>'desc'];
 
-        $elements=User::orderBy($orderby['key'],$orderby['order'])->paginate($itemsperpage,['*'],'page',$currentpage);
+        $elements=User::query();
+        if($search){
+            $elements->where('name','like','%'.$search.'%')->orWhere('email','like','%'.$search.'%');
+        }
+        $elements=$elements->orderBy($orderby['key'],$orderby['order'])->paginate($itemsperpage,['*'],'page',$currentpage);
         $totalElements=$elements->total();
         $elements=$elements->map(function ($item){
             return[
@@ -189,9 +195,33 @@ class UsersController extends Controller
         $user=User::find($id);
         $user->tokens()->delete();
         $user->delete();
-        event(new \App\Events\DataUserEvent($id,'delete'));
+        event(new \App\Events\DataUserEvents($id,'delete'));
         event(new \App\Events\UsersEvents($id,'delete'));
          return response()->json(['message' => 'Usuario eliminado correctamente.'], 200);
+    }
+    public function CreateUser(Request $request){
+       
+        $request->validate([
+            'name' => ['required', 'string'],
+            'paterno' => ['required', 'string'],
+            'materno' => ['nullable', 'string'],
+            'username' => ['required', 'string','unique:users,usuario', 'min:4'],
+            'email' => ['required', 'string', 'unique:users,email'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+        try {
+            User::create([
+                'name' => $request->name .' '.$request->paterno.' '.$request->materno,
+                'usuario' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+            $message='Creado Exitosamente';
+            return response()->json(compact('message'));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message'=>$e->getmessage()],500);
+        }
     }
     private function GetModulosPerUser($user){
         $usermodulos = $user->load('modulos_orden')->modulos_orden->isNotEmpty()
