@@ -60,7 +60,7 @@ useEcho(
     if (data.tipo === 58) {
       rows.value = rows.value.map(function(user){
         if( user.id == data.id_user){
-            user.date_deleted=new Date();
+            user.deleted_at=new Date();
         }
         return user
       } );
@@ -68,7 +68,7 @@ useEcho(
     if (data.tipo === 62) {
       rows.value = rows.value.map(function(user){
         if( user.id == data.id_user){
-            user.date_deleted=null
+            user.deleted_at=null
         }
         return user
       } );
@@ -77,8 +77,10 @@ useEcho(
 )
 const ToggleActiveUser=async ()=>{
     try {
-        await axios.post(route('toggle.user'),{id:iduser.value})
-        MyBasicToast.success('Eliminado Correctamente')
+        const response = await axios.post(route('toggle.user'),{id:iduser.value})
+        MyBasicToast.success( response.data.message || 'Cambiado Correctamente')
+        modalshow.value=0;
+        iduser.value=null;
     } catch (error : any) {
         if (error.response?.status) {
             MyBasicToast.error(error.response.data.message || 'Error del servidor')
@@ -154,7 +156,7 @@ onMounted(()=>{
                                 },
                                 {
                                 element: Button,
-                                props: {text:row.date_deleted?'Restaurar':'Eliminar', onClick:()=>{iduser = row.id; modalshow = row.date_deleted ? 4: 5},hiddenclases:true, classname:'w-full text-center p-2 '}
+                                props: {text:(row.deleted_at != undefined && row.deleted_at != null)  ? 'Restaurar':'Eliminar', onClick:()=>{iduser = row.id; modalshow = row.deleted_at ? 4: 5},hiddenclases:true, classname:'w-full text-center p-2 '}
                                 },
                             ]
                             ,contentClasses:['bg-gray-200']
@@ -173,7 +175,7 @@ onMounted(()=>{
     <BasicModal :show="modalshow === 5 " :buttonconfirm="{text:'Si, Eliminar',onClick:()=>{ToggleActiveUser(),openconfirmation=false},classname:'bg-red-600 font-bold text-white'} " @close="()=>{modalshow=0}">
         <h2 class="text-center text-lg">¿Realmente Deseas Eliminar al Usuario?</h2>
     </BasicModal>
-    <BasicModal :show="modalshow === 4 " :buttonconfirm="{text:'Si, Restaurar',onClick:()=>{ToggleActiveUser(),openconfirmation=false},classname:'bg-red-600 font-bold text-white'} " @close="()=>{modalshow=0}">
+    <BasicModal :show="modalshow === 4 " :buttonconfirm="{text:'Si, Restaurar',onClick:()=>{ToggleActiveUser(),openconfirmation=false},classname:'bg-green-600 font-bold text-white'} " @close="()=>{modalshow=0}">
         <h2 class="text-center text-lg">¿Realmente Deseas Restaurar al Usuario?</h2>
     </BasicModal>
 </template>

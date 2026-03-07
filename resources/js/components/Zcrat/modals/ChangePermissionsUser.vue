@@ -87,7 +87,7 @@ watch(
         <h3 class="text-center font-semibold text-[1.3rem] mb-4">Roles</h3>
         <template v-for="role in allroles" :key="role">
           <ButtonTogglePYR 
-            :isnew="!userroles.includes(role)" 
+            :isnew="!userroles.includes(role) && !userroles.includes('Super Admin')" 
             :text="role"  
              @toggle="()=>{ToggleRolesOrPermission(role, true)}"
           />
@@ -97,7 +97,7 @@ watch(
         <h3 class="text-center font-semibold text-[1.3rem] mb-4">Permisos</h3>
         <template v-for="permiso in allpermisos" :key="permiso">
           <ButtonTogglePYR 
-            :isnew="!userpermisos.includes(permiso)" 
+            :isnew="!userpermisos.includes(permiso) && !userpermisos.includes('*')" 
             :text="permiso"  
             @toggle="()=>{ToggleRolesOrPermission(permiso, false)}" 
           />

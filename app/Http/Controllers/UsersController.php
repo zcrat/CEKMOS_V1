@@ -15,6 +15,7 @@ use App\Models\ModulosPerUser;
 use \App\Notifications\SeendNotification;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 class UsersController extends Controller
 {
@@ -55,7 +56,8 @@ class UsersController extends Controller
                 'paterno'=>$namearray[1] ?? '',
                 'materno'=>$namearray[2] ?? '',
                 'email'=>$user->email,
-                'username'=>$user->usuario
+                'username'=>$user->usuario,
+                'deleted_at'=>$user->deleted_at,
             ];
             return response()->json(compact('datauser'));
         }catch(\Throwable $th){
@@ -118,10 +120,10 @@ class UsersController extends Controller
         
         $role=$request->role;
         $user=User::withTrashed()->find($id);
+        if($user->hasRole('Super Admin')){
+            return response()->json(['message'=>'No se puede revocar un rol a un Super Admin'],403);
+        }
         if($user->hasRole($role)){
-            if($role==='Super Admin'){
-                return response()->json(['message'=>'No se puede revocar el rol de Super Admin'],403);
-            }
             $user->removeRole($role);
         }else{
             $user->assignRole($role);
@@ -150,10 +152,10 @@ class UsersController extends Controller
         
         $permiso=$request->permiso;
         $user=User::withTrashed()->find($id);
+         if($user->hasRole('Super Admin')){
+            return response()->json(['message'=>'No se puede revocar el permiso a un Super Admin'],403);
+        }
         if($user->hasPermissionTo($permiso)){
-            if($user->hasRole('Super Admin')){
-                return response()->json(['message'=>'No se puede revocar el permiso a un Super Admin'],403);
-            }
             if($user->permissions()->where('name', $permiso)->exists()){
                 $user->revokePermissionTo($permiso);
                 $this->Notificate($user->id,'Permiso Eliminado', 'El permiso '.$permiso.' ha sido eliminado de tu cuenta','warning',2);
@@ -201,7 +203,7 @@ class UsersController extends Controller
     }
     public function ToggleActive(Request $request){
         $request->validate([
-            'id' => ['required','string','exists:users,id'],
+            'id' => ['required','exists:users,id'],
         ],
         [
             'id.required' => 'El ID del usuario es obligatorio.',
@@ -216,8 +218,9 @@ class UsersController extends Controller
         
         $user=User::withTrashed()->find($id);
         $accion='Eliminado';
+        Log::info($user->deleted_at);
         if($user->deleted_at){
-            $accio='Restaurado';
+            $accion='Restaurado';
             $user->restore();
             event(new \App\Events\UsersEvents($id,'reactive'));
         }else{
@@ -235,7 +238,7 @@ class UsersController extends Controller
             'paterno' => ['required', 'string'],
             'materno' => ['nullable', 'string'],
             'username' => ['required', 'string','unique:users,usuario', 'min:4'],
-            'email' => ['required', 'string', 'unique:users,email'],
+            'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
         try {
@@ -246,6 +249,34 @@ class UsersController extends Controller
                 'password' => Hash::make($request->password),
             ]);
             $message='Creado Exitosamente';
+            return response()->json(compact('message'));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message'=>$e->getmessage()],500);
+        }
+    }
+    public function UpdateUser(Request $request){
+       
+        $request->validate([
+            'id'=>['required','exists:users,id'],
+            'name' => ['required', 'string'],
+            'paterno' => ['required', 'string'],
+            'materno' => ['nullable', 'string'],
+            'username' => ['required', 'string',Rule::unique('users', 'usuario')->ignore($request->id), 'min:4'],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($request->id)],
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+        ]);
+        try {
+            $user=User::withTrashed()->find($request->id);
+            $user->name = $request->name .'-'.$request->paterno.'-'.$request->materno;
+            $user->usuario = $request->username;
+            $user->email = $request->email;
+
+            if($request->password){
+                $user->password = Hash::make($request->password);
+            }
+            $user->save();
+            $message='Actualizado Exitosamente';
             return response()->json(compact('message'));
         } catch (\Exception $e) {
             Log::error($e);
@@ -267,11 +298,15 @@ class UsersController extends Controller
         return response()->json(compact('usermodulos', 'allmodulos'));
     }
     private function GetRolesAndPermission($user){
-        $userpermisos=$user->getAllPermissions();
-        $userpermisos=$userpermisos->map(function ($item){
+        $isadmin=$user->hasRole('Super Admin') ;
+        $userpermisos = $isadmin
+            ? collect([(object)['name' => '*']]) 
+            : $user->getAllPermissions();
+
+        $userpermisos = $userpermisos->map(function ($item) {
             return $item->name;
         });
-        $userroles=$user->getRoleNames();
+        $userroles=$isadmin?collect(['Super Admin']):$user->getRoleNames();
         $allpermisos=Permission::all();
         $allpermisos=$allpermisos->map(function ($item){
             return $item->name;

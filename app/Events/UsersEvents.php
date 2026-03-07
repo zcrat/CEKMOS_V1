@@ -40,7 +40,7 @@ class UsersEvents implements ShouldBroadcastNow
         }elseif($this->typedata=='permisos'){
             return ['message' => 'Se Actualizaron Los Permisos De Tu Usuario','tipo'=> 61, 'id_user'=>$this->userId];
         }elseif($this->typedata=='reactive'){
-            return ['message' => 'Se Restauro  un Usuario','tipo'=> 62];
+            return ['message' => 'Se Restauro  un Usuario','tipo'=> 62,'id_user'=>$this->userId];
         }else{
             return ['message' => 'Se Actualizo Tu Usuario','tipo'=> 59, 'id_user'=>$this->userId];
         }

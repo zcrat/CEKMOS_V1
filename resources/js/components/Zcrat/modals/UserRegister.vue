@@ -69,7 +69,6 @@ const Create = async () => {
         } else{
           MyBasicToast.error(data.message ?? 'Errores de Validacion')
         }
-        
       }else{
         MyBasicToast.error(data.message??'Ocurrio Un Error Inesperado')
       }
@@ -112,10 +111,14 @@ const Read = async () => {
 }
 const buttonconfirm=computed<buttonconfirmed>(()=>{ 
   return {
-    text:'Crear Empleado',
+    text:props.userid?'Guardar':'Crear Empleado',
     classname:'bg-blue-600 text-white',
     onClick:Create,
-    disabled:Object.entries(UserForm)
+    disabled:props.userid?
+    Object.entries(UserForm)
+    .filter(([key]) => !['materno','password','password_confirmation'].includes(key))
+    .some(([_,value]) => value === null || value === '')
+    :Object.entries(UserForm)
     .filter(([key]) => !['materno'].includes(key))
     .some(([_,value]) => value === null || value === '')}})
 
