@@ -3,6 +3,7 @@ export interface UsersTable{
     email:string;
     verified:boolean;
     date:Date;
+    date_deleted?:Date|null;
     id:number;
 }
 export interface Employee{

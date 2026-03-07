@@ -130,7 +130,7 @@ export interface NuevoPresupuesto {
   domicilio_fiscal:string
  }
  export interface FormUser{
-  id?:number,
+  id?:number|null,
   name:string,
   paterno:string,
   materno:string|null,

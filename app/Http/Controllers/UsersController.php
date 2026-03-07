@@ -24,7 +24,7 @@ class UsersController extends Controller
         $search=$request->search ?? '';
         $orderby=$request->order ?? ['key'=>'id','order'=>'desc'];
 
-        $elements=User::query();
+        $elements=User::query()->withTrashed();
         if($search){
             $elements->where('name','like','%'.$search.'%')->orWhere('email','like','%'.$search.'%');
         }
@@ -32,7 +32,7 @@ class UsersController extends Controller
         $totalElements=$elements->total();
         $elements=$elements->map(function ($item){
             return[
-                'name'=>$item->name,
+                'name'=> str_replace('-', ' ', $item->name),
                 'email'=>$item->email,
                 'varified'=>$item->email_verified_at != null ? true:false,
                 'date'=>Carbon::parse($item->created_at)->format('Y-m-d H:i:s'),
@@ -41,10 +41,31 @@ class UsersController extends Controller
         });
         return response()->json(compact('elements','totalElements'));
     }
+    public  function ReadUser(Request $request){
+        try{
+            if(!$request->filled('id')){
+                throw new \Exception('ID Necesario');   
+            }
+            $id=$request->id;
+            $user=User::withTrashed()->find($id);
+            if(!$user){throw new \Exception('Id Erroneo');   }
+            $namearray=explode('-', $user->name);
+            $datauser=[
+                'name'=>$namearray[0] ?? '',
+                'paterno'=>$namearray[1] ?? '',
+                'materno'=>$namearray[2] ?? '',
+                'email'=>$user->email,
+                'username'=>$user->usuario
+            ];
+            return response()->json(compact('datauser'));
+        }catch(\Throwable $th){
+            return response()->json(['message'=>$th->getMessage()],500);
+        }
+    }
     public function GetPermisos(Request $request){
         $id=$request->id;
         
-        $user=User::find($id);
+        $user=User::withTrashed()->find($id);
         if(!$user){
             return response()->json(['message'=>'Usuario no encontrado'],404);
         }
@@ -53,7 +74,7 @@ class UsersController extends Controller
     public function GetModulos(Request $request){
         $id=$request->id;
         
-        $user=User::with('modulos_orden')->find($id);
+        $user=User::withTrashed()->with('modulos_orden')->find($id);
         if(!$user){
             return response()->json(['message'=>'Usuario no encontrado'],404);
         }
@@ -77,7 +98,7 @@ class UsersController extends Controller
         $id=$request->id;
         
         $permisos=$request->permisos;
-        $user=User::find($id);
+        $user=User::withTrashed()->find($id);
         $user->givePermissionTo($permisos);
         return response()->json(['message'=>'Permisos actualizados correctamente']);
     }
@@ -96,7 +117,7 @@ class UsersController extends Controller
         $id=$request->id;
         
         $role=$request->role;
-        $user=User::find($id);
+        $user=User::withTrashed()->find($id);
         if($user->hasRole($role)){
             if($role==='Super Admin'){
                 return response()->json(['message'=>'No se puede revocar el rol de Super Admin'],403);
@@ -128,7 +149,7 @@ class UsersController extends Controller
         $id=$request->id;
         
         $permiso=$request->permiso;
-        $user=User::find($id);
+        $user=User::withTrashed()->find($id);
         if($user->hasPermissionTo($permiso)){
             if($user->hasRole('Super Admin')){
                 return response()->json(['message'=>'No se puede revocar el permiso a un Super Admin'],403);
@@ -161,7 +182,7 @@ class UsersController extends Controller
         ]);
         $user=$request->user;
         $modulo=$request->modulo;
-        $exist=ModulosPerUser::withTrashed()->where('user_id',$user)->where('modulo_orden_id',$modulo)->first();
+        $exist=ModulosPerUser::withTrashed()->withTrashed()->where('user_id',$user)->where('modulo_orden_id',$modulo)->first();
         if ($exist) {
             if (isset($exist->deleted_at)) {
                 $exist->restore();
@@ -169,16 +190,16 @@ class UsersController extends Controller
                 $exist->delete();
             }
         }else{
-            ModulosPerUser::create([
+            ModulosPerUser::withTrashed()->create([
                 'modulo_orden_id'=>$modulo,
                 'user_id'=>$user,
             ]);
         }
         
-        $user=User::find($user);
+        $user=User::withTrashed()->find($user);
         return $this->GetModulosPerUser($user);
     }
-    public function DeleteUser(Request $request){
+    public function ToggleActive(Request $request){
         $request->validate([
             'id' => ['required','string','exists:users,id'],
         ],
@@ -186,18 +207,26 @@ class UsersController extends Controller
             'id.required' => 'El ID del usuario es obligatorio.',
             'id.exists' => 'El usuario no existe.',
         ]);
+
         $id=$request->id;
         
         if($id === $request->user()->id){
             return response()->json(['message'=>'No Puedes Eliminar Tu Propio Perfil'],500);
         }
         
-        $user=User::find($id);
-        $user->tokens()->delete();
-        $user->delete();
-        event(new \App\Events\DataUserEvents($id,'delete'));
-        event(new \App\Events\UsersEvents($id,'delete'));
-         return response()->json(['message' => 'Usuario eliminado correctamente.'], 200);
+        $user=User::withTrashed()->find($id);
+        $accion='Eliminado';
+        if($user->deleted_at){
+            $accio='Restaurado';
+            $user->restore();
+            event(new \App\Events\UsersEvents($id,'reactive'));
+        }else{
+            $user->tokens()->delete();
+            $user->delete();
+            event(new \App\Events\DataUserEvents($id,'delete'));
+            event(new \App\Events\UsersEvents($id,'delete'));
+        }
+         return response()->json(['message' => "Usuario {$accion} correctamente."], 200);
     }
     public function CreateUser(Request $request){
        
@@ -210,8 +239,8 @@ class UsersController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
         try {
-            User::create([
-                'name' => $request->name .' '.$request->paterno.' '.$request->materno,
+            User::withTrashed()->create([
+                'name' => $request->name .'-'.$request->paterno.'-'.$request->materno,
                 'usuario' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
@@ -293,7 +322,7 @@ class UsersController extends Controller
             $notificacion->tipo_id=$tipo;
             $notificacion->prioridad=$prioridad;
             $notificacion->save();
-            $user=User::find($user_id);
+            $user=User::withTrashed()->find($user_id);
 
             if($user){
                 $noti=[

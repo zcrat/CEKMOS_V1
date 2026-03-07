@@ -14,6 +14,7 @@ const props = defineProps<{
   width?:string;
   stoppropagation?:boolean;
   contentClasses?:string[];
+  classcontent?:string;
 }>();
 function handleClick(event: MouseEvent) {
   if (props.stoppropagation) {
@@ -24,7 +25,7 @@ function handleClick(event: MouseEvent) {
 </script>
 
 <template>
-  <Dropdown :align="align || 'center'" :width="width ?? '48' " :contentClasses="contentClasses ">
+  <Dropdown :align="align || 'center'" :width="width ?? '48' " :contentClasses="contentClasses" :classcontent="classcontent">
     <template #trigger>
       <component
         :is="props.father.element"

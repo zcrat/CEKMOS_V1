@@ -44,7 +44,6 @@ const pagination:paginationrefs = {
     itemsPerPage:ref(10),
     totalElements:ref(0)
 }
-const modalactive=ref<number>(0)
 
 const {debouncedGetElements,GetElements} = GetElementsFuntion({loading,
     params:() => ({ order: OrderKey.value,
@@ -59,13 +58,26 @@ useEcho(
   '.Events',
   (data: DataEvent) => {
     if (data.tipo === 58) {
-      rows.value = rows.value.filter(user => user.id !== data.id_user);
+      rows.value = rows.value.map(function(user){
+        if( user.id == data.id_user){
+            user.date_deleted=new Date();
+        }
+        return user
+      } );
+    }
+    if (data.tipo === 62) {
+      rows.value = rows.value.map(function(user){
+        if( user.id == data.id_user){
+            user.date_deleted=null
+        }
+        return user
+      } );
     }
   }
 )
-const DeleteUser=async ()=>{
+const ToggleActiveUser=async ()=>{
     try {
-        await axios.post(route('delete.user'),{id:iduser.value})
+        await axios.post(route('toggle.user'),{id:iduser.value})
         MyBasicToast.success('Eliminado Correctamente')
     } catch (error : any) {
         if (error.response?.status) {
@@ -95,11 +107,11 @@ onMounted(()=>{
 </script>
 
 <template>
-    <UserRegister :show="modalactive == 1" @close="modalactive=0"/>
+    
     <AppLayout title="Usuarios" description="Bienvenido al sistema CEKMOS" :loading="loading">
         <template #filtering>
             <div class="flex flex-row justify-start py-4 gap-2 w-full">
-                <ButtonNewElement @click="()=>{modalactive=1}"/>
+                <ButtonNewElement @click="()=>{modalshow=1 ,iduser=null}"/>
                 <Search Classdiv="sm:w-[20rem] w-full"  v-model="filters.search"/>
             </div>
         </template>
@@ -121,7 +133,7 @@ onMounted(()=>{
                         {element:row.email, classname:'lowercase'},
                         {element:row.verified ? 'Verificado':'Sin Verificar',classname:'uppercase'},
                         {element:row.date+'', classname:'uppercase'},
-                        {element: Dropdown,
+                        {classname:'flex justify-center', element: Dropdown,
                         props: {
                             father: {
                                 element: Button,
@@ -138,7 +150,11 @@ onMounted(()=>{
                                 },
                                 {
                                 element: Button,
-                                props: {text:'Eliminar', onClick:()=>{iduser = row.id; modalshow = 1},hiddenclases:true, classname:'w-full text-center p-2 '}
+                                props: {text:'Editar Datos', onClick:()=>{iduser = row.id; modalshow = 1},hiddenclases:true, classname:'w-full text-center p-2 '}
+                                },
+                                {
+                                element: Button,
+                                props: {text:row.date_deleted?'Restaurar':'Eliminar', onClick:()=>{iduser = row.id; modalshow = row.date_deleted ? 4: 5},hiddenclases:true, classname:'w-full text-center p-2 '}
                                 },
                             ]
                             ,contentClasses:['bg-gray-200']
@@ -151,9 +167,13 @@ onMounted(()=>{
                 <MessageEmpty v-else/>
         </template>
     </AppLayout>
+    <UserRegister :show="modalshow == 1" @close="()=>{modalshow=0}" :userid="iduser" />
     <ChangePermissionsUser :show="modalshow === 2"  :id="iduser"  @close="()=>{modalshow=0}"/>
     <ChangeModulosServicio :show="modalshow === 3"  :id="iduser"  @close="()=>{modalshow=0}"/>
-    <BasicModal :show="modalshow === 1 " :buttonconfirm="{text:'Si, Eliminar',onClick:()=>{DeleteUser(),openconfirmation=false},classname:'bg-red-600 font-bold text-white'} " @close="()=>{modalshow=0}">
+    <BasicModal :show="modalshow === 5 " :buttonconfirm="{text:'Si, Eliminar',onClick:()=>{ToggleActiveUser(),openconfirmation=false},classname:'bg-red-600 font-bold text-white'} " @close="()=>{modalshow=0}">
         <h2 class="text-center text-lg">¿Realmente Deseas Eliminar al Usuario?</h2>
+    </BasicModal>
+    <BasicModal :show="modalshow === 4 " :buttonconfirm="{text:'Si, Restaurar',onClick:()=>{ToggleActiveUser(),openconfirmation=false},classname:'bg-red-600 font-bold text-white'} " @close="()=>{modalshow=0}">
+        <h2 class="text-center text-lg">¿Realmente Deseas Restaurar al Usuario?</h2>
     </BasicModal>
 </template>

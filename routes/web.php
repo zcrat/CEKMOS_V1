@@ -30,7 +30,8 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::middleware(['permission:ver_usuarios_sitema'])->group(function () {
       Route::get('/users', function () {return Inertia::render('users');})->name('users');
       Route::get('/Get/Users',[UsersController::class,"ReadUsers"])->name('getusers');
-      Route::post('/Delete/User',[UsersController::class,"DeleteUser"])->name('delete.user');
+      Route::post('/Toggle/User',[UsersController::class,"ToggleActive"])->name('toggle.user');
+      Route::get('/Get/User',[UsersController::class,"ReadUser"])->name('user.read');
       Route::post('/Create/User',[UsersController::class,"CreateUser"])->name('user.create');
       Route::post('/Update/User',[UsersController::class,"UpdateUser"])->name('user.update');
     });
