@@ -7,6 +7,7 @@ import { type option } from '@/types/generales'
 
 const props = withDefaults(defineProps<{
   id:string
+  canNew?:boolean
   endpoint: string
   new_option?: option | null
   placeholder?:string
@@ -14,6 +15,7 @@ const props = withDefaults(defineProps<{
   timeout?: number
 }>(), {
   timeout: 400,
+  canNew:true,
   placeholder:'Buscar...'
 })
 const selected = defineModel<string | number |null>()
@@ -75,16 +77,15 @@ watch(selected, (val) => {
   if (val == null || val === undefined) {
     optionselect.value = null
   } else {
-    if (!options.value.find(o => o.value === val)) {
-        
-    }
     const found = options.value.find(o => o.value === val)
     if (found) {
       optionselect.value = found
-    } else {
+    } else if (props.canNew) {
       const tempOption = { value: val, label: String(val) }
       options.value.push(tempOption)
       optionselect.value = tempOption
+    }else{
+      selected.value=null
     }
   }
 })

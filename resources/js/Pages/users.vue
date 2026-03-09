@@ -28,7 +28,6 @@ interface DataEvent {
 const rows = ref<UsersTable[]>([])
 const loading = ref<boolean>(false)
 const modalshow = ref<number>(0)
-const ModalEditModuls = ref(false)
 const openconfirmation = ref(false)
 const OrderKey = ref<OrderKeyProp | null>(null)
 const iduser = ref<number | null>(null)

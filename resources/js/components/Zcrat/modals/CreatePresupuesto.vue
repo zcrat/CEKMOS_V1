@@ -20,7 +20,7 @@ import { sumarDiasSinDomingo } from '@/utils/functions/generales/fechas';
 import { useVehiculoFetcher } from '@/composables/useVehiculoFetchers';
 import { usePresupuestoFetcher } from '@/composables/usePresupuestoFetcher'
 const props = defineProps<{show: boolean}>()
-const emit = defineEmits(['update:show'])
+const emit = defineEmits(['close'])
 const optionstipos=ref<option[]>([{value:5,label:'Correctivo'},{value:6,label:'Preventivo'},{value:7,label:'Ambos'}])
 const optionsgasolima=ref<option[]>([])
 const empresa=ref<option|undefined>(undefined)
@@ -28,8 +28,8 @@ const cliente=ref<option|undefined>(undefined)
 const vehiculoconcepto=ref<option|undefined>(undefined)
 const modulosdisponibles=ref<option[]>([])
 
-const updateVisibility = (val: boolean) => {
-  emit('update:show', val)
+const updateVisibility = () => {
+  emit('close')
 }
 onMounted(async () => {
  optionsgasolima.value = await GetNivelesGasolina();
@@ -65,7 +65,7 @@ const presupuesto = reactive<NuevoPresupuesto>({
   vigencia: null,
   modulo_orden:''
 });
-const cancelgetvehiculodata = ref(false);
+const cancelgetvehiculodata = ref<boolean>(false);
 const { fetchvehiculo } = useVehiculoFetcher(presupuesto,cancelgetvehiculodata);
 const { fetchDatosPresupuesto } = usePresupuestoFetcher(presupuesto,empresa,cliente,vehiculoconcepto);
 const buscarVehiculo = async (campo:string,value:string) => {
@@ -76,12 +76,12 @@ const buscardatospresupuesto = async (value:string) => {
 };
 const debouncedGetDatosVehiculo = debounce(buscarVehiculo, 500);
 watch(() => presupuesto.economico, (nuevoEconomico, anteriorEconomico) => {
-  if (nuevoEconomico && nuevoEconomico !== anteriorEconomico && !cancelgetvehiculodata) {
+  if (nuevoEconomico && nuevoEconomico !== anteriorEconomico && !cancelgetvehiculodata.value) {
     debouncedGetDatosVehiculo('economico', nuevoEconomico);
   }
 });
 watch(() => presupuesto.placas, (nuevasPlacas, anterioresPlacas) => {
-  if (nuevasPlacas && nuevasPlacas !== anterioresPlacas && !cancelgetvehiculodata) {
+  if (nuevasPlacas && nuevasPlacas !== anterioresPlacas && !cancelgetvehiculodata.value) {
     debouncedGetDatosVehiculo('placas', nuevasPlacas);
   }
 });
@@ -96,7 +96,7 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
     onClick:()=>{
       Create(presupuesto).then((res)=>{
         if(res.status){
-          updateVisibility(false);
+          updateVisibility();
           window.location.href=route('Presupuesto.Editar',{presupuesto:res.data.id});
         }else{
           if(res.code===422){
@@ -116,7 +116,7 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
 </script>
 
 <template>
-  <BaseModal modaltitle="Nuevo Presupuesto" :position="'center'" :modelValue="props.show" @update:modelValue="updateVisibility" :buttonconfirm="buttonconfirm" >
+  <BaseModal modaltitle="Nuevo Presupuesto" :position="'center'" :show="props.show" @close="updateVisibility" :buttonconfirm="buttonconfirm" >
     <Subtitle>Datos Generales</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2" >
       <Combobox endpoint="Combobox.Ordenes_Servicio" label="Orden De Servicio" id="ordenservicio" v-model="presupuesto.orden_servicio"  placeholder="Buscar, Crear o Automatica"/>
