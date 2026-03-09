@@ -6,7 +6,6 @@ const props = defineProps<{
   porcentage?: number;
   text:string;
 }>();
-console.log('refrescada');
 </script>
 
 <template>

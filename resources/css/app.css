@@ -11,10 +11,13 @@ input{
 :root {
   --micolor: #176cb3;
   --btnprimary: #0479d8;
+  --btnprimaryshadow: #0479d8;
   --color1: #000000;
   --color2: #ffffff;
   --color3: #b30e32;
   --color3a: #c02a4a;
+  --color4: #aaaaaa;
+  --color5: #aaaaaa;
 }
 .multiselect__input {
   @apply px-3 py-2 border rounded focus:outline-none;
@@ -45,7 +48,7 @@ input{
 }
 
 .tabla td {
-  @apply px-4 py-2 border-b;
+  @apply px-4 py-2;
 }
 
 .tabla tbody tr:nth-child(even) {
@@ -56,14 +59,16 @@ input{
   @apply bg-blue-50 even:bg-blue-100;
 }
 .PageActive{
-  @apply w-8 text-center bg-[--micolor] text-[--color2] rounded-md h-8 justify-center items-center;
+  @apply w-8 text-center bg-[--color3] text-[--color2] rounded-md h-8 justify-center items-center;
 }
 .PageInactive{
-   @apply w-8 text-center bg-[--color3] text-[--color2] rounded-md h-8 justify-center items-center;
-
+   @apply w-8 text-center bg-[--micolor] text-[--color2] rounded-md h-8 justify-center items-center;
 }
-.PageInactive:hover{
-  @apply bg-[--micolor] text-[--color2];
+.PageInactive:not(:disabled):hover{
+  @apply bg-[--color3];
+}
+.PageInactive:disabled{
+  @apply opacity-65;
 }
 .barra{
     margin: 0;

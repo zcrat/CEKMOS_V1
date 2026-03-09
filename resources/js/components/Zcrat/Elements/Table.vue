@@ -36,7 +36,7 @@ const OnClickOrder= (Order:OrderKeysProp)=>{
 
 
 <template>
-  <div class="rounded w-content w-full">
+  <div class="rounded w-content w-full p-2">
     <table :class="['w-auto sm:w-full', classname]">
       <thead>
         <tr>

@@ -129,6 +129,16 @@ export interface NuevoPresupuesto {
   regimen_fiscal:string,
   domicilio_fiscal:string
  }
+ export interface FormUser{
+  id?:number|null,
+  name:string,
+  paterno:string,
+  materno:string|null,
+  email:string,
+  username:string,
+  password:string,
+  password_confirmation:string,
+ }
  export interface datagetpresupuestos{
     presupuesto: NuevoPresupuesto | null;
     empresa: option;
