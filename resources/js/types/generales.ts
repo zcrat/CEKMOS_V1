@@ -108,7 +108,7 @@ export interface NuevoPresupuesto {
   indicaciones_cliente: string,
   garantia: string,
   observaciones: string,//tiempo de entrega
-  tipo_id: 1|2|3//correctivo, preventivo,ambos
+  tipo_id: 5|6|7
   vehiculo_concepto_id: number| null,
   economico: string,
   placas: string,

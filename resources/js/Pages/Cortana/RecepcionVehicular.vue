@@ -10,7 +10,7 @@ import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
 import empresasselect from '@/components/Zcrat/Filters/empresasselect.vue'
 import {presupuestos} from '@/types/generales';
 import Pagination from '@/components/Zcrat/Filters/pagination.vue';
-import Nuevo from '@/components/Zcrat/modals/CreatePresupuesto.vue';
+import RecepcionVehicularModal from '@/components/Zcrat/modals/RecepcionVehicular.vue';
 import { OrderKeyProp } from '@/types/tablecomponent';
 
 const currentPage=ref<number>(1)
@@ -95,5 +95,5 @@ const orderBy=ref<null|OrderKeyProp>(null)
             </div>
         </template>
     </AppLayout>
-    <Nuevo v-model:show="ShowNuevo"  @close="()=>ShowNuevo=false"/>
+    <RecepcionVehicularModal v-model:show="ShowNuevo"  @close="()=>ShowNuevo=false"/>
 </template>
