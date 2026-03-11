@@ -144,7 +144,7 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
       <InputBasic id="Año" label="Año" type="number" v-model="presupuesto.año"  placeholder="ej. 2024"/>
       <InputBasic id="Marca" label="Marcas" type="text" v-model="presupuesto.marca" classname="uppercase" placeholder="ej. AUDI"/>
       <InputBasic id="Modelo" label="Modelo" type="text" v-model="presupuesto.modelo" classname="uppercase" placeholder="ej. A3"/>
-      <ZDCanvas :width=800 :height="200" class="col-span-3"></ZDCanvas>
+      <ZDCanvas class="col-span-3"></ZDCanvas>
     </div>
     <Subtitle>Datos De Ingreso</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2" >
