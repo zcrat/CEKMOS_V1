@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { TitleColumn, Row ,OrderKeyProp,OrderKeysProp} from '@/types/tablecomponent'
 import TitleOrderBy from '../Filters/TitleOrderBy.vue'
+import { computed } from 'vue';
 
 
-defineProps<{
+const props = defineProps<{
   classname?: string
   rows: Row[]
   titles: (TitleColumn | string)[]
@@ -31,6 +32,9 @@ const OnClickOrder= (Order:OrderKeysProp)=>{
     
   }
 }
+const hassubtitles = computed(() =>
+  props.titles.some(item => typeof item !== 'string' && item.subtittles)
+)
 
 </script>
 

@@ -4,6 +4,11 @@ export interface TitleColumn {
   title: string
   classname?: string
   CanOrder?:OrderKeysProp
+  subtittles?:{
+    title: string
+    classname?: string
+    CanOrder?:OrderKeysProp
+  }[]
 }
 
 export interface DataColumn {

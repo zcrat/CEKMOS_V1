@@ -13,6 +13,9 @@ class CortanaController extends Controller
     public function PresupuestosVista(Request $request){
         return Inertia::render('Cortana/Presupuestos');
     }
+    public function RecepcionVehicularVista(Request $request){
+        return Inertia::render('Cortana/RecepcionVehicular');
+    }
     public function GetItems(Request $request){
         $user=Auth::user()->load('modulos_orden');
         $currentPage=$request->currentPage ?? 1;

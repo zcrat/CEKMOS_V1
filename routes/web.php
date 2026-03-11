@@ -41,6 +41,9 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
       Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('Presupuesto.Get.Data_Orden');
       Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('Presupuesto.Create');
     });
+
+    Route::get('cortana/recepciones/vehiculares',[CortanaController::class,'RecepcionVehicularVista'])->name('Cortana.OrdenesServicio.Vista');
+
     Route::get('/dashboard', function () { return Inertia::render('Dashboard');})->name('dashboard');
 
     Route::get('/Get/Permisos/User',[UsersController::class,"GetPermisos"])->name('getpermisosuser');
@@ -54,7 +57,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('/employees',[EmpleadosController::class,'View'])->name('employees');
     Route::get('/employees/read',[EmpleadosController::class,'read'])->name('employees.read');
     Route::post('/employees/create',[EmpleadosController::class,'create'])->name('employees.create');
-    Route::get('cortana/recepciones/vehiculares',[CortanaController::class,'PresupuestosVista'])->name('Cortana.OrdenesServicio.Vista');
+    
     
     Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');
     Route::get('select2/regimenes/fiscales',[select2controller::class,'RegimenesFiscales'])->name('Select2.Regimenes.Fiscales');

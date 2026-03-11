@@ -12,35 +12,32 @@ import {presupuestos} from '@/types/generales';
 import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import Nuevo from '@/components/Zcrat/modals/CreatePresupuesto.vue';
 import { OrderKeyProp } from '@/types/tablecomponent';
+
 const currentPage=ref<number>(1)
 const itemsPerPage=ref<number>(10)
 const totalPages=ref<number>(0)
 const totalItems=ref<number>(0)
 const items=ref<presupuestos[]>([])
 const search = ref<string>('');
+const empresa = ref<string|null>(null);
 const estatus = ref<string[]>([]);
 const modulos = ref<string[]>([]);
-
-const prefacturasactive = false;
 const loading = ref<boolean>(false);
 const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
-
 const ShowNuevo = ref<boolean>(false)
 const orderBy=ref<null|OrderKeyProp>(null)
 
 </script>
 
 <template>
-    <AppLayout title="Presupuestos" :loading="loading">
+    <AppLayout title="Recepciones Vehiculares" :loading="loading">
         <template #header>
-                <Button text="Exportar" />
                 <Button text="Nueva" @click="ShowNuevo=true"  />
-                <Button text="Prefacturas" :classname="prefacturasactive?'bg-red-700' : 'bg-blue-700'"/>
         </template>
         <template #filtering>
             <div class="flex gap-2  flex-row">
-                <Search Classdiv="sm:w-[30rem] w-full" placeholder="Buscar Por Folio, PLacas, Economico o Order De Servicio" v-model="search"/>
-                <empresasselect/>
+                <Search Classdiv="sm:w-[30rem] w-full" placeholder="Buscar Por Order De Servicio, PLacas o Economico" v-model="search"/>
+                <empresasselect v-model="empresa" :canNew="false"/>
             </div>
                 <div class="flex gap-2 items-end justify-between sm:justify-start">
                     <MultiOptionFilter v-model:selectedIds="estatus" api="select.status" :params="{'categoria_id':2}" label="Estatus"/>
@@ -54,9 +51,8 @@ const orderBy=ref<null|OrderKeyProp>(null)
             <Table v-if="items.length>=0" 
                 v-model:OrderKey="orderBy"
                 :titles="[
-                    {title:'Folio',classname:'uppercase',CanOrder:{'key':'folio',types:'ambos'}},
                     {title:'No. Orden',classname:'uppercase',CanOrder:{'key':'orden',types:'desc'}},
-                    {title:'Empresa',classname:'uppercase',CanOrder:{'key':'empresa',types:'asc'}},
+                    {title:'Empresa',classname:'uppercase',CanOrder:{'key':'empresa_id',types:'asc'}},
                     {title:'Economico',classname:'uppercase'},
                     {title:'Placas',classname:'uppercase'},
                     {title:'Vin',classname:'uppercase'},
@@ -67,7 +63,6 @@ const orderBy=ref<null|OrderKeyProp>(null)
                 :rows="items.map(function(row){return {
                     classname:'bg-grey-300',
                     columns:[
-                        {element:row.folio, classname:'capitalize'},
                         {element:row.orden, classname:'capitalize'},
                         {element:row.empresa, classname:'lowercase'},
                         {element:row.economico ? 'Verificado':'Sin Verificar',classname:'uppercase'},
