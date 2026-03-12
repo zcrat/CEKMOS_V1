@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import Button from "../Inputs/Button.vue";
-
+import axios from 'axios' 
+import MyBasicToast from "@/utils/ToastNotificationBasic";
 interface Point{
   x:number
   y:number
@@ -20,6 +21,7 @@ let ctx: CanvasRenderingContext2D | null = null
 let drawing = false
 
 const Strokes=ref<Point[][]>([])
+const ImageDraw=ref<Blob|null>(null)
 const currentStroke= ref<Point[]>([])
 
 onMounted(() => {
@@ -48,30 +50,44 @@ onMounted(() => {
   })
   canvas.addEventListener("mousemove", draw)
 })
-function dibujarImagen(urlimagen:string) {
+
+  
+const dibujarImagen= async (blob:Blob|null) =>{
+  ImageDraw.value = blob
+  redraw()
+}
+const DrawImage = async () => {
   const canvas = canvasRef.value
-   if (!canvas) return
-  const img = new Image();
-  img.src = urlimagen;
-  img.onload = function () {
-    const ctx = canvas.getContext("2d")
-    const imgWidth = img.width;
-    const imgHeight = img.height;
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
-    const imgAspectRatio = imgWidth / imgHeight;
-    const canvasAspectRatio = canvasWidth / canvasHeight;
-    let renderWidth, renderHeight;
-    if (imgAspectRatio > canvasAspectRatio) {
-      renderWidth = canvasWidth;
-      renderHeight = canvasWidth / imgAspectRatio;
-    } else {
-      renderHeight = canvasHeight;
-      renderWidth = canvasHeight * imgAspectRatio;
+  if (!canvas || !ImageDraw.value) return
+  const ctx = canvas.getContext("2d")
+  if (!ctx) return
+  const url = URL.createObjectURL(ImageDraw.value)
+  const img = new Image()
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => {
+      const imgWidth = img.width
+      const imgHeight = img.height
+      const canvasWidth = canvas.width
+      const canvasHeight = canvas.height
+      const imgAspectRatio = imgWidth / imgHeight
+      const canvasAspectRatio = canvasWidth / canvasHeight
+      let renderWidth, renderHeight
+      if (imgAspectRatio > canvasAspectRatio) {
+        renderWidth = canvasWidth
+        renderHeight = canvasWidth / imgAspectRatio
+      } else {
+        renderHeight = canvasHeight
+        renderWidth = canvasHeight * imgAspectRatio
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, renderWidth, renderHeight)
+      URL.revokeObjectURL(url)
+      resolve()
     }
-    ctx?.clearRect(0, 0, canvas.width, canvas.height);
-    ctx?.drawImage(img, 0, 0, renderWidth, renderHeight);
-  };
+
+    img.onerror = reject
+    img.src = url
+  })
 }
 function draw(e: MouseEvent) {
   if (!drawing || !ctx || props.disabled) return
@@ -92,15 +108,17 @@ function draw(e: MouseEvent) {
 }
 
 function clearCanvas() {
-  const canvas = canvasRef.value
-  if (!ctx || !canvas) return
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  Strokes.value=[]
+  redraw()
+  
 }
-function redraw(){
+async function redraw(){
   const canvas = canvasRef.value
   if(!canvas || !ctx) return
 
   ctx.clearRect(0,0,canvas.width,canvas.height)
+
+  await DrawImage()
 
   Strokes.value.forEach(stroke => {
     ctx?.beginPath()
@@ -135,8 +153,8 @@ defineExpose({
     </div>
 
     <div class="flex w-fit gap-2">
-      <Button text="Limpiar" @click="clearCanvas" type="delete"/>
-      <Button text="Deshacer" @click="undo" type="secondary"/>
+      <Button text="Limpiar" :disabled="Strokes.length <= 0" @click="clearCanvas" type="delete"/>
+      <Button text="Deshacer" :disabled="Strokes.length <= 0" @click="undo" type="secondary"/>
     </div>
   </div>
 </template>

@@ -15,6 +15,9 @@ use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\presupuestosController;
 use App\Http\Controllers\PruebasController;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
+
 use Illuminate\Http\Request;
 Route::get('/', function () {
   return redirect('/login');
@@ -27,6 +30,21 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session')])->group(func
   
 });
 Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])->group(function () {
+    
+  Route::get('/Image/Tipo/Vehiculo/General/{type}', function ($type) {
+      if(!in_array($type,[1,2,3,4,5,6])){
+        return response()->json(['message'=>'Tipo Invalido'],404);
+      }
+      $path='VehiculosRecepcionVehicular/Vehiculo'.$type.'.png';
+      $file = Storage::disk('local')->path($path);
+      if (!file_exists($file)) {
+        return response()->json(['message'=>'No existe la Imagen Del Tipo '.$type],404);
+      }
+      return Response::file($file, [
+          'Content-Type' => mime_content_type($file)
+      ]);
+  })->where('path', '.*')->name('image.tipo.vehiculo');
+
     Route::middleware(['permission:ver_usuarios_sitema'])->group(function () {
       Route::get('/users', function () {return Inertia::render('users');})->name('users');
       Route::get('/Get/Users',[UsersController::class,"ReadUsers"])->name('getusers');

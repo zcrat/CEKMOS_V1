@@ -1,121 +1,146 @@
 <!-- ModalExample.vue -->
 <script setup lang="ts">
+  import InputBasic from '../Inputs/form/InputBasic.vue'
+  import Textarea from '../Inputs/form/Textarea.vue'
+  import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
+  import Create from '@/services/presupuesto/create'
+  import { ref, watch ,reactive, onMounted,computed} from 'vue' 
+  import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
+  import {type option,type Vehiculo, type datagetpresupuestos} from '@/types/generales'
+  import {type buttonconfirmed} from '@/types/modals'
+  import Combobox from '@/components/Zcrat/Elements/ZdCombobox.vue'
+  import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
+  import Select from '@/components/Zcrat/Elements/Select.vue';
+  import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
+  import debounce from 'lodash/debounce';
+  import GetNivelesGasolina from '@/utils/functions/select2/NivelesGasolina';
+  import GetModulosDisponibles  from '@/utils/functions/select2/ModulosCortana';
+  import { sumarDiasSinDomingo } from '@/utils/functions/generales/fechas';
+  import { useVehiculoFetcher } from '@/composables/useVehiculoFetchers';
+  import { usePresupuestoFetcher } from '@/composables/usePresupuestoFetcher'
+  import ZDCanvas from '../Elements/ZDCanvas.vue'
+  import axios from 'axios' 
+  import MyBasicToast from "@/utils/ToastNotificationBasic";
+  const props = defineProps<{show: boolean}>()
+  const emit = defineEmits(['close'])
+  const optionstipos=ref<option[]>([{value:5,label:'Correctivo'},{value:6,label:'Preventivo'},{value:7,label:'Ambos'}])
+  const optionsgasolima=ref<option[]>([])
+  const empresa=ref<option|undefined>(undefined)
+  const cliente=ref<option|undefined>(undefined)
+  const vehiculoconcepto=ref<option|undefined>(undefined)
+  const modulosdisponibles=ref<option[]>([])
 
-import InputBasic from '../Inputs/form/InputBasic.vue'
-import Textarea from '../Inputs/form/Textarea.vue'
-import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
-import Create from '@/services/presupuesto/create'
-import { ref, watch ,reactive, onMounted,computed} from 'vue' 
-import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
-import {type option,type Vehiculo, type datagetpresupuestos} from '@/types/generales'
-import {type buttonconfirmed} from '@/types/modals'
-import Combobox from '@/components/Zcrat/Elements/ZdCombobox.vue'
-import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
-import Select from '@/components/Zcrat/Elements/Select.vue';
-import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
-import debounce from 'lodash/debounce';
-import GetNivelesGasolina from '@/utils/functions/select2/NivelesGasolina';
-import GetModulosDisponibles  from '@/utils/functions/select2/ModulosCortana';
-import { sumarDiasSinDomingo } from '@/utils/functions/generales/fechas';
-import { useVehiculoFetcher } from '@/composables/useVehiculoFetchers';
-import { usePresupuestoFetcher } from '@/composables/usePresupuestoFetcher'
-import ZDCanvas from '../Elements/ZDCanvas.vue'
-import SignaturePad from '../Elements/SignaturePad.vue'
-const props = defineProps<{show: boolean}>()
-const emit = defineEmits(['close'])
-const optionstipos=ref<option[]>([{value:5,label:'Correctivo'},{value:6,label:'Preventivo'},{value:7,label:'Ambos'}])
-const optionsgasolima=ref<option[]>([])
-const empresa=ref<option|undefined>(undefined)
-const cliente=ref<option|undefined>(undefined)
-const vehiculoconcepto=ref<option|undefined>(undefined)
-const modulosdisponibles=ref<option[]>([])
+  const updateVisibility = () => {
+    emit('close')
+  }
+  onMounted(async () => {
+  optionsgasolima.value = await GetNivelesGasolina();
+  modulosdisponibles.value=await GetModulosDisponibles();
+  });
 
-const updateVisibility = () => {
-  emit('close')
-}
-onMounted(async () => {
- optionsgasolima.value = await GetNivelesGasolina();
- modulosdisponibles.value=await GetModulosDisponibles();
-});
+  export interface RecepcionVehicularForm {
+    id?:number
+    orden_seguimiento: string,
+    orden_opcional: string,
+    folio: string,
+    ubicacion: string,
+    telefono: number | null,
+    empresa_id: number|null,
+    cliente_id:number|null,
+    gasolina: number | string,
+    kilometraje: number | null,
+    estimacion: Date,
+    administrador: string,
+    jefe: string,
+    trabajador: string,
+    tecnico: string,
+    descripcion_mo: string,
+    indicaciones_cliente: string,
+    garantia: string,
+    observaciones: string,//tiempo de entrega
+    tipo_id: 5|6|7
+    vehiculo_concepto_id: number| null,
+    economico: string,
+    placas: string,
+    vin: string,
+    marca: string,
+    modelo: string,
+    año: number|null,
+    modulo_orden: number|string,
+    //datos posibles
+    vigencia: Date|null,
+  }
 
-export interface RecepcionVehicularForm {
-  id?:number
-  orden_seguimiento: string,
-  orden_opcional: string,
-  folio: string,
-  ubicacion: string,
-  telefono: number | null,
-  empresa_id: number|null,
-  cliente_id:number|null,
-  gasolina: number | string,
-  kilometraje: number | null,
-  estimacion: Date,
-  administrador: string,
-  jefe: string,
-  trabajador: string,
-  tecnico: string,
-  descripcion_mo: string,
-  indicaciones_cliente: string,
-  garantia: string,
-  observaciones: string,//tiempo de entrega
-  tipo_id: 5|6|7
-  vehiculo_concepto_id: number| null,
-  economico: string,
-  placas: string,
-  vin: string,
-  marca: string,
-  modelo: string,
-  año: number|null,
-  modulo_orden: number|string,
-  //datos posibles
-  vigencia: Date|null,
- }
+  const presupuesto = reactive<RecepcionVehicularForm>({
+    orden_seguimiento: '',
+    orden_opcional: '',
+    folio: '',
+    ubicacion: '',
+    telefono: null,
+    empresa_id: null,
+    cliente_id:null,
+    gasolina: '',
+    kilometraje: null,
+    estimacion: sumarDiasSinDomingo(new Date(new Date().setHours(12,0)),2),
+    administrador: '',
+    jefe: '',
+    trabajador: '',
+    tecnico: '',
+    descripcion_mo: '',
+    indicaciones_cliente: '',
+    garantia:'LO ESTIPULADO EN EL CONTRATO',
+    observaciones: 'DE ACUERDO A LO DIFICIL DE LA FALLA PARA SU REPARACION',//tiempo de entrega
+    tipo_id:7,//correctivo, preventivo,ambos
+    vehiculo_concepto_id: null,
+    economico: '',
+    placas: '',
+    vin: '',
+    marca: '',
+    modelo: '',
+    año: null,
+    vigencia: null,
+    modulo_orden:''
+  });
 
-const presupuesto = reactive<RecepcionVehicularForm>({
-  orden_seguimiento: '',
-  orden_opcional: '',
-  folio: '',
-  ubicacion: '',
-  telefono: null,
-  empresa_id: null,
-  cliente_id:null,
-  gasolina: '',
-  kilometraje: null,
-  estimacion: sumarDiasSinDomingo(new Date(new Date().setHours(12,0)),2),
-  administrador: '',
-  jefe: '',
-  trabajador: '',
-  tecnico: '',
-  descripcion_mo: '',
-  indicaciones_cliente: '',
-  garantia:'LO ESTIPULADO EN EL CONTRATO',
-  observaciones: 'DE ACUERDO A LO DIFICIL DE LA FALLA PARA SU REPARACION',//tiempo de entrega
-  tipo_id:7,//correctivo, preventivo,ambos
-  vehiculo_concepto_id: null,
-  economico: '',
-  placas: '',
-  vin: '',
-  marca: '',
-  modelo: '',
-  año: null,
-  vigencia: null,
-  modulo_orden:''
-});
+  const KeysOptional=['orden_opcional','folio','orden_seguimiento','vigencia'];
 
-const KeysOptional=['orden_opcional','folio','orden_seguimiento','vigencia'];
+  const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
 
 
-const buttonconfirm=computed<buttonconfirmed>(()=>{ 
-  return {
-    text:'Crear Presupuesto',
-    classname:'bg-blue-600 text-white',
-    onClick:()=>{
-      
-    },
-    disabled:Object.entries(presupuesto)
-    .filter(([key]) => !KeysOptional.includes(key))
-    .some(([_,value]) => value === null || value === '')}})
 
+  const buttonconfirm=computed<buttonconfirmed>(()=>{ 
+    return {
+      text:'Crear Presupuesto',
+      classname:'bg-blue-600 text-white',
+      onClick:()=>{
+        
+      },
+      disabled:Object.entries(presupuesto)
+      .filter(([key]) => !KeysOptional.includes(key))
+      .some(([_,value]) => value === null || value === '')}})
+
+  const prueba = async () => {
+    try {
+      const response = await axios.get(route('image.tipo.vehiculo', { type: 1 }), {
+        responseType: 'blob'
+      });
+      ImageVehiculoEntrada.value?.dibujarImagen(response.data);
+    } catch (error:any) {
+      if (error.response) {
+        const blob = error.response.data;
+        const contentType = error.response.headers['content-type'];
+        if (contentType && contentType.includes('application/json')) {
+          const text = await blob.text();
+          const jsonError = JSON.parse(text);
+          MyBasicToast.error(jsonError.message || 'Error al encontrar la imagen de referencia');
+        } else {
+          MyBasicToast.error('Error desconocido del servidor');
+        }
+      } else {
+        MyBasicToast.error('Error al conectar con el servidor');
+      }
+    }
+  }
 </script>
 
 <template>
@@ -144,7 +169,8 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
       <InputBasic id="Año" label="Año" type="number" v-model="presupuesto.año"  placeholder="ej. 2024"/>
       <InputBasic id="Marca" label="Marcas" type="text" v-model="presupuesto.marca" classname="uppercase" placeholder="ej. AUDI"/>
       <InputBasic id="Modelo" label="Modelo" type="text" v-model="presupuesto.modelo" classname="uppercase" placeholder="ej. A3"/>
-      <ZDCanvas class="col-span-3"></ZDCanvas>
+      <ZDCanvas class="col-span-3" ref="ImageVehiculoEntrada"></ZDCanvas>
+      <button @click="prueba()">prueba</button>
     </div>
     <Subtitle>Datos De Ingreso</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2" >
