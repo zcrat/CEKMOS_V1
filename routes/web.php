@@ -32,13 +32,14 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session')])->group(func
 Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])->group(function () {
     
   Route::get('/Image/Tipo/Vehiculo/General/{type}', function ($type) {
-      if(!in_array($type,[1,2,3,4,5,6])){
+      if(!in_array($type,[8,9,10,11,12,13])){
         return response()->json(['message'=>'Tipo Invalido'],404);
       }
-      $path='VehiculosRecepcionVehicular/Vehiculo'.$type.'.png';
+      $realtype=$type-7;
+      $path='VehiculosRecepcionVehicular/Vehiculo'.$realtype.'.png';
       $file = Storage::disk('local')->path($path);
       if (!file_exists($file)) {
-        return response()->json(['message'=>'No existe la Imagen Del Tipo '.$type],404);
+        return response()->json(['message'=>'No existe la Imagen Del Tipo '.$realtype],404);
       }
       return Response::file($file, [
           'Content-Type' => mime_content_type($file)
@@ -79,10 +80,11 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     
     Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');
     Route::get('select2/regimenes/fiscales',[select2controller::class,'RegimenesFiscales'])->name('Select2.Regimenes.Fiscales');
+    
     Route::get('select/niveles/combustible',[selectcontroller::class,'NivelesCombustible'])->name('select.niveles.combustible');
     Route::get('select/modulos/orden',[selectcontroller::class,'ModulosOrden'])->name('select.modulos.disponibles.usuario');
-
     Route::get('select/estatus',[selectcontroller::class,'EstatusIdsPerCategory'])->name('select.status');
+    Route::get('select/tipos/vehiculos',[selectcontroller::class,'TiposVehiculosGeneral'])->name('select.tipos.vehiculos');
     
     Route::get('ComboBox/OrdenesServicio',[ComboboxController::class,'GetOrdenesServicio'])->name('Combobox.Ordenes_Servicio');
     Route::get('ComboBox/Ubicacion',[ComboboxController::class,'GetUbicaciones'])->name('Combobox.Ubicaciones');

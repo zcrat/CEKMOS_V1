@@ -8,9 +8,14 @@ use App\Models\NivelesCombustible;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ModuloOrdenesServicio;
+use App\Models\Tipos;
 
 class selectcontroller extends Controller
 {
+    public function TiposVehiculosGeneral(Request $request){
+        $options=Tipos::selectraw("id as value , descripcion as label")->where('categoria_id',3)->get();
+        return response()->json(compact('options'));
+    }
     public function NivelesCombustible(Request $request){
         $options=NivelesCombustible::selectraw("id as value , descripcion as label")->get();
         return response()->json(compact('options'));

@@ -13,14 +13,15 @@
   import Select from '@/components/Zcrat/Elements/Select.vue';
   import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
   import debounce from 'lodash/debounce';
-  import GetNivelesGasolina from '@/utils/functions/select2/NivelesGasolina';
-  import GetModulosDisponibles  from '@/utils/functions/select2/ModulosCortana';
+  import GetNivelesGasolina from '@/utils/functions/select/NivelesGasolina';
+  import GetModulosDisponibles  from '@/utils/functions/select/ModulosCortana';
   import { sumarDiasSinDomingo } from '@/utils/functions/generales/fechas';
   import { useVehiculoFetcher } from '@/composables/useVehiculoFetchers';
   import { usePresupuestoFetcher } from '@/composables/usePresupuestoFetcher'
   import ZDCanvas from '../Elements/ZDCanvas.vue'
   import axios from 'axios' 
   import MyBasicToast from "@/utils/ToastNotificationBasic";
+import TiposVehiculos from '../Forms/TiposVehiculos.vue'
   const props = defineProps<{show: boolean}>()
   const emit = defineEmits(['close'])
   const optionstipos=ref<option[]>([{value:5,label:'Correctivo'},{value:6,label:'Preventivo'},{value:7,label:'Ambos'}])
@@ -29,6 +30,8 @@
   const cliente=ref<option|undefined>(undefined)
   const vehiculoconcepto=ref<option|undefined>(undefined)
   const modulosdisponibles=ref<option[]>([])
+  const tiposvehiculos=ref<option[]>([])
+  const vehiculoselected=ref<number|"">("")
 
   const updateVisibility = () => {
     emit('close')
@@ -118,10 +121,15 @@
       disabled:Object.entries(presupuesto)
       .filter(([key]) => !KeysOptional.includes(key))
       .some(([_,value]) => value === null || value === '')}})
-
+  
+  watch(vehiculoselected,(val)=>{
+    if(val !== ""){
+      prueba()
+    }
+  })
   const prueba = async () => {
     try {
-      const response = await axios.get(route('image.tipo.vehiculo', { type: 1 }), {
+      const response = await axios.get(route('image.tipo.vehiculo', { type: vehiculoselected.value }), {
         responseType: 'blob'
       });
       ImageVehiculoEntrada.value?.dibujarImagen(response.data);
@@ -169,6 +177,7 @@
       <InputBasic id="Año" label="Año" type="number" v-model="presupuesto.año"  placeholder="ej. 2024"/>
       <InputBasic id="Marca" label="Marcas" type="text" v-model="presupuesto.marca" classname="uppercase" placeholder="ej. AUDI"/>
       <InputBasic id="Modelo" label="Modelo" type="text" v-model="presupuesto.modelo" classname="uppercase" placeholder="ej. A3"/>
+      <TiposVehiculos label="Tipo De Vehiculo" id="tipovehiculo" v-model="vehiculoselected" />
       <ZDCanvas class="col-span-3" ref="ImageVehiculoEntrada"></ZDCanvas>
       <button @click="prueba()">prueba</button>
     </div>
