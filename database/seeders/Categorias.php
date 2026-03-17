@@ -23,6 +23,7 @@ class Categorias extends Seeder
             ['descripcion' => 'Notificaciones'],
             ['descripcion' => 'Hoja de Conceptos'],
             ['descripcion' => 'WEB SOCKETS'],
+            ['descripcion' => 'Detalles Equipo'],
         ];
         foreach ($categorias as $data) {
             CategoriasModel::create($data);

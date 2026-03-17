@@ -27,6 +27,12 @@ class Estatus extends Seeder
             ['descripcion' => 'Cancelacion exitosa', 'categoria_id' => 6],
             ['descripcion' => 'Solicitud realizada anteriormente, espere 72 horas...', 'categoria_id' => 6],
             ['descripcion' => 'Límite de solicitudes de cancelación alcanzado.', 'categoria_id' => 6],
+            ['descripcion' => 'SIN DAÑO VISIBLE', 'categoria_id' => 11],
+            ['descripcion' => 'OPERACIONAL', 'categoria_id' => 11],
+            ['descripcion' => 'FALTA OBJETO', 'categoria_id' => 11],
+            ['descripcion' => 'DANADA', 'categoria_id' => 11],
+            ['descripcion' => 'REPARACION NECESARIA', 'categoria_id' => 11],
+            ['descripcion' => 'NO APLICA', 'categoria_id' => 11],
         ];
         foreach ($estatus as $data) {
             EstatusModel::create($data);

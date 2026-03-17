@@ -17,7 +17,7 @@ input{
   --color3: #b30e32;
   --color3a: #c02a4a;
   --color4: #aaaaaa;
-  --color5: #aaaaaa;
+  --color5: #faaaaa;
 }
 .multiselect__input {
   @apply px-3 py-2 border rounded focus:outline-none;
