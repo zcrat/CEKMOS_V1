@@ -22,7 +22,7 @@
   import axios from 'axios' 
   import MyBasicToast from "@/utils/ToastNotificationBasic";
 import TiposVehiculos from '../Forms/TiposVehiculos.vue'
-import GetStatusPerCategory from '@/utils/functions/select2/StatusPerCategory'
+import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
 import Checkbox from '../Inputs/form/Checkbox.vue'
   const props = defineProps<{show: boolean}>()
   const emit = defineEmits(['close'])
