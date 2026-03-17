@@ -14,8 +14,8 @@ import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
 import Select from '@/components/Zcrat/Elements/Select.vue';
 import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
 import debounce from 'lodash/debounce';
-import GetNivelesGasolina from '@/utils/functions/select2/NivelesGasolina';
-import GetModulosDisponibles  from '@/utils/functions/select2/ModulosCortana';
+import GetNivelesGasolina from '@/utils/functions/select/NivelesGasolina';
+import GetModulosDisponibles  from '@/utils/functions/select/ModulosCortana';
 import { sumarDiasSinDomingo } from '@/utils/functions/generales/fechas';
 import { useVehiculoFetcher } from '@/composables/useVehiculoFetchers';
 import { usePresupuestoFetcher } from '@/composables/usePresupuestoFetcher'

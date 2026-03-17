@@ -13,7 +13,7 @@ const props=withDefaults(defineProps<{
   disabled?:boolean
 }>(),{
   disabled:false,
-  classnamedivcanvas:'w-full h-[25rem]'
+  classnamedivcanvas:'w-full h-[20rem]'
 })
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -110,7 +110,6 @@ function draw(e: MouseEvent) {
 function clearCanvas() {
   Strokes.value=[]
   redraw()
-  
 }
 async function redraw(){
   const canvas = canvasRef.value

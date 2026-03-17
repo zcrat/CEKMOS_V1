@@ -3,7 +3,7 @@
   import Poper from '@/components/Zcrat/Elements/poper.vue' 
 import { onMounted, ref,computed } from 'vue';
 import { option } from '@/types/generales';
-import MultiOptionFilter from '@/utils/functions/select2/MultiOptionFilter';
+import MultiOptionFilter from '@/utils/functions/select/MultiOptionFilter';
 interface Props {
     api: string;
     params?: Record<string,any>;
