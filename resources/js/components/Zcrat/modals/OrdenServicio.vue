@@ -3,7 +3,6 @@
   import InputBasic from '../Inputs/form/InputBasic.vue'
   import Textarea from '../Inputs/form/Textarea.vue'
   import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
-  import Create from '@/services/presupuesto/create'
   import { ref, watch ,reactive, onMounted,computed} from 'vue' 
   import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
   import {type option,type Vehiculo, type datagetpresupuestos} from '@/types/generales'
@@ -21,24 +20,8 @@
   import ZDCanvas from '../Elements/ZDCanvas.vue'
   import axios from 'axios' 
   import MyBasicToast from "@/utils/ToastNotificationBasic";
-import TiposVehiculos from '../Forms/TiposVehiculos.vue'
-  const props = defineProps<{show: boolean}>()
-  const emit = defineEmits(['close'])
-  const optionstipos=ref<option[]>([{value:5,label:'Correctivo'},{value:6,label:'Preventivo'},{value:7,label:'Ambos'}])
-  const optionsgasolima=ref<option[]>([])
-  const empresa=ref<option|undefined>(undefined)
-  const cliente=ref<option|undefined>(undefined)
-  const vehiculoconcepto=ref<option|undefined>(undefined)
-  const modulosdisponibles=ref<option[]>([])
-  const tiposvehiculos=ref<option[]>([])
-
-  const updateVisibility = () => {
-    emit('close')
-  }
-  onMounted(async () => {
-  optionsgasolima.value = await GetNivelesGasolina();
-  modulosdisponibles.value=await GetModulosDisponibles();
-  });
+  import TiposVehiculos from '../Forms/TiposVehiculos.vue';
+  import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
 
   export interface Economico {
     id?:number,
@@ -81,6 +64,162 @@ import TiposVehiculos from '../Forms/TiposVehiculos.vue'
     image:Blob,
     tipo_id:number
   }
+  export interface PinturaForm{
+    id?:number,
+    DetallesGeneralesId?:number,
+    decolarada:"1"|"",
+    color_desigual:"1"|"",
+    rayonnes:"1"|"",
+    grietas:"1"|"",
+    golpes:"1"|"",
+    emblemas:"1"|"",
+    logos:"1"|"",
+    rociado:"1"|"",
+    granizo:"1"|"",
+    lluvia:"1"|"",
+  }
+  export interface InventarioForm{
+    id?:number,
+    DetallesGeneralesId?:number,
+    llanta:"1"|"",
+    cables:"1"|"",
+    estuche:"1"|"",
+    llave_tuerca:"1"|"",
+    triangulo:"1"|"",
+    tarjeta_circulacion:"1"|"",
+    cubreruedas:"1"|"",
+    candado_rueda:"1"|"",
+    extinguidor:"1"|"",
+    gato:"1"|"",
+    placas:"1"|"",
+  }
+  export interface CondicionesInterioresForm{
+    id?:number,
+    DetallesGeneralesId?:number,
+    puerta_izq_f:string,
+    puerta_izq_t:string,
+    puerta_der_f:string,
+    puerta_der_t:string,
+    asiento_izq_f:string,
+    asiento_izq_t:string,
+    asiento_der_f:string,
+    asiento_der_t:string,
+    consola:string,
+    claxon:string,
+    tablero:string,
+    quemacocos:string,
+    toldo:string,
+    elevadores:string,
+    luces:string,
+    seguros:string,
+    climatizador:string,
+    radio:string,
+    retrovisor:string,
+    tapetes:string,
+  }
+  export interface CondicionesExterioresForm{
+    id?:number,
+    DetallesGeneralesId?:number,
+    antena_radio:string,
+    estribos:string,
+    antena_telefono:string,
+    guardafangos:string,
+    antena_cb:string,
+    parabrisas:string,
+    alarma:string,
+    limpiaparabrisas:string,
+    luces:string,
+    espejos_laterales:string
+  }
+
+  const emit = defineEmits(['close'])
+  const props = defineProps<{show: boolean}>()
+  const optionstipos=[
+    {value:5,label:'Correctivo'},
+    {value:6,label:'Preventivo'},
+    {value:7,label:'Ambos'}
+  ];
+  const CondicionesExterioresInputs={
+    'antena_radio':'ANTENA/RADIO',
+    'estribos':'ESTRIBOS',
+    'antena_telefono':'ANTENA/TELEFONO',
+    'guardafangos':'GUARDAFANGOS',
+    'antena_cb':'ANTENA/C.B',
+    'parabrisas':'PARABRISAS',
+    'alarma':'SISTEMA DE ALARMA',
+    'limpiaparabrisas':'LIMPIAPARABRISAS',
+    'luces':'LUCES EXTERIORES',
+    'espejos_laterales':'ESPEJOS LATERALES'
+  }
+  const CondicionesInterioresInputs={
+    'PANALES DE PUERTA':{
+      'puerta_izq_f':'IZQUIERDA FRONTAL',
+      'puerta_izq_t':'IZQUIERDA TRASERA',
+      'puerta_der_f':'DERECHA FRONTAL',
+      'puerta_der_t':'DERECHA TRASERA',
+    },
+    'ASIENTOS':{
+      'asiento_izq_f':'IZQUIERDO FRONTAL',
+      'asiento_izq_t':'IZQUIERDO TRASERO',
+      'asiento_der_f':'DERECHO FRONTAL',
+      'asiento_der_t':'DERECHO TRASERO',
+    },
+    'OTROS':{
+      'consola':'CONSOLA CENTRAL',
+      'claxon':'CLAXON',
+      'tablero':'TABLERO',
+      'quemacocos':'QUEMACOCOS',
+      'toldo':'TOLDO',
+      'elevadores':'ELEVADORES ELEC.',
+      'luces':'LUCES INTERIORES',
+      'seguros':'SEGUROS ELEC.',
+      'climatizador':'CLIMATIZADOR',
+      'radio':'RADIO',
+      'retrovisor':'ESPEJO RETROVISOR',
+      'tapetes':'TAPETES'
+    }
+  }
+  const InventarioInputs={
+    'llanta':'LLANTA REFACCION',
+    'cables':'CABLES PARA CORRIENTE',
+    'estuche':'ESTUCHE DE HERRAMIENTAS',
+    'llave_tuerca':'LLAVE TUERCAS DE RUEDA',
+    'triangulo':'TRIANGULO DE SEGURO',
+    'tarjeta_circulacion':'TARJETA DE CIRCULACION',
+    'cubreruedas':'CUBRERUEDAS',
+    'candado_rueda':'CANDADO DE RUEDA',
+    'extinguidor':'EXTINGUIDOR',
+    'gato':'GATO',
+    'placas':'PLACAS'
+  }
+  const PinturaInputs={
+    'decolarada':'DECOLORADA',
+    'color_desigual':'COLOR NO IGULADO',
+    'rayonnes':'EXCESO DE RAYONES',
+    'grietas':'PEQUEÑAS GRIETAS',
+    'golpes':'CARROCERIA CON GOLPES',
+    'emblemas':'EMBLEMAS COMPLETOS',
+    'logos':'LOGOS EN BUEN ESTADO',
+    'rociado':'EXCESO DE ROCIADO',
+    'granizo':'DAÑOS POR GRANIZO',
+    'lluvia':'LLUVIA ACIDA'
+  }
+  const optionsgasolima=ref<option[]>([])
+  const optionsequipo=ref<option[]>([])
+  const modulosdisponibles=ref<option[]>([])
+  
+  const empresa=ref<option|undefined>(undefined)
+  const cliente=ref<option|undefined>(undefined)
+  const vehiculoconcepto=ref<option|undefined>(undefined)
+
+  const updateVisibility = () => {
+    emit('close')
+  }
+  onMounted(async () => {
+  optionsgasolima.value = await GetNivelesGasolina();
+  optionsequipo.value = await GetStatusPerCategory(11);
+  modulosdisponibles.value=await GetModulosDisponibles();
+  });
 
   const Economico = reactive<Economico>({
     id:undefined,
@@ -117,12 +256,110 @@ import TiposVehiculos from '../Forms/TiposVehiculos.vue'
     observaciones: 'DE ACUERDO A LO DIFICIL DE LA FALLA PARA SU REPARACION',//tiempo de entrega
   });
 
-
+  const Inventario=reactive<InventarioForm>
+  ({
+    id:undefined,
+    DetallesGeneralesId:undefined,
+    llanta:"",
+    cables:"",
+    estuche:"",
+    llave_tuerca:"",
+    triangulo:"",
+    tarjeta_circulacion:"",
+    cubreruedas:"",
+    candado_rueda:"",
+    extinguidor:"",
+    gato:"",
+    placas:"",
+  })
+  const Pintura=reactive<PinturaForm>
+  ({
+    id:undefined,
+    DetallesGeneralesId:undefined,
+    decolarada:"",
+    color_desigual:"",
+    rayonnes:"",
+    grietas:"",
+    golpes:"",
+    emblemas:"",
+    logos:"",
+    rociado:"",
+    granizo:"",
+    lluvia:"",
+  })
+  const CondicionesInteriores=reactive<CondicionesInterioresForm>
+  ({
+    id:undefined,
+    DetallesGeneralesId:undefined,
+    puerta_izq_f:"",
+    puerta_izq_t:"",
+    puerta_der_f:"",
+    puerta_der_t:"",
+    asiento_izq_f:"",
+    asiento_izq_t:"",
+    asiento_der_f:"",
+    asiento_der_t:"",
+    consola:"",
+    claxon:"",
+    tablero:"",
+    quemacocos:"",
+    toldo:"",
+    elevadores:"",
+    luces:"",
+    seguros:"",
+    climatizador:"",
+    radio:"",
+    retrovisor:"",
+    tapetes:"",
+  })
+  const CondicionesExteriores=reactive<CondicionesExterioresForm>
+  ({
+    id:undefined,
+    DetallesGeneralesId:undefined,
+    antena_radio:"",
+    estribos:"",
+    antena_telefono:"",
+    guardafangos:"",
+    antena_cb:"",
+    parabrisas:"",
+    alarma:"",
+    limpiaparabrisas:"",
+    luces:"",
+    espejos_laterales:""
+  })
   const KeysOptional=['orden_opcional','orden_seguimiento'];
 
   const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
 
+  const SaveCarAndFirma = async()=>{
+    const carro=await ImageVehiculoEntrada.value?.getCanvasBlob();
+    const existingIndexCarro = Imagenes.findIndex(img => img.tipo_id === 1);
+    if(carro != null){
+      if (existingIndexCarro !== -1) {
+        Imagenes[existingIndexCarro].image = carro;
+      } else {
+        Imagenes.push({tipo_id:1,image:carro});
+      }
+    } else {
+      if (existingIndexCarro !== -1) {
+        Imagenes.splice(existingIndexCarro, 1);
+      }
+    }
+    const firma=await ImageFirmaEntrada.value?.getCanvasBlob();
+    const existingIndexFirma = Imagenes.findIndex(img => img.tipo_id === 2);
+    if(firma != null){
+      if (existingIndexFirma !== -1) {
+        Imagenes[existingIndexFirma].image = firma;
+      } else {
+        Imagenes.push({tipo_id:2,image:firma});
+      }
+    } else {
+      if (existingIndexFirma !== -1) {
+        Imagenes.splice(existingIndexFirma, 1);
+      }
+    }
+  }
 
 
   const buttonconfirm=computed<buttonconfirmed>(()=>{ 
@@ -130,15 +367,7 @@ import TiposVehiculos from '../Forms/TiposVehiculos.vue'
       text:'Crear Presupuesto',
       classname:'bg-blue-600 text-white',
       onClick:async ()=>{
-        const carro=await ImageVehiculoEntrada.value?.getCanvasBlob();
-        if(carro != null){
-          Imagenes.pop()
-          Imagenes.push({tipo_id:1,image:carro})
-        }
-        const ImageFirmaEntrada=await ImageVehiculoEntrada.value?.getCanvasBlob();
-        if(carro != null){
-          Imagenes.push({tipo_id:2,image:carro})
-        }
+        await SaveCarAndFirma()
       },
       disabled:Object.entries(DetallesGenerales)
       .filter(([key]) => !KeysOptional.includes(key))
@@ -229,6 +458,68 @@ import TiposVehiculos from '../Forms/TiposVehiculos.vue'
       <Textarea id="observaciones" label="Garantia" v-model="DetallesGenerales.garantia" placeholder="Escribe las observaciones aqui..." classname="h-24"/>
       <Textarea id="descripcionmo" label="Tiempo de Entrega" v-model="DetallesGenerales.observaciones" placeholder="Escribe la descripcion de la mano de obra aqui..." classname="h-24"/>
     </div>
-    
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div>
+        <Subtitle>Inventario Equipo</Subtitle>
+        <div class="grid sm:grid-cols-2 2xl:grid-cols-3">
+          <Checkbox v-for="(item,index) in InventarioInputs" value='1' :key="'inventario-'+index" :checked="Inventario[index] ==='1'" :label="item"/>
+        </div>
+      </div>
+      <div>
+        <Subtitle>Condiciones Pintura</Subtitle>
+        <div class="grid sm:grid-cols-2 2xl:grid-cols-3">
+          <Checkbox v-for="(item,index) in PinturaInputs" value='1' :key="'inventario-'+index" :checked="Pintura[index] ==='1'" :label="item"/>
+        </div>
+      </div>
+    </div>
+    <div class="border-2 rounded-md p-2">
+      <Subtitle>Condiciones Equipo Interior</Subtitle>
+      <div class="grid sm:grid-cols-2 gap-2">
+        <div >
+          <Subtitle bg="bg-[--color4]">Puertas</Subtitle>
+          <div class="grid md:grid-cols-2 2xl:grid-cols-4 gap-2">
+            <Select v-for="(item,index) in CondicionesInterioresInputs['PANALES DE PUERTA']" 
+            :label="item" 
+            :key="'inventario-'+index" 
+            v-model="CondicionesInteriores[index]" 
+            :options="optionsequipo">
+          </Select>
+          </div>
+        </div>
+        <div>
+          <Subtitle bg="bg-[--color4]">Asientos</Subtitle>
+          <div class="grid md:grid-cols-2 2xl:grid-cols-4 gap-2">
+            <Select v-for="(item,index) in CondicionesInterioresInputs['ASIENTOS']" 
+            :label="item" 
+            :key="'inventario-'+index" 
+            v-model="CondicionesInteriores[index]" 
+            :options="optionsequipo">
+          </Select>
+          </div>
+        </div>
+      </div>
+      <div>
+        <Subtitle bg="bg-[--color4]">Otros</Subtitle>
+        <div class="grid sm:grid-cols-2 md:grid-cols-4 2xl:grid-cols-6 gap-2">
+            <Select v-for="(item,index) in CondicionesInterioresInputs['OTROS']" 
+            :label="item" 
+            :key="'inventario-'+index" 
+            v-model="CondicionesInteriores[index]" 
+            :options="optionsequipo">
+          </Select>
+        </div>
+      </div>
+    </div>
+    <div>
+      <Subtitle>Condiciones Equipo Exterior</Subtitle>
+      <div class="grid gap-2 sm:grid-cols-3 xl:grid-cols-5 ">
+        <Select v-for="(item,index) in CondicionesExterioresInputs" 
+          :label="item" 
+          :key="'inventario-'+index" 
+          v-model="CondicionesExteriores[index]"
+          :options="optionsequipo">
+        </Select>
+      </div>
+    </div>
   </BaseModal>
 </template>
