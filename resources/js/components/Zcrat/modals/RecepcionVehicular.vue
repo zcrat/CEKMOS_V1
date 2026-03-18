@@ -22,10 +22,13 @@
   import axios from 'axios' 
   import MyBasicToast from "@/utils/ToastNotificationBasic";
 import TiposVehiculos from '../Forms/TiposVehiculos.vue'
+import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
+import Checkbox from '../Inputs/form/Checkbox.vue'
   const props = defineProps<{show: boolean}>()
   const emit = defineEmits(['close'])
   const optionstipos=ref<option[]>([{value:5,label:'Correctivo'},{value:6,label:'Preventivo'},{value:7,label:'Ambos'}])
   const optionsgasolima=ref<option[]>([])
+  const optionsequipo=ref<option[]>([])
   const empresa=ref<option|undefined>(undefined)
   const cliente=ref<option|undefined>(undefined)
   const vehiculoconcepto=ref<option|undefined>(undefined)
@@ -38,6 +41,7 @@ import TiposVehiculos from '../Forms/TiposVehiculos.vue'
   }
   onMounted(async () => {
   optionsgasolima.value = await GetNivelesGasolina();
+  optionsequipo.value = await GetStatusPerCategory(11);
   modulosdisponibles.value=await GetModulosDisponibles();
   });
 
@@ -73,6 +77,144 @@ import TiposVehiculos from '../Forms/TiposVehiculos.vue'
     //datos posibles
     vigencia: Date|null,
   }
+  interface PinturaForm{
+    id?:number,
+    DetallesGeneralesId?:number,
+    decolarada:"1"|"",
+    color_desigual:"1"|"",
+    rayonnes:"1"|"",
+    grietas:"1"|"",
+    golpes:"1"|"",
+    emblemas:"1"|"",
+    logos:"1"|"",
+    rociado:"1"|"",
+    granizo:"1"|"",
+    lluvia:"1"|"",
+  }
+  interface InventarioForm{
+    id?:number,
+    DetallesGeneralesId?:number,
+    llanta:"1"|"",
+    cables:"1"|"",
+    estuche:"1"|"",
+    llave_tuerca:"1"|"",
+    triangulo:"1"|"",
+    tarjeta_circulacion:"1"|"",
+    cubreruedas:"1"|"",
+    candado_rueda:"1"|"",
+    extinguidor:"1"|"",
+    gato:"1"|"",
+    placas:"1"|"",
+  }
+  interface CondicionesInterioresForm{
+    id?:number,
+    DetallesGeneralesId?:number,
+    puerta_izq_f:string,
+    puerta_izq_t:string,
+    puerta_der_f:string,
+    puerta_der_t:string,
+    asiento_izq_f:string,
+    asiento_izq_t:string,
+    asiento_der_f:string,
+    asiento_der_t:string,
+    consola:string,
+    claxon:string,
+    tablero:string,
+    quemacocos:string,
+    toldo:string,
+    elevadores:string,
+    luces:string,
+    seguros:string,
+    climatizador:string,
+    radio:string,
+    retrovisor:string,
+    tapetes:string,
+  }
+  interface CondicionesExterioresForm{
+    id?:number,
+    DetallesGeneralesId?:number,
+    antena_radio:string,
+    estribos:string,
+    antena_telefono:string,
+    guardafangos:string,
+    antena_cb:string,
+    parabrisas:string,
+    alarma:string,
+    limpiaparabrisas:string,
+    luces:string,
+    espejos_laterales:string
+  }
+  const Inventario=reactive<InventarioForm>
+  ({
+    id:undefined,
+    DetallesGeneralesId:undefined,
+    llanta:"",
+    cables:"",
+    estuche:"",
+    llave_tuerca:"",
+    triangulo:"",
+    tarjeta_circulacion:"",
+    cubreruedas:"",
+    candado_rueda:"",
+    extinguidor:"",
+    gato:"",
+    placas:"",
+  })
+  const Pintura=reactive<PinturaForm>
+  ({
+    id:undefined,
+    DetallesGeneralesId:undefined,
+    decolarada:"",
+    color_desigual:"",
+    rayonnes:"",
+    grietas:"",
+    golpes:"",
+    emblemas:"",
+    logos:"",
+    rociado:"",
+    granizo:"",
+    lluvia:"",
+  })
+  const CondicionesInteriores=reactive<CondicionesInterioresForm>
+  ({
+    id:undefined,
+    DetallesGeneralesId:undefined,
+    puerta_izq_f:"",
+    puerta_izq_t:"",
+    puerta_der_f:"",
+    puerta_der_t:"",
+    asiento_izq_f:"",
+    asiento_izq_t:"",
+    asiento_der_f:"",
+    asiento_der_t:"",
+    consola:"",
+    claxon:"",
+    tablero:"",
+    quemacocos:"",
+    toldo:"",
+    elevadores:"",
+    luces:"",
+    seguros:"",
+    climatizador:"",
+    radio:"",
+    retrovisor:"",
+    tapetes:"",
+  })
+  const CondicionesExteriores=reactive<CondicionesExterioresForm>
+  ({
+    id:undefined,
+    DetallesGeneralesId:undefined,
+    antena_radio:"",
+    estribos:"",
+    antena_telefono:"",
+    guardafangos:"",
+    antena_cb:"",
+    parabrisas:"",
+    alarma:"",
+    limpiaparabrisas:"",
+    luces:"",
+    espejos_laterales:""
+  })
 
   const presupuesto = reactive<RecepcionVehicularForm>({
     orden_seguimiento: '',
@@ -149,6 +291,72 @@ import TiposVehiculos from '../Forms/TiposVehiculos.vue'
       }
     }
   }
+
+  const CondicionesExterioresInputs={
+    'antena_radio':'ANTENA/RADIO',
+    'estribos':'ESTRIBOS',
+    'antena_telefono':'ANTENA/TELEFONO',
+    'guardafangos':'GUARDAFANGOS',
+    'antena_cb':'ANTENA/C.B',
+    'parabrisas':'PARABRISAS',
+    'alarma':'SISTEMA DE ALARMA',
+    'limpiaparabrisas':'LIMPIAPARABRISAS',
+    'luces':'LUCES EXTERIORES',
+    'espejos_laterales':'ESPEJOS LATERALES'
+  }
+  const CondicionesInterioresInputs={
+    'PANALES DE PUERTA':{
+      'puerta_izq_f':'IZQUIERDA FRONTAL',
+      'puerta_izq_t':'IZQUIERDA TRASERA',
+      'puerta_der_f':'DERECHA FRONTAL',
+      'puerta_der_t':'DERECHA TRASERA',
+    },
+    'ASIENTOS':{
+      'asiento_izq_f':'IZQUIERDO FRONTAL',
+      'asiento_izq_t':'IZQUIERDO TRASERO',
+      'asiento_der_f':'DERECHO FRONTAL',
+      'asiento_der_t':'DERECHO TRASERO',
+    },
+    'OTROS':{
+      'consola':'CONSOLA CENTRAL',
+      'claxon':'CLAXON',
+      'tablero':'TABLERO',
+      'quemacocos':'QUEMACOCOS',
+      'toldo':'TOLDO',
+      'elevadores':'ELEVADORES ELEC.',
+      'luces':'LUCES INTERIORES',
+      'seguros':'SEGUROS ELEC.',
+      'climatizador':'CLIMATIZADOR',
+      'radio':'RADIO',
+      'retrovisor':'ESPEJO RETROVISOR',
+      'tapetes':'TAPETES'
+    }
+  }
+  const InventarioInputs={
+    'llanta':'LLANTA REFACCION',
+    'cables':'CABLES PARA CORRIENTE',
+    'estuche':'ESTUCHE DE HERRAMIENTAS',
+    'llave_tuerca':'LLAVE TUERCAS DE RUEDA',
+    'triangulo':'TRIANGULO DE SEGURO',
+    'tarjeta_circulacion':'TARJETA DE CIRCULACION',
+    'cubreruedas':'CUBRERUEDAS',
+    'candado_rueda':'CANDADO DE RUEDA',
+    'extinguidor':'EXTINGUIDOR',
+    'gato':'GATO',
+    'placas':'PLACAS'
+  }
+  const PinturaInputs={
+    'decolarada':'DECOLORADA',
+    'color_desigual':'COLOR NO IGULADO',
+    'rayonnes':'EXCESO DE RAYONES',
+    'grietas':'PEQUEÑAS GRIETAS',
+    'golpes':'CARROCERIA CON GOLPES',
+    'emblemas':'EMBLEMAS COMPLETOS',
+    'logos':'LOGOS EN BUEN ESTADO',
+    'rociado':'EXCESO DE ROCIADO',
+    'granizo':'DAÑOS POR GRANIZO',
+    'lluvia':'LLUVIA ACIDA'
+  }
 </script>
 
 <template>
@@ -179,13 +387,12 @@ import TiposVehiculos from '../Forms/TiposVehiculos.vue'
       <InputBasic id="Modelo" label="Modelo" type="text" v-model="presupuesto.modelo" classname="uppercase" placeholder="ej. A3"/>
       <TiposVehiculos label="Tipo De Vehiculo" id="tipovehiculo" v-model="vehiculoselected" />
       <ZDCanvas class="col-span-3" ref="ImageVehiculoEntrada"></ZDCanvas>
-      <button @click="prueba()">prueba</button>
     </div>
     <Subtitle>Datos De Ingreso</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2" >
       <Datapicker label="Fecha Estimada" v-model="presupuesto.estimacion" :clearable="false" :time="true" :range="false" class="w-full sm:col-span-2 md:col-span-1"/>
       <InputBasic id="kilometraje" label="Kilometraje" type="number" v-model="presupuesto.kilometraje" placeholder="ej. 392.31"/>
-      <Select id="gasolina" :canempty="true" v-model="presupuesto.gasolina" label="Gasolina" :options="optionsgasolima"></Select>
+      
     </div>
     <Subtitle>Empleados Encargados</Subtitle>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2" >
@@ -200,6 +407,69 @@ import TiposVehiculos from '../Forms/TiposVehiculos.vue'
       <Textarea id="notasmecanico" label="Descripcion Mano De Obra" v-model="presupuesto.descripcion_mo" placeholder="Escribe las notas del mecanico aqui..." classname="h-24"/>
       <Textarea id="observaciones" label="Garantia" v-model="presupuesto.garantia" placeholder="Escribe las observaciones aqui..." classname="h-24"/>
       <Textarea id="descripcionmo" label="Tiempo de Entrega" v-model="presupuesto.observaciones" placeholder="Escribe la descripcion de la mano de obra aqui..." classname="h-24"/>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div>
+        <Subtitle>Inventario Equipo</Subtitle>
+        <div class="grid sm:grid-cols-2 2xl:grid-cols-3">
+          <Checkbox v-for="(item,index) in InventarioInputs" value='1' :key="'inventario-'+index" :checked="Inventario[index] ==='1'" :label="item"/>
+        </div>
+      </div>
+      <div>
+        <Subtitle>Condiciones Pintura</Subtitle>
+        <div class="grid sm:grid-cols-2 2xl:grid-cols-3">
+          <Checkbox v-for="(item,index) in PinturaInputs" value='1' :key="'inventario-'+index" :checked="Pintura[index] ==='1'" :label="item"/>
+        </div>
+      </div>
+    </div>
+    <div class="border-2 rounded-md p-2">
+      <Subtitle>Condiciones Equipo Interior</Subtitle>
+      <div class="grid sm:grid-cols-2 gap-2">
+        <div >
+          <Subtitle bg="bg-[--color4]">Puertas</Subtitle>
+          <div class="grid md:grid-cols-2 2xl:grid-cols-4 gap-2">
+            <Select v-for="(item,index) in CondicionesInterioresInputs['PANALES DE PUERTA']" 
+            :label="item" 
+            :key="'inventario-'+index" 
+            v-model="CondicionesInteriores[index]" 
+            :options="optionsequipo">
+          </Select>
+          </div>
+        </div>
+        <div>
+          <Subtitle bg="bg-[--color4]">Asientos</Subtitle>
+          <div class="grid md:grid-cols-2 2xl:grid-cols-4 gap-2">
+            <Select v-for="(item,index) in CondicionesInterioresInputs['ASIENTOS']" 
+            :label="item" 
+            :key="'inventario-'+index" 
+            v-model="CondicionesInteriores[index]" 
+            :options="optionsequipo">
+          </Select>
+          </div>
+        </div>
+      </div>
+      <div>
+        <Subtitle bg="bg-[--color4]">Otros</Subtitle>
+        <div class="grid sm:grid-cols-2 md:grid-cols-4 2xl:grid-cols-6 gap-2">
+            <Select v-for="(item,index) in CondicionesInterioresInputs['OTROS']" 
+            :label="item" 
+            :key="'inventario-'+index" 
+            v-model="CondicionesInteriores[index]" 
+            :options="optionsequipo">
+          </Select>
+        </div>
+      </div>
+    </div>
+    <div>
+      <Subtitle>Condiciones Equipo Exterior</Subtitle>
+      <div class="grid gap-2 sm:grid-cols-3 xl:grid-cols-5 ">
+        <Select v-for="(item,index) in CondicionesExterioresInputs" 
+          :label="item" 
+          :key="'inventario-'+index" 
+          v-model="CondicionesExteriores[index]"
+          :options="optionsequipo">
+        </Select>
+      </div>
     </div>
     
   </BaseModal>

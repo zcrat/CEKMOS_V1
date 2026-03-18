@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
+
 import { computed } from 'vue';
 const emit = defineEmits(['update:checked']);
 const props=defineProps<{
@@ -7,10 +7,10 @@ const props=defineProps<{
   classlabel?: string
   classdiv?: string
   label?: string
-  value: String
-  checked:  Boolean
-  id: string
-  name: string
+  value: string
+  checked:  boolean
+  id?: string
+  name?: string
 
 }>()
 
