@@ -11,8 +11,11 @@ interface Point{
 const props=withDefaults(defineProps<{
   classnamedivcanvas?:string
   disabled?:boolean
+  title?:string
+  strokecolor?:'red'|'black'
 }>(),{
   disabled:false,
+  strokecolor:'black',
   classnamedivcanvas:'w-full h-[20rem]'
 })
 
@@ -93,6 +96,7 @@ function draw(e: MouseEvent) {
   if (!drawing || !ctx || props.disabled) return
 
   ctx.lineWidth = 2
+  ctx.strokeStyle = props.strokecolor
   ctx.lineCap = "round"
 
   currentStroke.value.push({
@@ -105,6 +109,16 @@ function draw(e: MouseEvent) {
 
   ctx.beginPath()
   ctx.moveTo(e.offsetX, e.offsetY)
+}
+async function getCanvasBlob(): Promise<Blob | null> {
+  const canvas = canvasRef.value
+  if (!canvas) return null
+
+  return new Promise(resolve => {
+    canvas.toBlob(blob => {
+      resolve(blob)
+    }, "image/png")
+  })
 }
 
 function clearCanvas() {
@@ -138,12 +152,14 @@ function undo(){
   redraw()
 }
 defineExpose({
-  dibujarImagen
+  dibujarImagen,
+  getCanvasBlob
 })
 </script>
 
 <template>
   <div>
+    <H2 class="w-full text-center text-3xl font-semibold capitalize" v-if="title">{{ title }}</H2>
     <div :class="classnamedivcanvas">
       <canvas
         ref="canvasRef"

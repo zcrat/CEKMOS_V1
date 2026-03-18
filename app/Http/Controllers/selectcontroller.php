@@ -22,8 +22,12 @@ class selectcontroller extends Controller
     }
     public function ModulosOrden(Request $request){
         $user=Auth::user()->load('modulos_orden');
-        $modulosvisibles=$user->modulos_orden ? $user->modulos_orden->pluck('modulo_orden_id')->toarray(): [] ;
-        $options=ModuloOrdenesServicio::whereIn('id',$modulosvisibles)->selectraw("id as value , descripcion as label")->get();
+        $options=ModuloOrdenesServicio::query();
+        if(!$request->user()->can('ver.todo.modulos.presupuestos')){
+            $modulosvisibles=$user->modulos_orden ? $user->modulos_orden->pluck('modulo_orden_id')->toarray(): [] ;
+            $options->whereIn('id',$modulosvisibles);
+        }
+        $options=$options->selectraw("id as value , descripcion as label")->orderByDesc('año')->get();
         return response()->json(compact('options'));
     }
     public function EstatusIdsPerCategory(Request $request){

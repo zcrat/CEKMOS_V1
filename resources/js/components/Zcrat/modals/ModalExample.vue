@@ -65,7 +65,7 @@ const buttonconfirm = computed((): buttonconfirmed => ({
 </script>
 
 <template>
-  <BaseModal modaltitle="Registrar Nuevo Empleado" :modelValue="props.show" @update:modelValue="updateVisibility" :buttonconfirm="buttonconfirm">
+  <BaseModal modaltitle="Registrar Nuevo Empleado" :show="props.show" @close="()=>updateVisibility" :buttonconfirm="buttonconfirm">
     <form action="">
       <div class="flex flex-col sm:flex-row gap-1 sm:w-[40rem]">
         <Inputbasic label="Nombre(s)" id="nombre" type="text" v-model="newEmployee.nombre" icon="fa-solid fa-user" classdiv="flex-grow"/> 
