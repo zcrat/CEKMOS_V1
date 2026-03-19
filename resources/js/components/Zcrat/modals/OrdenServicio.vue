@@ -22,6 +22,7 @@
   import MyBasicToast from "@/utils/ToastNotificationBasic";
   import TiposVehiculos from '../Forms/TiposVehiculos.vue';
   import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
+import Checkbox from '../Inputs/form/Checkbox.vue';
 
   export interface Economico {
     id?:number,
@@ -407,11 +408,21 @@
     <Subtitle>Datos Generales</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2" >
       <InputBasic id="ordenseguimiento" label="Orden De Seguimiento" type="text" v-model="DetallesGenerales.orden_seguimiento" placeholder="Automatico o Ingresar"/>
-      <InputBasic id="ordenseguimiento" label="Orden Opcional" type="text" v-model="DetallesGenerales.orden_opcional" placeholder="Opcional"/>
+      <InputBasic id="ordenopcional" label="Orden Opcional" type="text" v-model="DetallesGenerales.orden_opcional" placeholder="Opcional"/>
       <Combobox id="ubicacion" label="Ubicacion" v-model="DetallesGenerales.ubicacion" endpoint="Combobox.ubicaciones" placeholder="Buscar o Crear"/>
       <Select label="Tipo De Presupuesto"  v-model="DetallesGenerales.tipo_id" id="presupuestotipo"  :options="optionstipos"></Select>
       <Select label="Modulo Orden"  v-model="DetallesGenerales.modulo_orden" id="modulooreden" :canempty="true" :options="modulosdisponibles"></Select>
-      <Select2 :new_option="vehiculoconcepto" label="Vehiculo De Los Conceptos" endpoint="Select2.Empresas" v-model="DetallesGenerales.vehiculo_concepto_id" id="presupuestovehiculoconcepto" placeholder="Buscar Cliente" />
+      <Select2 
+        :new_option="vehiculoconcepto" 
+        :extraparams="{'id_modulo':DetallesGenerales.modulo_orden}" 
+        label="Vehiculo De Los Conceptos" 
+        endpoint="Select2.Vehiculos.Conceptos.Modulos" 
+        v-model="DetallesGenerales.vehiculo_concepto_id" 
+        id="presupuestovehiculoconcepto" 
+        placeholder="Buscar Cliente" 
+        :searchable="false"
+        :clear="false"
+      />
     </div>
     <Subtitle>Datos Cliente</Subtitle>
     <div class="grid sm:grid-cols-2 gap-2">

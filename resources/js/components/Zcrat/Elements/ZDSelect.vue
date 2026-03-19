@@ -10,13 +10,23 @@ const props = withDefaults(defineProps<{
   canNew?:boolean
   endpoint: string
   new_option?: option | null
+  searchable?:boolean
+  clear?:boolean
   placeholder?:string
   label?: string
   timeout?: number
+  extraparams?:Record<string,any>
+  empty_message?:string
+  loading_message?:string
+
 }>(), {
   timeout: 400,
   canNew:true,
-  placeholder:'Buscar...'
+  placeholder:'Buscar...',
+  empty_message:'Sin Resultados',
+  loading_message:'Cargando...',
+  searchable:true,
+  clear:true,
 })
 const selected = defineModel<string | number |null>()
 const options = ref<option[]>([])
@@ -35,7 +45,7 @@ const GetOptions = async () => {
 
     loading.value = true
     const response = await axios.get(route(props.endpoint), { 
-      params: { query: query.value },
+      params: { query: query.value , ...props.extraparams},
       signal: controller.signal  // <-- pasar el signal al fetch
     })
     options.value = response.data.options
@@ -54,7 +64,9 @@ watch(query, debouncedGetOptions)
 const onFocus = () => {
   isOpen.value = true
   //query.value = '' opcional para resetear la busqueda al enfocar
-  GetOptions()
+  if(options.value.length == 0 ){
+    GetOptions()
+  }
 }
 const selectOption = () => {
   const input = document.querySelector('#'+thisid) as HTMLInputElement
@@ -67,6 +79,10 @@ watch(() => props.new_option, (val) => {
     }
     optionselect.value = val;
   }
+}, { immediate: true })
+
+watch(() => props.extraparams, () => {
+  GetOptions()
 }, { immediate: true })
 
 watch(optionselect, (val) => {
@@ -89,6 +105,13 @@ watch(selected, (val) => {
     }
   }
 })
+const onInputChange=(event: Event)=> {
+  if (props.searchable === false) {
+    event.preventDefault();
+    return;
+  }
+  query.value = (event.target as HTMLInputElement).value;
+}
 </script>
 
 <template>
@@ -100,14 +123,15 @@ watch(selected, (val) => {
           <ComboboxInput
           class="w-full ps-2 pr-6 truncate rounded border-2 ComboboxInput"
           :id="thisid"
-          @change="query = $event.target.value"
+          @change="onInputChange"
+          :readonly="props.searchable === false"
           :placeholder="placeholder"
           @focus="onFocus"
           @blur="isOpen = false"
           :displayValue="(option: unknown) => (option as option | null)?.label ?? ''"
           />
         <button
-          v-if="optionselect"
+          v-if="optionselect && clear"
           type="button"
           class="absolute inset-y-0 right-2 text-sm flex items-center text-gray-400 hover:text-gray-600"
           @click="optionselect = null"
@@ -116,8 +140,8 @@ watch(selected, (val) => {
         </button>
       </div>
       <ComboboxOptions v-show="isOpen" static class="absolute border-2 border-gray-500 w-full rounded-md bg-white z-50 overflow-auto max-h-[15rem]">
-        <div v-if="options.length === 0 && !loading">Sin Resultados</div>
-        <div v-if="options.length === 0 && loading">Cargando...</div>
+        <div v-if="options.length === 0 && !loading">{{props.empty_message }}</div>
+        <div v-if="options.length === 0 && loading">{{props.loading_message}}</div>
         <ComboboxOption
           v-for="option in options"
           :key="option.value"

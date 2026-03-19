@@ -79,6 +79,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     
     
     Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');
+    Route::get('select2/vehiculos/conceptos/disponibles',[select2controller::class,'VehiculosConceptosPorModulo'])->name('Select2.Vehiculos.Conceptos.Modulos');
     Route::get('select2/regimenes/fiscales',[select2controller::class,'RegimenesFiscales'])->name('Select2.Regimenes.Fiscales');
     
     Route::get('select/niveles/combustible',[selectcontroller::class,'NivelesCombustible'])->name('select.niveles.combustible');

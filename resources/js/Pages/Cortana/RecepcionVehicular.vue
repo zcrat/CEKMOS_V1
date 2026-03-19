@@ -48,7 +48,7 @@ const orderBy=ref<null|OrderKeyProp>(null)
         </template>
         <template #content>
             <Pagination api="Cortana.Presupuesto.Items" :params="{'search':search,'estatus':estatus}" :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
-            <Table v-if="items.length>=0" 
+            <Table v-if="items.length>0" 
                 v-model:OrderKey="orderBy"
                 :titles="[
                     {title:'No. Orden',classname:'uppercase',CanOrder:{'key':'orden',types:'desc'}},

@@ -159,7 +159,7 @@ defineExpose({
 
 <template>
   <div>
-    <H2 class="w-full text-center text-3xl font-semibold capitalize" v-if="title">{{ title }}</H2>
+    <h2 class="w-full text-center text-3xl font-semibold capitalize" v-if="title">{{ title }}</h2>
     <div :class="classnamedivcanvas">
       <canvas
         ref="canvasRef"
