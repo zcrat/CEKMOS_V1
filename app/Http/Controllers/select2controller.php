@@ -30,7 +30,7 @@ class select2controller extends Controller
     }
     public function VehiculosConceptosPorModulo(Request $request){
 
-        $validation=Validator::make($request->all(),['id_modulo'=>['required','exists:modulo_ordenes_servicios,id'],'query'=>['string']]);
+        $validation=Validator::make($request->all(),['id_modulo'=>['required','exists:modulo_ordenes_servicios,id'],'query'=>['nullable','string']]);
         $options=[];
         if (!$validation->fails()){
             $search="%".$validation->validated()['query']."%";
