@@ -42,6 +42,7 @@ class select2controller extends Controller
             'label'=>$item->descripcion
             ]);
         }
+        sleep(3);
         return response()->json(compact('options'));
     }
 }

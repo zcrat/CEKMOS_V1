@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<{
         <VueDatePicker v-model="date" :range="range?{ partialRange: false }:false" 
         :locale="'es'"
         auto-apply
-        :ui="{ input:'py-8 focus-input' }"
+        :ui="{ input:'py-8 inputfocus' }"
         :style="{ '--dp-input-padding': '0.5rem'}"
         :enable-time-picker="time" :placeholder="'Seleccionar Fechas'" :clearable="clearable">
         </VueDatePicker>

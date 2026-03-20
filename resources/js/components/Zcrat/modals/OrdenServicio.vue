@@ -2,7 +2,7 @@
 <script setup lang="ts">
   import InputBasic from '../Inputs/form/InputBasic.vue'
   import Textarea from '../Inputs/form/Textarea.vue'
-  import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
+  import BaseModal from '@/components/Zcrat/modals/BaseModal.vue'
   import { ref, watch ,reactive, onMounted,computed} from 'vue' 
   import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
   import {type option,type Vehiculo, type datagetpresupuestos} from '@/types/generales'
@@ -11,7 +11,8 @@
   import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
   import Select from '@/components/Zcrat/Elements/Select.vue';
   import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
-  import zSelect from '@/components/Zcrat/Elements/Select2.vue';
+  import zSelect from '@/components/Zcrat/Elements/Select3.vue';
+  import zSelect2 from '@/components/Zcrat/Elements/Select2.vue';
   import debounce from 'lodash/debounce';
   import GetNivelesGasolina from '@/utils/functions/select/NivelesGasolina';
   import GetModulosDisponibles  from '@/utils/functions/select/ModulosCortana';
@@ -210,17 +211,13 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
   const optionsequipo=ref<option[]>([])
   const modulosdisponibles=ref<option[]>([])
   
-  const empresa=ref<option|undefined>(undefined)
-  const cliente=ref<option|undefined>(undefined)
-  const vehiculoconcepto=ref<option|undefined>(undefined)
-
   const updateVisibility = () => {
     emit('close')
   }
-  onMounted(async () => {
-  optionsgasolima.value = await GetNivelesGasolina();
-  optionsequipo.value = await GetStatusPerCategory(11);
-  modulosdisponibles.value=await GetModulosDisponibles();
+  onMounted(async () => {console.log('montado')
+    optionsgasolima.value = await GetNivelesGasolina();
+    optionsequipo.value = await GetStatusPerCategory(11);
+    modulosdisponibles.value=await GetModulosDisponibles();
   });
 
   const Economico = reactive<Economico>({
@@ -234,7 +231,7 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
     tipo_id:""
   })
   const Imagenes = reactive<ImagenesForm[]>([])
-  const DetallesGenerales = reactive<OrdenServicioForm>({
+  const Database={
     id:undefined,
     orden_seguimiento: '',
     orden_opcional: '',
@@ -256,7 +253,8 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
     indicaciones_cliente: '',
     garantia:'LO ESTIPULADO EN EL CONTRATO',
     observaciones: 'DE ACUERDO A LO DIFICIL DE LA FALLA PARA SU REPARACION',//tiempo de entrega
-  });
+  }
+  const DetallesGenerales = reactive<OrdenServicioForm>(Database);
 
   const Inventario=reactive<InventarioForm>
   ({
@@ -330,9 +328,7 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
     espejos_laterales:""
   })
   const KeysOptional=['orden_opcional','orden_seguimiento'];
-  const paramsvehiculoconceptoselect=computed(()=>{
-    {}
-  })
+
   const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
 
@@ -416,14 +412,22 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
       <Select label="Tipo De Presupuesto"  v-model="DetallesGenerales.tipo_id" id="presupuestotipo"  :options="optionstipos"></Select>
       <Select label="Modulo Orden"  v-model="DetallesGenerales.modulo_orden" id="modulooreden" :canempty="true" :options="modulosdisponibles"></Select>
       <zSelect
-         
         :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
         label="Vehiculo De Los Conceptos" 
         endpoint="Select2.Vehiculos.Conceptos.Modulos" 
         v-model="DetallesGenerales.vehiculo_concepto_id" 
         :empty_message="DetallesGenerales.modulo_orden? 'Sin Resultados':'Selecciona Un Modulo'" 
         placeholder="Buscar Vehiculo" 
-        :cleareble="false"
+        :cleareble="true"
+      />
+      <zSelect2
+        :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
+        label="Vehiculo De Los Conceptos" 
+        endpoint="Select2.Vehiculos.Conceptos.Modulos" 
+        v-model="DetallesGenerales.vehiculo_concepto_id" 
+        :empty_message="DetallesGenerales.modulo_orden? 'Sin Resultados':'Selecciona Un Modulo'" 
+        placeholder="Buscar Vehiculo" 
+        :cleareble="true"
       />
     </div>
     <Subtitle>Datos Cliente</Subtitle>
@@ -452,7 +456,7 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
       <Datapicker label="Fecha Estimada" v-model="DetallesGenerales.estimacion" :clearable="false" :time="true" :range="false" class="w-full sm:col-span-2 md:col-span-1"/>
       <InputBasic id="kilometraje" label="Kilometraje" type="number" v-model="DetallesGenerales.kilometraje" placeholder="ej. 392.31"/>
       <Select id="gasolina" :canempty="true" v-model="DetallesGenerales.gasolina" label="Gasolina" :options="optionsgasolima"></Select>
-      <div class="md:col-span-4 sm:col-span-2 flex md:flex-row gap-2" >
+      <div class="md:col-span-4 sm:col-span-2 flex flex-col md:flex-row gap-2" >
         <ZDCanvas class="w-[70%]" ref="ImageVehiculoEntrada" title="Detalles Del Vehiculo" strokecolor="red"></ZDCanvas>
         <ZDCanvas class="w-[30%]" ref="ImageFirmaEntrada" title="Firma"></ZDCanvas>
       </div>

@@ -14,6 +14,6 @@ const props=defineProps<{
 <template>
   <div :class="['flex flex-col justify-start relative', classdiv]">
     <label v-if="props.label">{{props.label}}</label>
-    <textarea :placeholder="props.placeholder" :class="['rounded-md focus-input w-full',props.classname]" v-model="modelValue" :id="id" :name="id"></textarea>
+    <textarea :placeholder="props.placeholder" :class="['rounded-md inputfocus w-full',props.classname]" v-model="modelValue" :id="id" :name="id"></textarea>
   </div>
 </template>
