@@ -4,39 +4,40 @@ import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headl
 import axios from 'axios'
 import { useDebounceFn } from '@vueuse/core'
 import { type option } from '@/types/generales'
+import isEqual from 'lodash/isEqual'
 
 const props = withDefaults(defineProps<{
-  id:string
-  canNew?:boolean
-  endpoint: string
-  new_option?: option | null
-  searchable?:boolean
-  clear?:boolean
-  placeholder?:string
-  label?: string
-  timeout?: number
-  extraparams?:Record<string,any>
-  empty_message?:string
-  loading_message?:string
-  cacheoptions?:boolean
+    endpoint: string
+    canNew?:boolean
+    searchable?:boolean
+    cleareble?:boolean
+    cacheoptions?:boolean
+    placeholder?:string
+    label?: string
+    timeout?: number
+    params?:Record<string,any>
+    empty_message?:string
+    loading_message?:string
+    close_when_selected?:boolean
+    blur_when_selected?:boolean
 }>(), {
   timeout: 400,
-  canNew:true,
+  canNew:false,
   placeholder:'Buscar...',
   empty_message:'Sin Resultados',
   loading_message:'Cargando...',
   searchable:true,
-  clear:true,
-  cacheoptions:true
+  cleareble:true,
+  cacheoptions:true,
+  close_when_selected:true,
+  blur_when_selected:true
 })
-const selected = defineModel<string | number |null>()
 const options = ref<option[]>([])
-const optionselect = ref<option | null>(null)
-const loading = ref(false)
-const query = ref('')
-const isOpen = ref(false)
-const extraparams=computed(() => (props.extraparams))
-const thisid=computed(() => (props.id+Date.now()))
+const optionselect = defineModel<option | null>()
+const loading = ref<boolean>(false)
+const query = ref<string>('')
+const isOpen = ref<boolean>(false)
+const thisid='Select2'+Date.now()
 
 let controller: AbortController | null = null
 let currentRequestId = 0
@@ -51,7 +52,7 @@ const GetOptions = async () => {
 
     loading.value = true
     const response = await axios.get(route(props.endpoint), { 
-      params: { query: query.value , ...extraparams.value},
+      params: { query: query.value , ...props.params},
       signal: controller.signal  // <-- pasar el signal al fetch
     })
     if (requestId === currentRequestId) {
@@ -66,54 +67,33 @@ const GetOptions = async () => {
     }
   }
 }
-
 const debouncedGetOptions = useDebounceFn(GetOptions, props.timeout)
-
-watch(query, debouncedGetOptions)
-
+const triggerBlur = () => {
+    query.value = ''
+    if(props.blur_when_selected){
+        const input = document.querySelector('#'+thisid) as HTMLInputElement
+        input?.blur()
+    }else if(props.close_when_selected){
+        isOpen.value = false
+    }
+}
 const onFocus = () => {
   isOpen.value = true
   if(!props.cacheoptions){
     GetOptions()
   }
 }
-const selectOption = () => {
-  const input = document.querySelector('#'+thisid.value) as HTMLInputElement
-  input?.blur()
+const onBlur = () => {
+  isOpen.value = false
 }
-watch(() => props.new_option, (val) => {
-  if(val != undefined){
-    if (!options.value.find(o => o.value === val.value) && val != null) {
-      options.value.push(val)
-    }
-    optionselect.value = val;
-  }
-}, { immediate: true })
+watch(query, debouncedGetOptions)
 
-watch(() => extraparams, () => {
-  GetOptions()
-}, { immediate: true })
-
-watch(optionselect, (val) => {
-  selected.value = val ? val.value : null
-})
-
-watch(selected, (val) => {
-  if (val == null || val === undefined) {
-    optionselect.value = null
-  } else {
-    const found = options.value.find(o => o.value === val)
-    if (found) {
-      optionselect.value = found
-    } else if (props.canNew) {
-      const tempOption = { value: val, label: String(val) }
-      options.value.push(tempOption)
-      optionselect.value = tempOption
-    }else{
-      selected.value=null
-    }
+watch(() => props.params, (newVal, oldVal) => {
+  if (!isEqual(newVal, oldVal)) {
+    GetOptions()
   }
 })
+
 const onInputChange=(event: Event)=> {
   if (props.searchable === false) {
     event.preventDefault();
@@ -130,17 +110,17 @@ const onInputChange=(event: Event)=> {
       <div class="relative">
         <div>
           <ComboboxInput
-          class="w-full ps-2 pr-6 truncate rounded border-2 ComboboxInput"
           :id="thisid"
+          class="w-full ps-2 pr-6 truncate rounded border-2 ComboboxInput"
           @change="onInputChange"
           :readonly="props.searchable === false"
           :placeholder="placeholder"
+          @blur="onBlur"
           @focus="onFocus"
-          @blur="isOpen = false"
           :displayValue="(option: unknown) => (option as option | null)?.label ?? ''"
           />
         <button
-          v-if="optionselect && clear"
+          v-if="optionselect && cleareble"
           type="button"
           class="absolute inset-y-0 right-2 text-sm flex items-center text-gray-400 hover:text-gray-600"
           @click="optionselect = null"
@@ -156,8 +136,7 @@ const onInputChange=(event: Event)=> {
           v-for="option in options"
           :key="option.value"
           :value="option"
-          @click="selectOption()"
-          
+          @click="triggerBlur"
           v-slot="{ active }"
           as="template"
         >

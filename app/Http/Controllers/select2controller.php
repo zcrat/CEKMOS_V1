@@ -41,7 +41,5 @@ class select2controller extends Controller
             ]);
         }
         return response()->json(compact('options'));
-
-
     }
 }
