@@ -11,6 +11,7 @@
   import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
   import Select from '@/components/Zcrat/Elements/Select.vue';
   import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
+  import zSelect from '@/components/Zcrat/Elements/Select2.vue';
   import debounce from 'lodash/debounce';
   import GetNivelesGasolina from '@/utils/functions/select/NivelesGasolina';
   import GetModulosDisponibles  from '@/utils/functions/select/ModulosCortana';
@@ -41,7 +42,7 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
     ubicacion: string,
     tipo_id: 5|6|7
     modulo_orden: number|string,
-    vehiculo_concepto_id: number| null,
+    vehiculo_concepto_id: option| null,
     empresa_id: number|null,
     cliente_id:number|null,
     telefono: number | null,
@@ -329,7 +330,9 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
     espejos_laterales:""
   })
   const KeysOptional=['orden_opcional','orden_seguimiento'];
-
+  const paramsvehiculoconceptoselect=computed(()=>{
+    {}
+  })
   const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
 
@@ -412,16 +415,15 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
       <Combobox id="ubicacion" label="Ubicacion" v-model="DetallesGenerales.ubicacion" endpoint="Combobox.ubicaciones" placeholder="Buscar o Crear"/>
       <Select label="Tipo De Presupuesto"  v-model="DetallesGenerales.tipo_id" id="presupuestotipo"  :options="optionstipos"></Select>
       <Select label="Modulo Orden"  v-model="DetallesGenerales.modulo_orden" id="modulooreden" :canempty="true" :options="modulosdisponibles"></Select>
-      <Select2 
-        :new_option="vehiculoconcepto" 
-        :extraparams="{'id_modulo':DetallesGenerales.modulo_orden}" 
+      <zSelect
+         
+        :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
         label="Vehiculo De Los Conceptos" 
         endpoint="Select2.Vehiculos.Conceptos.Modulos" 
         v-model="DetallesGenerales.vehiculo_concepto_id" 
-        id="presupuestovehiculoconcepto" 
-        placeholder="Buscar Cliente" 
-        :searchable="false"
-        :clear="false"
+        :empty_message="DetallesGenerales.modulo_orden? 'Sin Resultados':'Selecciona Un Modulo'" 
+        placeholder="Buscar Vehiculo" 
+        :cleareble="false"
       />
     </div>
     <Subtitle>Datos Cliente</Subtitle>
