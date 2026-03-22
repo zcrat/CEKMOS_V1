@@ -1,21 +1,128 @@
 <script setup lang="ts">
-import {option} from '@/types/generales'
-const props = defineProps<{
+import {ref, watch } from 'vue'
+import {
+  ComboboxAnchor,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxGroup,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxRoot,
+  ComboboxTrigger,
+  ComboboxViewport,
+  ComboboxCancel,
+} from 'reka-ui'
+import { type option } from '@/types/generales'
+
+const props = withDefaults(defineProps<{
+  id?:string
   label?: string
-  optionlabelempty?: string
-  id?: string
-  canempty?:boolean
+  placeholder?:string
+  empty_message?:string
+  clearable?:boolean
+  searchable?:boolean
+  close_when_selected?:boolean
   options:option[]
-}>()
-const selected = defineModel<string|number>();
+}>(), {
+  empty_message:'Sin Opciones',
+  placeholder:'Seleccionar',
+  searchable:false,
+  clearable:true,
+  close_when_selected:true,
+})
+const selected = defineModel<string | number |null>()
+const optionselect = ref<option | null>(null)
+const filtered_options = ref<option[]>([])
+const query = ref<string>('')
+const isOpen = ref<boolean>(false)
+
+const onFocus = () => {
+  isOpen.value = true
+}
+const onSelect = () => {
+    query.value = ''
+    if(props.close_when_selected){
+        isOpen.value = false
+    }
+}
+
+watch([query, () => props.options], ([newQuery]) => {
+  filtered_options.value = props.options.filter(option =>
+    option.label.toLowerCase().includes(newQuery.toLowerCase())
+  )
+}, { immediate: true })
+
+watch(optionselect, (val) => {
+  selected.value = val ? val.value : null
+})
+
+watch(selected, (val) => {
+  if (val == null || val === undefined) {
+    optionselect.value = null
+  } else {
+    const found = props.options.find(o => o.value === val)
+    if (found) {
+      optionselect.value = found
+    } else {
+      selected.value = null
+    }
+  }
+})
+const onInputChange=(event: Event)=> {
+  if (props.searchable === false) {
+    event.preventDefault();
+    return;
+  }
+  query.value = (event.target as HTMLInputElement).value;
+}
+const clearSelect = () => {
+  query.value = ''
+  optionselect.value = null
+}
 </script>
+
 <template>
-    
-    <div class="flex flex-col">
-      <label for="" v-if="props.label">{{props.label }}</label>
-      <select :name="props.id" :id="props.id" v-model="selected" class="inputfocus rounded-md">
-          <option value="" v-show="canempty || !selected" v-if="canempty || !selected">{{optionlabelempty ??'Seleccionar'}}</option>
-          <option v-for="opt in props.options" :key="'option-'+opt.value" :value="opt.value">{{ opt.label }}</option>
-      </select>
-    </div>
+  <div class="flex flex-col w-full" >
+    <label for="" v-if="props.label">{{ props.label }}</label>
+  <ComboboxRoot class="relative" v-model="optionselect" v-model:open="isOpen">
+    <ComboboxAnchor :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen }]">
+      <ComboboxInput
+        :class="['w-full ps-2 pr-8 truncate rounded border-none inputnotfocus']"
+        @input="onInputChange"
+        :readonly="props.searchable === false"
+        :placeholder="placeholder"
+        @focus="onFocus"
+        :displayValue="(option: option | null) => option?.label ?? ''"
+      />
+      <ComboboxTrigger class="absolute inset-y-0 right-0 px-2 w-8" v-if="!optionselect || !clearable">
+        <font-awesome-icon icon="fa-solid fa-angle-down" class="text-[1.25rem]" v-if="!isOpen"/>
+        <font-awesome-icon icon="fa-solid fa-angle-up" class="text-[1.25rem]" v-else/>
+      </ComboboxTrigger>
+      <ComboboxCancel class="absolute inset-y-0 right-0 px-2 w-8" v-if="optionselect && clearable && !isOpen" @click="clearSelect">
+        <font-awesome-icon icon="fa-solid fa-x" class="text-[0.8rem]"/>
+      </ComboboxCancel>
+    </ComboboxAnchor>
+    <ComboboxContent 
+      class="absolute z-20 w-full mt-1 min-w-[10rem] bg-white border-2 border-gray-500 overflow-y-auto rounded-md ">
+      <ComboboxViewport>
+        <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2">
+         {{empty_message }}
+        </ComboboxEmpty>
+        <ComboboxGroup class="max-h-[25rem] overflow-auto">
+          <ComboboxItem
+            v-for="option in filtered_options"
+            :key="option.value"
+            :value="option"
+            @select="onSelect"
+            as="template"
+            > 
+            <div :class="['px-4 py-2 rounded-sm ', option.value === optionselect?.value ? 'optionactive' : 'hoveroptionselect']">
+              {{ option.label }}
+            </div>
+          </ComboboxItem>
+        </ComboboxGroup>
+      </ComboboxViewport>
+    </ComboboxContent>
+  </ComboboxRoot>
+  </div>
 </template>

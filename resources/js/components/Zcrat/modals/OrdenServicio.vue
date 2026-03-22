@@ -1,4 +1,4 @@
-<!-- ModalExample.vue -->
+fd<!-- ModalExample.vue -->
 <script setup lang="ts">
   import InputBasic from '../Inputs/form/InputBasic.vue'
   import Textarea from '../Inputs/form/Textarea.vue'
@@ -10,9 +10,7 @@
   import Combobox from '@/components/Zcrat/Elements/ZdCombobox.vue'
   import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
   import Select from '@/components/Zcrat/Elements/Select.vue';
-  import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
-  import zSelect from '@/components/Zcrat/Elements/Select3.vue';
-  import zSelect2 from '@/components/Zcrat/Elements/Select2.vue';
+  import Select2 from '@/components/Zcrat/Elements/Select2.vue';
   import debounce from 'lodash/debounce';
   import GetNivelesGasolina from '@/utils/functions/select/NivelesGasolina';
   import GetModulosDisponibles  from '@/utils/functions/select/ModulosCortana';
@@ -24,7 +22,8 @@
   import MyBasicToast from "@/utils/ToastNotificationBasic";
   import TiposVehiculos from '../Forms/TiposVehiculos.vue';
   import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
-import Checkbox from '../Inputs/form/Checkbox.vue';
+  import Checkbox from '../Inputs/form/Checkbox.vue';
+import OptionsCondicionesEquipo from '../Elements/OptionsCondicionesEquipo.vue';
 
   export interface Economico {
     id?:number,
@@ -36,6 +35,7 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
     modelo:string,
     tipo_id: number|""
   }
+
   export interface OrdenServicioForm {
     id?:number
     orden_seguimiento: string,
@@ -44,8 +44,8 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
     tipo_id: 5|6|7
     modulo_orden: number|string,
     vehiculo_concepto_id: option| null,
-    empresa_id: number|null,
-    cliente_id:number|null,
+    empresa:option|null,
+    cliente:option|null,
     telefono: number | null,
     estimacion: Date,
     kilometraje: number | null,
@@ -231,7 +231,7 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
     tipo_id:""
   })
   const Imagenes = reactive<ImagenesForm[]>([])
-  const Database={
+  const Database: OrdenServicioForm ={
     id:undefined,
     orden_seguimiento: '',
     orden_opcional: '',
@@ -239,8 +239,8 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
     tipo_id:7,
     modulo_orden:'',
     vehiculo_concepto_id: null,
-    empresa_id: null,
-    cliente_id:null,
+    empresa: null,
+    cliente:null,
     estimacion: sumarDiasSinDomingo(new Date(new Date().setHours(12,0)),2),
     kilometraje: null,
     gasolina: '',
@@ -378,6 +378,9 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
       prueba()
     }
   })
+  watch(()=>DetallesGenerales.modulo_orden,()=>{
+    DetallesGenerales.vehiculo_concepto_id=null
+  })
   const prueba = async () => {
     try {
       const response = await axios.get(route('image.tipo.vehiculo', { type: Economico.tipo_id }), {
@@ -411,16 +414,7 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
       <Combobox id="ubicacion" label="Ubicacion" v-model="DetallesGenerales.ubicacion" endpoint="Combobox.ubicaciones" placeholder="Buscar o Crear"/>
       <Select label="Tipo De Presupuesto"  v-model="DetallesGenerales.tipo_id" id="presupuestotipo"  :options="optionstipos"></Select>
       <Select label="Modulo Orden"  v-model="DetallesGenerales.modulo_orden" id="modulooreden" :canempty="true" :options="modulosdisponibles"></Select>
-      <zSelect
-        :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
-        label="Vehiculo De Los Conceptos" 
-        endpoint="Select2.Vehiculos.Conceptos.Modulos" 
-        v-model="DetallesGenerales.vehiculo_concepto_id" 
-        :empty_message="DetallesGenerales.modulo_orden? 'Sin Resultados':'Selecciona Un Modulo'" 
-        placeholder="Buscar Vehiculo" 
-        :cleareble="true"
-      />
-      <zSelect2
+      <Select2
         :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
         label="Vehiculo De Los Conceptos" 
         endpoint="Select2.Vehiculos.Conceptos.Modulos" 
@@ -432,8 +426,8 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
     </div>
     <Subtitle>Datos Cliente</Subtitle>
     <div class="grid sm:grid-cols-2 gap-2">
-      <Select2 :new_option="empresa" label="Empresa" id="presupuestoempresa" endpoint="Select2.Empresas" v-model="DetallesGenerales.empresa_id" placeholder="Buscar Empresas"/>
-      <Select2 :new_option="cliente" label="Cliente" endpoint="Select2.Empresas" v-model="DetallesGenerales.cliente_id" id="presupuestoempresa" placeholder="Buscar Cliente"/>
+      <Select2 :new_option="DetallesGenerales.empresa" label="Empresa" id="presupuestoempresa" endpoint="Select2.Empresas" v-model="DetallesGenerales.empresa" placeholder="Buscar Empresas"/>
+      <Select2 :new_option="DetallesGenerales.cliente" label="Cliente" endpoint="Select2.Empresas" v-model="DetallesGenerales.cliente" id="presupuestoempresa" placeholder="Buscar Cliente"/>
     </div>
     <Subtitle>Datos Vehiculo</Subtitle>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2">
@@ -457,8 +451,8 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
       <InputBasic id="kilometraje" label="Kilometraje" type="number" v-model="DetallesGenerales.kilometraje" placeholder="ej. 392.31"/>
       <Select id="gasolina" :canempty="true" v-model="DetallesGenerales.gasolina" label="Gasolina" :options="optionsgasolima"></Select>
       <div class="md:col-span-4 sm:col-span-2 flex flex-col md:flex-row gap-2" >
-        <ZDCanvas class="w-[70%]" ref="ImageVehiculoEntrada" title="Detalles Del Vehiculo" strokecolor="red"></ZDCanvas>
-        <ZDCanvas class="w-[30%]" ref="ImageFirmaEntrada" title="Firma"></ZDCanvas>
+        <ZDCanvas class="md:w-[70%]" ref="ImageVehiculoEntrada" title="Detalles Del Vehiculo" strokecolor="red"></ZDCanvas>
+        <ZDCanvas class="md:w-[30%]" classnamedivcanvas="w-full h-[10rem]" ref="ImageFirmaEntrada" title="Firma"></ZDCanvas>
       </div>
     </div>
     <Subtitle>Empleados Encargados</Subtitle>
@@ -475,18 +469,38 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
       <Textarea id="observaciones" label="Garantia" v-model="DetallesGenerales.garantia" placeholder="Escribe las observaciones aqui..." classname="h-24"/>
       <Textarea id="descripcionmo" label="Tiempo de Entrega" v-model="DetallesGenerales.observaciones" placeholder="Escribe la descripcion de la mano de obra aqui..." classname="h-24"/>
     </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-      <div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+      <div class="border-2 rounded-md p-2">
         <Subtitle>Inventario Equipo</Subtitle>
         <div class="grid sm:grid-cols-2 2xl:grid-cols-3">
           <Checkbox v-for="(item,index) in InventarioInputs" value='1' :key="'inventario-'+index" :checked="Inventario[index] ==='1'" :label="item"/>
         </div>
       </div>
-      <div>
+      <div class="border-2 rounded-md p-2">
         <Subtitle>Condiciones Pintura</Subtitle>
         <div class="grid sm:grid-cols-2 2xl:grid-cols-3">
           <Checkbox v-for="(item,index) in PinturaInputs" value='1' :key="'inventario-'+index" :checked="Pintura[index] ==='1'" :label="item"/>
         </div>
+      </div>
+    </div>
+    <div class="border rounded-md py-2 my-2 flex gap-2 justify-around flex-wrap">
+      <div>
+        D=Dañada
+      </div>
+      <div>
+        O=Operacional
+      </div>
+      <div>
+        F=Falta Objeto
+      </div>
+      <div>
+        R=Reparacion Necesaria
+      </div>
+      <div>
+        N/A=No Aplica
+      </div>
+      <div>
+        <font-awesome-icon icon="fa-solid fa-check"></font-awesome-icon>=Sin Daño Visible
       </div>
     </div>
     <div class="border-2 rounded-md p-2">
@@ -494,48 +508,43 @@ import Checkbox from '../Inputs/form/Checkbox.vue';
       <div class="grid sm:grid-cols-2 gap-2">
         <div >
           <Subtitle bg="bg-[--color4]">Puertas</Subtitle>
-          <div class="grid md:grid-cols-2 2xl:grid-cols-4 gap-2">
-            <Select v-for="(item,index) in CondicionesInterioresInputs['PANALES DE PUERTA']" 
+          <div class=" justify-center items-center grid lg:grid-cols-2 2xl:grid-cols-4 gap-2">
+            <OptionsCondicionesEquipo v-for="(item,index) in CondicionesInterioresInputs['PANALES DE PUERTA']" 
             :label="item" 
             :key="'inventario-'+index" 
             v-model="CondicionesInteriores[index]" 
             :options="optionsequipo">
-          </Select>
+          </OptionsCondicionesEquipo>
           </div>
         </div>
         <div>
           <Subtitle bg="bg-[--color4]">Asientos</Subtitle>
-          <div class="grid md:grid-cols-2 2xl:grid-cols-4 gap-2">
-            <Select v-for="(item,index) in CondicionesInterioresInputs['ASIENTOS']" 
+          <div class="flex flex-col items-center lg:grid lg:grid-cols-2 2xl:grid-cols-4 gap-2">
+            <OptionsCondicionesEquipo v-for="(item,index) in CondicionesInterioresInputs['ASIENTOS']" 
             :label="item" 
             :key="'inventario-'+index" 
             v-model="CondicionesInteriores[index]" 
             :options="optionsequipo">
-          </Select>
+          </OptionsCondicionesEquipo>
           </div>
         </div>
       </div>
       <div>
         <Subtitle bg="bg-[--color4]">Otros</Subtitle>
-        <div class="grid sm:grid-cols-2 md:grid-cols-4 2xl:grid-cols-6 gap-2">
-            <Select v-for="(item,index) in CondicionesInterioresInputs['OTROS']" 
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-2">
+            <OptionsCondicionesEquipo v-for="(item,index) in CondicionesInterioresInputs['OTROS']" 
             :label="item" 
             :key="'inventario-'+index" 
             v-model="CondicionesInteriores[index]" 
             :options="optionsequipo">
-          </Select>
+          </OptionsCondicionesEquipo>
         </div>
       </div>
     </div>
-    <div>
+    <div class="pb-2">
       <Subtitle>Condiciones Equipo Exterior</Subtitle>
-      <div class="grid gap-2 sm:grid-cols-3 xl:grid-cols-5 ">
-        <Select v-for="(item,index) in CondicionesExterioresInputs" 
-          :label="item" 
-          :key="'inventario-'+index" 
-          v-model="CondicionesExteriores[index]"
-          :options="optionsequipo">
-        </Select>
+      <div class="grid gap-2 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ">
+        <OptionsCondicionesEquipo  :key="'equipo-exterior-'+index"  v-for="(item,index) in CondicionesExterioresInputs" :label="item" v-model="CondicionesExteriores[index]"/>
       </div>
     </div>
   </BaseModal>

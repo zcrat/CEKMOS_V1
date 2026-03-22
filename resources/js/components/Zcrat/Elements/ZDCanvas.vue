@@ -24,6 +24,7 @@ let ctx: CanvasRenderingContext2D | null = null
 let drawing = false
 
 const Strokes=ref<Point[][]>([])
+const StrokesDelete=ref<Point[][]>([])
 const ImageDraw=ref<Blob|null>(null)
 const currentStroke= ref<Point[]>([])
 
@@ -47,6 +48,7 @@ onMounted(() => {
   window.addEventListener("mouseup", () => {
     if (drawing && currentStroke.value.length>0) {
         Strokes.value.push(currentStroke.value)
+        StrokesDelete.value
     }
     drawing = false
     ctx?.beginPath()
@@ -122,6 +124,7 @@ async function getCanvasBlob(): Promise<Blob | null> {
 }
 
 function clearCanvas() {
+  StrokesDelete.value=Strokes.value
   Strokes.value=[]
   redraw()
 }
@@ -148,8 +151,23 @@ async function redraw(){
   })
 }
 function undo(){
-  Strokes.value.pop()
-  redraw()
+  if (Strokes.value.length > 0) {
+    const removed = Strokes.value.pop();   // quita el último
+    if (removed) {
+      StrokesDelete.value.push(removed);   // lo guarda en el historial
+    }
+    redraw();
+  }
+
+}
+function redo(){
+  if (StrokesDelete.value.length > 0) {
+    const removed = StrokesDelete.value.pop();   // quita el último
+    if (removed) {
+      Strokes.value.push(removed);   // lo guarda en el historial
+    }
+    redraw();
+  }
 }
 defineExpose({
   dibujarImagen,
@@ -169,7 +187,8 @@ defineExpose({
 
     <div class="flex w-fit gap-2">
       <Button text="Limpiar" :disabled="Strokes.length <= 0" @click="clearCanvas" type="delete"/>
-      <Button text="Deshacer" :disabled="Strokes.length <= 0" @click="undo" type="secondary"/>
+      <Button icon="fa-solid fa-angle-left" :disabled="Strokes.length <= 0" @click="undo" type="secondary"/>
+      <Button icon="fa-solid fa-angle-right" :disabled="StrokesDelete.length <= 0" @click="redo" type="secondary"/>
     </div>
   </div>
 </template>

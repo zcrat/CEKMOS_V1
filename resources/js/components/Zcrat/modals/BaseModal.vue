@@ -34,52 +34,53 @@ const classtitleposition = computed(() => ({
 
 <template>
   <DialogRoot
-    :open="show"
-    @close="closeModal"
-  >
+  :open="show"
+  @update:open="() => closeModal()"
+  v-slot="{ close }"
+>
     <DialogPortal >
       <DialogOverlay class="fixed inset-0 bg-black/40" />
-      <DialogContent
-        class="fixed inset-0 max-w-screen w-full sm:m-4 sm:w-auto p-2 bg-white rounded-xl shadow-xl max-h-[90vh]"
-      >
-        <div v-if="modaltitle" class="flex justify-between items-center px-4 ">
-        <DialogTitle
-         
-          :class="['text-xl font-semibold', classtitleposition]"
-        >
-          {{ modaltitle }}
-        </DialogTitle>
-        <DialogClose
-            aria-label="Close"
-            @click="closeModal"
-          >
-          <font-awesome-icon icon="fa-solid fa-x" class="text-[1rem]"/>
-        </DialogClose>
-        </div>
-        <div class="overflow-auto h-[90%] sm:px-4">
-          <slot />
-        </div>
-        <div class="pt-2 flex justify-end gap-4">
-          <button
-            class="px-4 py-2 bg-[--color4] rounded-md"
-            @click="closeModal"
-          >
-            Cerrar
-          </button>
-          <button
-            v-if="buttonconfirm"
-            :class="[
-              'px-4 py-2 rounded-md capitalize',
-              buttonconfirm.classname ?? 'bg-[--micolor]',
-              buttonconfirm.disabled ? 'opacity-50' : ''
-            ]"
-            :disabled="!!buttonconfirm.disabled"
-            @click="buttonconfirm.onClick"
-          >
-            {{ buttonconfirm.text }}
-          </button>
-
+      <DialogContent class="fixed inset-0 flex items-center justify-center">
+        <div class=" relative max-w-screen w-full m-4 sm:w-auto px-6 bg-white rounded-xl shadow-xl max-h-[90vh] overflow-auto">
+          <div v-if="modaltitle" class="flex justify-between items-center pt-4 pb-2 sticky top-0 z-10 bg-white">
+          <DialogTitle
           
+            :class="['text-xl font-semibold', classtitleposition]"
+          >
+            {{ modaltitle }}
+          </DialogTitle>
+          <DialogClose
+              aria-label="Close"
+              @click="close"
+            >
+            <font-awesome-icon icon="fa-solid fa-x" class="text-[1rem]"/>
+          </DialogClose>
+          </div>
+          <div class="sm:px-4 overflow-auto">
+            <slot />
+          </div>
+          <div class="pt-2 pb-4 flex justify-end items-center gap-4 sticky bottom-0 z-10 bg-white ">
+            <button
+              class="px-4 py-2 bg-[--color4] h-10 rounded-md"
+              @click="close"
+            >
+              Cerrar
+            </button>
+            <button
+              v-if="buttonconfirm"
+              :class="[
+                'px-4 py-2 rounded-md capitalize h-10',
+                buttonconfirm.classname ?? 'bg-[--micolor]',
+                buttonconfirm.disabled ? 'opacity-50' : ''
+              ]"
+              :disabled="!!buttonconfirm.disabled"
+              @click="buttonconfirm.onClick"
+            >
+              {{ buttonconfirm.text }}
+            </button>
+
+            
+          </div>
         </div>
       </DialogContent>
     </DialogPortal>
