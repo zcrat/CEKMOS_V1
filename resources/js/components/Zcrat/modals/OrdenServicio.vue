@@ -24,6 +24,7 @@ fd<!-- ModalExample.vue -->
   import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
   import Checkbox from '../Inputs/form/Checkbox.vue';
 import OptionsCondicionesEquipo from '../Elements/OptionsCondicionesEquipo.vue';
+import Button from '../Inputs/Button.vue';
 
   export interface Economico {
     id?:number,
@@ -331,6 +332,7 @@ import OptionsCondicionesEquipo from '../Elements/OptionsCondicionesEquipo.vue';
 
   const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
+  const LoadImages = ref<HTMLInputElement | null>(null)
 
   const SaveCarAndFirma = async()=>{
     const carro=await ImageVehiculoEntrada.value?.getCanvasBlob();
@@ -403,6 +405,18 @@ import OptionsCondicionesEquipo from '../Elements/OptionsCondicionesEquipo.vue';
       }
     }
   }
+  const SaveImagesEvidencia = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files) {
+    Array.from(target.files).forEach(file => {
+      Imagenes.push({ tipo_id: 3, image: file })
+    })
+  }
+}
+function CovertBlobToURL(file: Blob) {
+  return window.URL.createObjectURL(file)
+}
+
 </script>
 
 <template>
@@ -541,10 +555,26 @@ import OptionsCondicionesEquipo from '../Elements/OptionsCondicionesEquipo.vue';
         </div>
       </div>
     </div>
-    <div class="pb-2">
+    <div class="border-2 rounded-md p-2 mt-2">
       <Subtitle>Condiciones Equipo Exterior</Subtitle>
       <div class="grid gap-2 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ">
         <OptionsCondicionesEquipo  :key="'equipo-exterior-'+index"  v-for="(item,index) in CondicionesExterioresInputs" :label="item" v-model="CondicionesExteriores[index]"/>
+      </div>
+    </div>
+    <div class="pb-2 border-2 p-2 rounded  mt-2">
+      <Subtitle>Evidencias</Subtitle>
+      <div class="flex flex-row sm:flex-row gap-2 w-full">
+        <div class="flex flex-roe sm:flex-col gap-2">
+          <input type="file" name="LoadImages" id="LoadImages" ref="LoadImages" multiple style="position: absolute; left: -9999px;" @change="SaveImagesEvidencia"/>
+          <Button text="Tomar Fotos"  @click="()=>{LoadImages?.click()}" />
+          <Button text="Eliminar Fotos"  type="delete" v-if="Imagenes.some(img => img.tipo_id === 3)"/>
+        </div>
+        <div :class="'overflow-x-auto flex gap-2 flex-row'">
+          <div :key="index" v-for="(value,index) in Imagenes.filter(item=>item.tipo_id ===3)" class="border-2 border-gray-700 p-2 w-fit flex flex-col justify-end">
+             <img :src="CovertBlobToURL(value.image)" style="max-width:200px;" />
+            <Button text="Eliminar"  type="delete"/>
+          </div>
+        </div>
       </div>
     </div>
   </BaseModal>
