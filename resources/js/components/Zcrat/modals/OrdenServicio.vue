@@ -5,26 +5,23 @@ fd<!-- ModalExample.vue -->
   import BaseModal from '@/components/Zcrat/modals/BaseModal.vue'
   import { ref, watch ,reactive, onMounted,computed} from 'vue' 
   import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
-  import {type option,type Vehiculo, type datagetpresupuestos} from '@/types/generales'
+  import {type option} from '@/types/generales'
   import {type buttonconfirmed} from '@/types/modals'
   import Combobox from '@/components/Zcrat/Elements/ZdCombobox.vue'
   import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
   import Select from '@/components/Zcrat/Elements/Select.vue';
   import Select2 from '@/components/Zcrat/Elements/Select2.vue';
-  import debounce from 'lodash/debounce';
   import GetNivelesGasolina from '@/utils/functions/select/NivelesGasolina';
   import GetModulosDisponibles  from '@/utils/functions/select/ModulosCortana';
   import { sumarDiasSinDomingo } from '@/utils/functions/generales/fechas';
-  import { useVehiculoFetcher } from '@/composables/useVehiculoFetchers';
-  import { usePresupuestoFetcher } from '@/composables/usePresupuestoFetcher'
   import ZDCanvas from '../Elements/ZDCanvas.vue'
   import axios from 'axios' 
   import MyBasicToast from "@/utils/ToastNotificationBasic";
   import TiposVehiculos from '../Forms/TiposVehiculos.vue';
   import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
   import Checkbox from '../Inputs/form/Checkbox.vue';
-import OptionsCondicionesEquipo from '../Elements/OptionsCondicionesEquipo.vue';
-import Button from '../Inputs/Button.vue';
+  import OptionsCondicionesEquipo from '../Elements/OptionsCondicionesEquipo.vue';
+  import Button from '../Inputs/Button.vue';
 
   export interface Economico {
     id?:number,
@@ -36,7 +33,6 @@ import Button from '../Inputs/Button.vue';
     modelo:string,
     tipo_id: number|""
   }
-
   export interface OrdenServicioForm {
     id?:number
     orden_seguimiento: string,
@@ -138,11 +134,16 @@ import Button from '../Inputs/Button.vue';
 
   const emit = defineEmits(['close'])
   const props = defineProps<{show: boolean}>()
+  const optionsgasolima=ref<option[]>([])
+  const optionsequipo=ref<option[]>([])
+  const modulosdisponibles=ref<option[]>([])
+  const imagepreview=ref<string>('')
   const optionstipos=[
     {value:5,label:'Correctivo'},
     {value:6,label:'Preventivo'},
     {value:7,label:'Ambos'}
   ];
+
   const CondicionesExterioresInputs={
     'antena_radio':'ANTENA/RADIO',
     'estribos':'ESTRIBOS',
@@ -208,9 +209,7 @@ import Button from '../Inputs/Button.vue';
     'granizo':'DAÑOS POR GRANIZO',
     'lluvia':'LLUVIA ACIDA'
   }
-  const optionsgasolima=ref<option[]>([])
-  const optionsequipo=ref<option[]>([])
-  const modulosdisponibles=ref<option[]>([])
+
   
   const updateVisibility = () => {
     emit('close')
@@ -333,6 +332,7 @@ import Button from '../Inputs/Button.vue';
   const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const LoadImages = ref<HTMLInputElement | null>(null)
+  const CanEditImages = ref<boolean>(true)
 
   const SaveCarAndFirma = async()=>{
     const carro=await ImageVehiculoEntrada.value?.getCanvasBlob();
@@ -406,16 +406,46 @@ import Button from '../Inputs/Button.vue';
     }
   }
   const SaveImagesEvidencia = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  if (target.files) {
-    Array.from(target.files).forEach(file => {
-      Imagenes.push({ tipo_id: 3, image: file })
-    })
+    const target = event.target as HTMLInputElement
+    if (target.files) {
+      if (Array.from(target.files).some(file => !file.type.startsWith('image/'))) {
+        MyBasicToast.error('Solo se permiten archivos de imagen');
+          return;
+      } 
+      Array.from(target.files).forEach(file => {
+        
+        Imagenes.push({ tipo_id: 3, image: file })
+      })
+    }
+    target.value = '';
   }
-}
-function CovertBlobToURL(file: Blob) {
-  return window.URL.createObjectURL(file)
-}
+  function CovertBlobToURL(file: Blob) {
+    return window.URL.createObjectURL(file)
+  }
+  function DeleteImage(index:number) {
+    const registro=Imagenes[index];
+    if(registro){
+      if(registro.ids?.id){
+        // Aquí podrías hacer una petición al servidor para eliminar la imagen usando el ID
+        // Por ejemplo: await axios.delete(`/api/imagenes/${registro.id}`);
+      }else{
+        Imagenes.splice(index, 1);
+      }
+    }
+  }
+  function DeleteImagesNew() {
+    const imagenesNuevas = Imagenes.filter(img => !img.ids?.id);
+    if (imagenesNuevas.length > 0) {
+      imagenesNuevas.forEach((img) => {
+        const index = Imagenes.findIndex(i => i.image === img.image);
+        if (index !== -1) {
+          Imagenes.splice(index, 1);
+        }
+      });
+    }else{
+      MyBasicToast.error('No hay imágenes nuevas para eliminar');
+    }
+  }
 
 </script>
 
@@ -563,18 +593,21 @@ function CovertBlobToURL(file: Blob) {
     </div>
     <div class="pb-2 border-2 p-2 rounded  mt-2">
       <Subtitle>Evidencias</Subtitle>
-      <div class="flex flex-row sm:flex-row gap-2 w-full">
-        <div class="flex flex-roe sm:flex-col gap-2">
-          <input type="file" name="LoadImages" id="LoadImages" ref="LoadImages" multiple style="position: absolute; left: -9999px;" @change="SaveImagesEvidencia"/>
+      <div class="flex flex-col sm:flex-row gap-2 w-full">
+        <div class="flex flex-row sm:flex-col gap-2" v-if="CanEditImages">
+          <input type="file" name="LoadImages" id="LoadImages" ref="LoadImages" multiple style="position: absolute; left: -9999px;" accept="image/*" @change="SaveImagesEvidencia"/>
           <Button text="Tomar Fotos"  @click="()=>{LoadImages?.click()}" />
-          <Button text="Eliminar Fotos"  type="delete" v-if="Imagenes.some(img => img.tipo_id === 3)"/>
+          <Button text="Eliminar Fotos" @click="DeleteImagesNew"  type="delete" v-if="Imagenes.some(img => img.tipo_id === 3)"/>
         </div>
         <div :class="'overflow-x-auto flex gap-2 flex-row'">
-          <div :key="index" v-for="(value,index) in Imagenes.filter(item=>item.tipo_id ===3)" class="border-2 border-gray-700 p-2 w-fit flex flex-col justify-end">
-             <img :src="CovertBlobToURL(value.image)" style="max-width:200px;" />
-            <Button text="Eliminar"  type="delete"/>
+          <div :key="index" v-for="(value,index) in Imagenes.filter(item=>item.tipo_id ===3)" class="border-2 rounded-md border-gray-700 p-2 w-fit flex flex-col justify-end">
+             <img :src="CovertBlobToURL(value.image)" class="max-w-[200px] max-h-[200px]" @click="imagepreview=CovertBlobToURL(value.image)" />
+            <Button text="Eliminar"  type="delete" @click="DeleteImage(index)" v-if="CanEditImages"/>
           </div>
         </div>
+      </div>
+      <div v-if="imagepreview != ''" class='fixed inset-0 bg-black/50 flex items-center justify-center z-50'  @click="imagepreview=''">
+        <img :src="imagepreview" alt="imagen de evidencia" class="max-w-[90vw] max-h-[90vh] rounded-md shadow-lg"/>
       </div>
     </div>
   </BaseModal>
