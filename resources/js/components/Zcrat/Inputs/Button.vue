@@ -6,7 +6,7 @@ const props=withDefaults(defineProps<{
   classname?: string
   disabled?:boolean
   hiddenclases?:boolean
-  text: string
+  text?: string
   icon?: string
   type?:'new'|'delete'|'save'|'secondary'
 }>(),{
@@ -25,7 +25,7 @@ const classbutton =  computed(() => 'flex flex-row gap-2 p-2 justify-center item
 <template>
      <button :class="[hiddenclases?'':classbutton,classname]" :disabled="disabled" >
         <font-awesome-icon  v-if="icon" :icon="icon" />
-        <span>
+        <span v-if="text">
             {{text}}
         </span>
      </button>
