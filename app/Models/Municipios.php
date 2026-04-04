@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-class Ciudades extends Model
+class Municipios extends Model
 {
     use SoftDeletes;
-    protected $table = 'ciudades';
+    protected $table = 'municipios';
     protected $fillable = [
         'descripcion',
-        'estado_id'
+        'estado_id',
+        'clave'
     ];
     public function estado(){
         return $this->belongsTo(Estados::class, 'estado_id');

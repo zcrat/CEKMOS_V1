@@ -67,31 +67,31 @@ fd<!-- ModalExample.vue -->
   export interface PinturaForm{
     id?:number,
     DetallesGeneralesId?:number,
-    decolarada:"1"|"",
-    color_desigual:"1"|"",
-    rayonnes:"1"|"",
-    grietas:"1"|"",
-    golpes:"1"|"",
-    emblemas:"1"|"",
-    logos:"1"|"",
-    rociado:"1"|"",
-    granizo:"1"|"",
-    lluvia:"1"|"",
+    decolarada:"1"|"0",
+    color_desigual:"1"|"0",
+    rayonnes:"1"|"0",
+    grietas:"1"|"0",
+    golpes:"1"|"0",
+    emblemas:"1"|"0",
+    logos:"1"|"0",
+    rociado:"1"|"0",
+    granizo:"1"|"0",
+    lluvia:"1"|"0",
   }
   export interface InventarioForm{
     id?:number,
     DetallesGeneralesId?:number,
-    llanta:"1"|"",
-    cables:"1"|"",
-    estuche:"1"|"",
-    llave_tuerca:"1"|"",
-    triangulo:"1"|"",
-    tarjeta_circulacion:"1"|"",
-    cubreruedas:"1"|"",
-    candado_rueda:"1"|"",
-    extinguidor:"1"|"",
-    gato:"1"|"",
-    placas:"1"|"",
+    llanta:"1"|"0",
+    cables:"1"|"0",
+    estuche:"1"|"0",
+    llave_tuerca:"1"|"0",
+    triangulo:"1"|"0",
+    tarjeta_circulacion:"1"|"0",
+    cubreruedas:"1"|"0",
+    candado_rueda:"1"|"0",
+    extinguidor:"1"|"0",
+    gato:"1"|"0",
+    placas:"1"|"0",
   }
   export interface CondicionesInterioresForm{
     id?:number,
@@ -142,6 +142,14 @@ fd<!-- ModalExample.vue -->
     {value:5,label:'Correctivo'},
     {value:6,label:'Preventivo'},
     {value:7,label:'Ambos'}
+  ];
+  const OpcionesCondicionesEquipo=[
+    {value:'D',label:'Dañada'},
+    {value:'O',label:'Operacional'},
+    {value:'F',label:'Falta Objeto'},
+    {value:'R',label:'Reparacion Necesaria'},
+    {value:'NA',label:'No Aplica'},
+    {icon:'fa-solid fa-check',label:'Sin Daño Visible'},
   ];
 
   const CondicionesExterioresInputs={
@@ -260,32 +268,32 @@ fd<!-- ModalExample.vue -->
   ({
     id:undefined,
     DetallesGeneralesId:undefined,
-    llanta:"",
-    cables:"",
-    estuche:"",
-    llave_tuerca:"",
-    triangulo:"",
-    tarjeta_circulacion:"",
-    cubreruedas:"",
-    candado_rueda:"",
-    extinguidor:"",
-    gato:"",
-    placas:"",
+    llanta:"0",
+    cables:"0",
+    estuche:"0",
+    llave_tuerca:"0",
+    triangulo:"0",
+    tarjeta_circulacion:"0",
+    cubreruedas:"0",
+    candado_rueda:"0",
+    extinguidor:"0",
+    gato:"0",
+    placas:"0",
   })
   const Pintura=reactive<PinturaForm>
   ({
     id:undefined,
     DetallesGeneralesId:undefined,
-    decolarada:"",
-    color_desigual:"",
-    rayonnes:"",
-    grietas:"",
-    golpes:"",
-    emblemas:"",
-    logos:"",
-    rociado:"",
-    granizo:"",
-    lluvia:"",
+    decolarada:"0",
+    color_desigual:"0",
+    rayonnes:"0",
+    grietas:"0",
+    golpes:"0",
+    emblemas:"0",
+    logos:"0",
+    rociado:"0",
+    granizo:"0",
+    lluvia:"0",
   })
   const CondicionesInteriores=reactive<CondicionesInterioresForm>
   ({
@@ -327,7 +335,7 @@ fd<!-- ModalExample.vue -->
     luces:"",
     espejos_laterales:""
   })
-  const KeysOptional=['orden_opcional','orden_seguimiento'];
+  const KeysOptional=['orden_opcional','orden_seguimiento','id'];
 
   const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
@@ -373,7 +381,24 @@ fd<!-- ModalExample.vue -->
       },
       disabled:Object.entries(DetallesGenerales)
       .filter(([key]) => !KeysOptional.includes(key))
-      .some(([_,value]) => value === null || value === '')}})
+      .some(([_,value]) => value === null || value === '') 
+      ||
+      Object.entries(Economico)
+      .filter(([key]) => !['id'].includes(key))
+      .some(([_,value]) => value === null || value === '')
+      ||
+      Object.entries(CondicionesInteriores)
+      .filter(([key]) => !['id','DetallesGeneralesId'].includes(key))
+      .some(([_,value]) => value === null || value === '')
+      ||
+      Object.entries(CondicionesExteriores)
+      .filter(([key]) => !['id','DetallesGeneralesId'].includes(key))
+      .some(([_,value]) => value === null || value === '')
+      ||
+      Imagenes.filter(item=>item.tipo_id ===3).length < 6
+    }
+
+    })  
   
   watch(()=>Economico.tipo_id,(val)=>{
     if(val !== ""){
@@ -382,6 +407,9 @@ fd<!-- ModalExample.vue -->
   })
   watch(()=>DetallesGenerales.modulo_orden,()=>{
     DetallesGenerales.vehiculo_concepto_id=null
+  })
+  watch(()=>DetallesGenerales.empresa,()=>{
+    DetallesGenerales.cliente=null
   })
   const prueba = async () => {
     try {
@@ -446,6 +474,31 @@ fd<!-- ModalExample.vue -->
       MyBasicToast.error('No hay imágenes nuevas para eliminar');
     }
   }
+  function GetDataVehiculoEconomico() {
+    if(Economico.economico){
+      axios.get(route('Vehiculo.Get.Datos'), {
+        params: { search: Economico.economico ,filtro:'economico'}
+      })
+      .then(response => {
+        const data = response.data.datos;
+        if (data) {
+          Economico.placas = data.placas;
+          Economico.vin = data.vin;
+          Economico.anio = data.anio;
+          Economico.marca = data.modelo.marca.descripcion;
+          Economico.modelo = data.modelo.descripcion;
+          Economico.tipo_id = data.tipo_id;
+        } else {
+          if(!Economico.placas){
+            MyBasicToast.warning('Crearas un nuevo vehículo, no se encontraron datos con el economico proporcionado');
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error al obtener los datos del vehículo:', error);
+      });
+    }
+  }
 
 </script>
 
@@ -470,17 +523,34 @@ fd<!-- ModalExample.vue -->
     </div>
     <Subtitle>Datos Cliente</Subtitle>
     <div class="grid sm:grid-cols-2 gap-2">
-      <Select2 :new_option="DetallesGenerales.empresa" label="Empresa" id="presupuestoempresa" endpoint="Select2.Empresas" v-model="DetallesGenerales.empresa" placeholder="Buscar Empresas"/>
-      <Select2 :new_option="DetallesGenerales.cliente" label="Cliente" endpoint="Select2.Empresas" v-model="DetallesGenerales.cliente" id="presupuestoempresa" placeholder="Buscar Cliente"/>
+      <Select2 
+        label="Empresa" 
+        id="presupuestoempresa" 
+        endpoint="Select2.Empresas" 
+        v-model="DetallesGenerales.empresa" 
+        placeholder="Buscar Empresas"
+      />
+      <Select2   
+      label="Cliente" 
+      :params="{'empresa_id':DetallesGenerales.empresa?.value}" 
+      endpoint="Select2.Clientes" 
+      :empty_message="DetallesGenerales.empresa ? 'Sin Resultados' : 'Selecciona una empresa'"
+      v-model="DetallesGenerales.cliente" 
+      id="presupuestoempresa" 
+      placeholder="Buscar Cliente"/>
     </div>
     <Subtitle>Datos Vehiculo</Subtitle>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2">
       <div class="flex flex-col sm:flex-row gap-2">
-        <Combobox endpoint="Combobox.Vehiculo.Economico" label="Economico" id="economico" 
-          v-model="Economico.economico"  
+        <Combobox 
+          endpoint="Combobox.Vehiculo.Economico" 
+          label="Economico" id="economico" 
+          v-model="Economico.economico"
+          :OnBlur="GetDataVehiculoEconomico"
           placeholder="Buscar o Crear Economico" 
-          :timeout="1"/>
-        <Combobox endpoint="Combobox.Vehiculo.Placas" label="Placas" id="placas" v-model="Economico.placas"  placeholder="Buscar o Crear PLacas"/>
+          :timeout="1"
+          />
+        <Combobox endpoint="Combobox.Vehiculo.Placas" label="Placas" id="placas" v-model="Economico.placas"  placeholder="Buscar o Crear PLacas" />
       </div>
       <InputBasic id="Vin" label="Vin" type="text" v-model="Economico.vin" placeholder="Ej.JJSOE18P388988750 "/>
       <InputBasic id="Año" label="Año" type="number" v-model="Economico.anio"  placeholder="ej. 2024"/>
@@ -517,34 +587,20 @@ fd<!-- ModalExample.vue -->
       <div class="border-2 rounded-md p-2">
         <Subtitle>Inventario Equipo</Subtitle>
         <div class="grid sm:grid-cols-2 2xl:grid-cols-3">
-          <Checkbox v-for="(item,index) in InventarioInputs" value='1' :key="'inventario-'+index" :checked="Inventario[index] ==='1'" :label="item"/>
+          <Checkbox v-for="(item,index) in InventarioInputs" value='1' :key="'inventario-'+index" :checked="Inventario[index] ==='1'" :label="item" @update:checked="()=>{Inventario[index] = Inventario[index] === '1' ? '0' : '1'}"/>
         </div>
       </div>
       <div class="border-2 rounded-md p-2">
         <Subtitle>Condiciones Pintura</Subtitle>
         <div class="grid sm:grid-cols-2 2xl:grid-cols-3">
-          <Checkbox v-for="(item,index) in PinturaInputs" value='1' :key="'inventario-'+index" :checked="Pintura[index] ==='1'" :label="item"/>
+          <Checkbox v-for="(item,index) in PinturaInputs" value='1' :key="'inventario-'+index" :checked="Pintura[index] ==='1'" :label="item" @update:checked="()=>{Pintura[index] = Pintura[index] === '1' ? '0' : '1'}"/>
         </div>
       </div>
     </div>
     <div class="border rounded-md py-2 my-2 flex gap-2 justify-around flex-wrap">
-      <div>
-        D=Dañada
-      </div>
-      <div>
-        O=Operacional
-      </div>
-      <div>
-        F=Falta Objeto
-      </div>
-      <div>
-        R=Reparacion Necesaria
-      </div>
-      <div>
-        N/A=No Aplica
-      </div>
-      <div>
-        <font-awesome-icon icon="fa-solid fa-check"></font-awesome-icon>=Sin Daño Visible
+      
+      <div v-for="(item,index) in OpcionesCondicionesEquipo" :key="'leyenda-'+index" class="flex items-center gap-1">
+        <font-awesome-icon :icon="item.icon" v-if="item.icon"></font-awesome-icon><p v-if="item.value">{{ item.value }}</p>=<p>{{item.label}}</p>
       </div>
     </div>
     <div class="border-2 rounded-md p-2">

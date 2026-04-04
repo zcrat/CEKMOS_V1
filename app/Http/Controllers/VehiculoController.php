@@ -16,8 +16,9 @@ class VehiculoController extends Controller
         if(!in_array($filtro,['economico','placas'])){
            return response()->json(['message'=>'Filtro no valido'],400);
         }
-        $vehiculo=Vehiculos::where($filtro,'LIKE','%'.$search.'%')->with('marca','modelo')->first();
-        return response()->json($vehiculo);
+        $vehiculo=Vehiculos::where($filtro,'LIKE','%'.$search.'%')->with('modelo.marca')->first();
+        
+        return response()->json(['datos'=>$vehiculo]);
     }
 
     

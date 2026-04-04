@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ciudades', function (Blueprint $table) {
+        Schema::create('municipios', function (Blueprint $table) {
             $table->id();
             $table->string('descripcion');
-            $table->foreignId('estado_id')->constrained('estados');
+            $table->string('clave');
+            $table->unsignedBigInteger('estado_id');
+            $table->foreign('estado_id')->references('clave')->on('estados');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ciudades');
+        Schema::dropIfExists('municipios');
     }
 };

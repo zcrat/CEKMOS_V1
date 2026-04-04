@@ -20,5 +20,21 @@ const MyBasicToast = {
         pauseOnHover: false,
         hideProgressBar:true
     }),
+  warning: (msg = "Advertencia") =>
+    toast.warning(msg, {
+        timeout: 2000,
+        position:POSITION.TOP_RIGHT,
+        closeOnClick: true,
+        pauseOnHover: false,
+        hideProgressBar:true
+    }),
+  info: (msg = "Información") =>
+    toast.info(msg, {
+        timeout: 2000,
+        position:POSITION.TOP_RIGHT,
+        closeOnClick: true,
+        pauseOnHover: false,
+        hideProgressBar:true
+    }),
 }
 export default MyBasicToast

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('estados', function (Blueprint $table) {
             $table->id();
             $table->string('descripcion');
+            $table->unsignedBigInteger('clave')->unique();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -13,7 +13,7 @@ class Clientes extends Model
         'nombre',
         'calle',
         'cp',
-        'ciudad_id',
+        'municipio_id',
         'user_id',
         'email',
         'telefono',
@@ -25,8 +25,8 @@ class Clientes extends Model
     public function user(){
         return $this->belongsTo(User::class,'user_id');
     }
-    public function ciudad(){
-        return $this->belongsTo(Ciudades::class,'ciudad_id');
+    public function municipio(){
+        return $this->belongsTo(Municipios::class,'municipio_id');
     }
     public function empresa(){
         return $this->belongsTo(Empresas::class,'empresa_id');

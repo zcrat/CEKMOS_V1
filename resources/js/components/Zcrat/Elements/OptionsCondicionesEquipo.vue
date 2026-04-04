@@ -17,7 +17,7 @@
           <button @click="selected='15'" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='15' ? 'bg-[--micolor] font-semibold text-white':'']">O</button>
           <button @click="selected='16'" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='16' ? 'bg-[--micolor] font-semibold text-white':'']">F</button>
           <button @click="selected='18'" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='18' ? 'bg-[--micolor] font-semibold text-white':'']">R</button>
-          <button @click="selected='19'" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='19' ? 'bg-[--micolor] font-semibold text-white':'']">N/A</button>
+          <button @click="selected='19'" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='19' ? 'bg-[--micolor] font-semibold text-white':'']">NA</button>
           <button @click="selected='14'" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='14' ? 'bg-[--micolor] font-semibold text-white':'']"><font-awesome-icon icon="fa-solid fa-check"></font-awesome-icon></button>
         </div>
     </div>

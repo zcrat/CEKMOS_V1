@@ -10,8 +10,9 @@ class Estados extends Model
     protected $table = 'estados';
     protected $fillable = [
         'descripcion',
+        'clave'
     ];
-    public function ciudades(){
-        return $this->hasMany(Ciudades::class, 'estado_id');
+    public function municipios(){
+        return $this->hasMany(Municipios::class, 'estado_id');
     }
 }

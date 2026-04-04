@@ -15,7 +15,7 @@ class Empresas extends Model
         'logo',
         'calle',
         'cp',
-        'ciudad_id',
+        'municipio_id',
         'user_id',
         'regimen_fiscal_id',
         'telefono',
@@ -27,8 +27,8 @@ class Empresas extends Model
     public function user(){
         return $this->belongsTo(User::class,'user_id');
     }
-    public function ciudad(){
-        return $this->belongsTo(Ciudades::class,'ciudad_id');
+    public function municipio(){
+        return $this->belongsTo(Municipios::class,'municipio_id');
     }
     public function regimen(){
         return $this->belongsTo(RegimenesFiscales::class,'regimen_id');

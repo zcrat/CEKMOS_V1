@@ -19,13 +19,13 @@ return new class extends Migration
             $table->string('logo');
             $table->string('calle');
             $table->integer('cp');
-            $table->foreignId('ciudad_id')->constrained('ciudades');
+            $table->foreignId('municipio_id')->constrained('municipios');
             $table->foreignId('user_id')->constrained('users');
             $table->string('regimen_fiscal_id', 3);
             $table->foreign('regimen_fiscal_id')->references('clave')->on('regimes_fiscales');
-            $table->integer('telefono');
-            $table->integer('tel_celular');
-            $table->integer('tel_negocio');
+            $table->string('telefono', 15);
+            $table->string('tel_celular', 15);
+            $table->string('tel_negocio', 15);
             $table->timestamps();
             $table->softDeletes();
         });
