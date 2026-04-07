@@ -18,7 +18,7 @@ class VehiculoController extends Controller
         }
         $vehiculo=Vehiculos::where($filtro,'LIKE','%'.$search.'%')->with('modelo.marca')->first();
         
-        return response()->json(['datos'=>$vehiculo]);
+    return response()->json(['datos'=>$vehiculo]);
     }
 
     

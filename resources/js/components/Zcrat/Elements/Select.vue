@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, watch } from 'vue'
+import {ref, watch,onMounted,onBeforeUnmount } from 'vue'
 import {
   ComboboxAnchor,
   ComboboxContent,
@@ -11,6 +11,7 @@ import {
   ComboboxTrigger,
   ComboboxViewport,
   ComboboxCancel,
+  ComboboxPortal
 } from 'reka-ui'
 import { type option } from '@/types/generales'
 
@@ -39,12 +40,35 @@ const isOpen = ref<boolean>(false)
 const onFocus = () => {
   isOpen.value = true
 }
+const onMouseDown = (e: MouseEvent) => {
+  if (isOpen.value) {
+    // Si ya está abierto → cerrar
+    e.preventDefault() // 👈 evita que vuelva a hacer focus
+    isOpen.value = false
+  } else {
+    // Si está cerrado → abrir
+    isOpen.value = true
+  }
+}
 const onSelect = () => {
     query.value = ''
     if(props.close_when_selected){
         isOpen.value = false
     }
 }
+const handleScroll = () => {
+  if (isOpen.value) {
+    isOpen.value = false
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll, true) // 👈 CAPTURE
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll, true)
+})
 
 watch([query, () => props.options], ([newQuery]) => {
   filtered_options.value = props.options.filter(option =>
@@ -92,6 +116,7 @@ const clearSelect = () => {
         :readonly="props.searchable === false"
         :placeholder="placeholder"
         @focus="onFocus"
+          @mousedown="onMouseDown"
         :displayValue="(option: option | null) => option?.label ?? ''"
       />
       <ComboboxTrigger class="absolute inset-y-0 right-0 px-2 w-8" v-if="!optionselect || !clearable">
@@ -102,8 +127,13 @@ const clearSelect = () => {
         <font-awesome-icon icon="fa-solid fa-x" class="text-[0.8rem]"/>
       </ComboboxCancel>
     </ComboboxAnchor>
+    <ComboboxPortal>
     <ComboboxContent 
-      class="absolute z-20 w-full mt-1 min-w-[10rem] bg-white border-2 border-gray-500 overflow-y-auto rounded-md ">
+      position="popper"
+      :avoidCollisions="true"
+      :collisionPadding="8"
+      :sideOffset="4"
+      class="z-15 w-[var(--reka-combobox-trigger-width)] bg-white border-2 border-gray-500 rounded-md">
       <ComboboxViewport>
         <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2">
          {{empty_message }}
@@ -123,6 +153,7 @@ const clearSelect = () => {
         </ComboboxGroup>
       </ComboboxViewport>
     </ComboboxContent>
+    </ComboboxPortal>
   </ComboboxRoot>
   </div>
 </template>

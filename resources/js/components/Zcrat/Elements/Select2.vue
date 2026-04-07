@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch,onBeforeUnmount } from 'vue'
 
 import axios from 'axios'
 import { useDebounceFn } from '@vueuse/core'
@@ -16,6 +16,7 @@ import {
   ComboboxTrigger,
   ComboboxViewport,
   ComboboxCancel,
+  ComboboxPortal
 } from 'reka-ui'
 
 const props = withDefaults(defineProps<{
@@ -75,7 +76,7 @@ const GetOptions = async () => {
   }
 }
 const debouncedGetOptions = useDebounceFn(GetOptions, props.timeout)
-
+const inputRef = ref<HTMLInputElement | null>(null)
 const onSelect = () => {
     query.value = ''
     if(props.close_when_selected){
@@ -83,9 +84,18 @@ const onSelect = () => {
     }
 }
 const onFocus = () => {
+  console.log('focus')
   isOpen.value = true
   if(!props.cacheoptions){
     GetOptions()
+  }
+}
+const onMouseDown = (e: MouseEvent) => {
+  if (isOpen.value) {
+    e.preventDefault() // 👈 evita que vuelva a hacer focus
+    isOpen.value = false
+  } else {
+    isOpen.value = true
   }
 }
 onMounted(()=>{
@@ -94,7 +104,10 @@ onMounted(()=>{
 watch(query, debouncedGetOptions)
 
 watch(isOpen, (open) => {
-  if (!open) query.value = ''
+  if (!open) { 
+    query.value = ''
+    inputRef.value?.blur() // quitar foco del input
+  }
 })
 watch(() => props.params, (newVal, oldVal) => {
   if (!isEqual(newVal, oldVal)) {
@@ -113,6 +126,19 @@ const clearSelect = () => {
   query.value = ''
   optionselect.value = null
 }
+const handleScroll = () => {
+  if (isOpen.value) {
+    isOpen.value = false
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll, true) // 👈 CAPTURE
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll, true)
+})
 </script>
 
 <template>
@@ -122,14 +148,28 @@ const clearSelect = () => {
     <ComboboxAnchor 
       :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen }]"
       >
-      <ComboboxInput
-        :class="['w-full ps-2 pr-8 truncate rounded border-none inputnotfocus']"
+      <ComboboxInput asChild>
+        <input
+          ref="inputRef"
+          class="w-full ps-2 pr-8 truncate rounded border-none inputnotfocus"
+          @input="onInputChange"
+          :readonly="props.searchable === false"
+          :placeholder="placeholder"
+          @focus="onFocus"
+          :value="isOpen ? query : optionselect?.label ?? ''"
+          @mousedown="onMouseDown"
+        />
+      </ComboboxInput>
+        <!-- :class="['w-full ps-2 pr-8 truncate rounded border-none inputnotfocus']"
         @input="onInputChange"
+        ref="inputRef"
         :readonly="props.searchable === false"
         :placeholder="placeholder"
         @focus="onFocus"
+        @blur="()=>{console.log('ajdsh')}"
+        @mousedown="onMouseDown"
         :displayValue="(option: option | null) => option?.label ?? ''"
-      />
+      /> -->
       <ComboboxTrigger class="absolute inset-y-0 right-0 px-2 w-8" v-if="!optionselect || !clearable">
         <font-awesome-icon icon="fa-solid fa-angle-down" class="text-[1.25rem]" v-if="!isOpen"/>
         <font-awesome-icon icon="fa-solid fa-angle-up" class="text-[1.25rem]" v-else/>
@@ -139,8 +179,13 @@ const clearSelect = () => {
       </ComboboxCancel>
     </ComboboxAnchor>
 
+    <ComboboxPortal>
     <ComboboxContent 
-      class="absolute z-10 w-full mt-1 min-w-[10rem] bg-white  border-2 border-gray-500 overflow-y-auto rounded-md ">
+      position="popper"
+      :avoidCollisions="true"
+      :collisionPadding="8"
+      :sideOffset="4"
+      class="z-15 w-[var(--reka-combobox-trigger-width)] bg-white border-2 border-gray-500 rounded-md">
       <ComboboxViewport>
         <div v-if="loading" class="text-mauve8 text-xs font-medium text-center py-2">
           {{ loading_message }}
@@ -166,6 +211,7 @@ const clearSelect = () => {
         </template>
       </ComboboxViewport>
     </ComboboxContent>
+    </ComboboxPortal>
   </ComboboxRoot>
   </div>
 </template>

@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import InputBasic from '../Inputs/form/InputBasic.vue'
 import axios from 'axios'
-import debounce from 'lodash/debounce';
-const search = defineModel<string|null>()
-const isactive = ref<boolean>(false);
-const posibleitems = ref<string[]>([])
-const inputRef = ref<HTMLElement | null>(null)
-const abortrequest=ref<AbortController|null>(null);
+import debounce from 'lodash/debounce'
+import {
+  ComboboxRoot,
+  ComboboxInput,
+  ComboboxAnchor,
+  ComboboxContent,
+  ComboboxViewport,
+  ComboboxItem,
+  ComboboxEmpty,
+  ComboboxPortal
+} from 'reka-ui'
+
+const search = defineModel<string | null>()
 
 const props = withDefaults(defineProps<{
   id: string
@@ -23,76 +29,140 @@ const props = withDefaults(defineProps<{
   getallways: false
 })
 
+const isOpen = ref(false)
+const posibleitems = ref<string[]>([])
 const loading = ref(false)
-const oldvalue = ref()
 const searched = ref(false)
+const abortrequest = ref<AbortController | null>(null)
+const oldvalue = ref()
+const inputRef = ref<HTMLInputElement | null>(null)
 
 const GetOptions = async () => {
   if (abortrequest.value) {
-    abortrequest.value.abort() // Cancelar la solicitud anterior
+    abortrequest.value.abort()
   }
-  abortrequest.value = new AbortController() // Crear un nuevo AbortController
+  abortrequest.value = new AbortController()
+
   try {
     loading.value = true
     const response = await axios.get(route(props.endpoint), {
       params: { search: search.value },
-      signal: abortrequest.value.signal // Pasar la señal al fetch
+      signal: abortrequest.value.signal
     })
-    searched.value = true
     posibleitems.value = response.data.options
-  } catch (error) {
-    console.error(error)
+    searched.value = true
+  } catch (e) {
+    console.error(e)
   } finally {
     loading.value = false
   }
 }
 
-const getdata = debounce(GetOptions, props.timeout);
+const getdata = debounce(GetOptions, props.timeout)
 
-const changesearch = (option:string) => {
-  search.value=option;
-  inputRef.value?.blur()
-}
-watch([search,isactive], ([newSearch, newIsactive], [oldSearch, oldIsactive]) => {
-  if (newIsactive && (newSearch!=oldSearch || props.getallways)) {
+watch(search, () => {
+  console.log('Search changed:', search.value)
+  if (isOpen.value && (search.value || props.getallways)) {
     getdata()
   }
 })
-function addItem(search: string) {
-  if (search !== '' && !posibleitems.value.includes(search)) {
-    posibleitems.value.push(search)
-  }
+
+// 🔥 SELECT
+const selectItem = (value: string) => {
+  search.value = value
+  isOpen.value = false
+  inputRef.value?.blur()
 }
 
+// 🔥 FOCUS / BLUR
+const onFocus = () => {
+  isOpen.value = true
+  oldvalue.value = search.value
+}
+
+const onBlur = () => {
+  //isOpen.value = false
+  if(oldvalue.value !== search.value){
+    props.OnBlur?.()
+  }
+  //if(search && !posibleitems.find((item) => item === search )){addItem(search)}
+}
+const onInputChange=(event: Event)=> {
+ search.value = (event.target as HTMLInputElement).value;
+}
 </script>
-
 <template>
+  <div class="flex flex-col w-full">
     
-    <div class="relative">
-      <InputBasic :id="props.id" ref="inputRef" :label="props.label" type="text" v-model="search" :OnFocus="()=>{isactive=true; oldvalue=search}" :OnBlur="()=>{
-        isactive=false; 
-        if(oldvalue !== search){
-          props.OnBlur?.()
-        }
-        //if(search && !posibleitems.find((item) => item === search )){addItem(search)}
-        }"
-      :placeholder="props.placeholder"/>
-      <div v-if="isactive" class="absolute bg-white border-2 border-[--micolor] rounded mt-2 flex flex-col w-full z-10 max-h-[15rem] overflow-auto" tabindex="-1">
-        <div v-if="loading" class="p-2 text-center">
-          Cargando...
-        </div class="w-full">
-        <div v-else>    
-          <div v-if="posibleitems.length > 0">
-            <button v-for="value in posibleitems" :key="value" @mousedown.prevent="changesearch(value)" :class="['p-2 text-start w-full',search === value ? 'bg-[--micolor] opacity-80  text-white font-semibold' : 'hover:bg-gray-200']"  tabindex="-1">{{value}}</button>
-          </div>
-          <div v-else-if="searched" class="p-2 text-center text-gray-500" >
-            Sin Coincidencias...
-          </div>
-          <div v-else class="p-2 text-center text-gray-500" >
-            Escribe para buscar...
-          </div>
-        </div>
-      </div>
-    </div>
+    <label v-if="label">{{ label }}</label>
 
+    <ComboboxRoot v-model:open="isOpen">
+
+      <!-- INPUT -->
+      <ComboboxAnchor class="relative w-full">
+        <ComboboxInput asChild>
+          <input
+            ref="inputRef"
+            type="text"
+            :value="search"
+            @input="onInputChange"
+            :placeholder="placeholder"
+            class="w-full border rounded px-2 py-2"
+            @focus="onFocus"
+            @blur="onBlur"
+          />
+        </ComboboxInput>
+      </ComboboxAnchor>
+
+      <!-- DROPDOWN -->
+      <ComboboxPortal>
+        <ComboboxContent
+          position="popper"
+          side="bottom"
+          align="start"
+          :sideOffset="4"
+          :avoidCollisions="true"
+          class="z-50 w-[var(--reka-combobox-trigger-width)] bg-white border rounded shadow-md"
+        >
+          <ComboboxViewport class="max-h-[15rem] overflow-auto">
+
+            <!-- LOADING -->
+            <div v-if="loading" class="p-2 text-center">
+              Cargando...
+            </div>
+
+            <!-- ITEMS -->
+            <template v-else>
+              <ComboboxEmpty v-if="searched && posibleitems.length === 0">
+                <div class="p-2 text-center text-gray-500">
+                  Sin Coincidencias...
+                </div>
+              </ComboboxEmpty>
+
+              <div v-else-if="!searched">
+                <div class="p-2 text-center text-gray-500">
+                  Escribe para buscar...
+                </div>
+              </div>
+
+              <ComboboxItem
+                v-for="item in posibleitems"
+                :key="item"
+                :value="item"
+                @select="selectItem(item)"
+                as="template"
+              >
+                <div class="px-3 py-2 cursor-pointer hover:bg-gray-200">
+                  {{ item }}
+                </div>
+              </ComboboxItem>
+
+            </template>
+
+          </ComboboxViewport>
+        </ComboboxContent>
+      </ComboboxPortal>
+
+    </ComboboxRoot>
+  </div>
 </template>
