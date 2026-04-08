@@ -31,7 +31,7 @@ fd<!-- ModalExample.vue -->
     anio:number|"",
     marca:string,
     modelo:string,
-    tipo_id: number|""
+    tipo_id: string|null|undefined
   }
   export interface OrdenServicioForm {
     id?:number
@@ -263,7 +263,10 @@ fd<!-- ModalExample.vue -->
     observaciones: 'DE ACUERDO A LO DIFICIL DE LA FALLA PARA SU REPARACION',//tiempo de entrega
   }
   const DetallesGenerales = reactive<OrdenServicioForm>(Database);
-
+  const InventarioAll=ref<"1"|"0">("0");
+  const CondicionesInterioresAll1=ref<string>();
+  const CondicionesInterioresAll2=ref<string>();
+  const CondicionesInterioresAll3=ref<string>();
   const Inventario=reactive<InventarioForm>
   ({
     id:undefined,
@@ -401,13 +404,45 @@ fd<!-- ModalExample.vue -->
     })  
   
   watch(()=>Economico.tipo_id,(val)=>{
-    if(val !== ""){
+    if(val){
       prueba()
     }
   })
   watch(()=>DetallesGenerales.modulo_orden,()=>{
     DetallesGenerales.vehiculo_concepto_id=null
   })
+  watch(CondicionesInterioresAll1,()=>{
+    const keys = Object.keys(
+      CondicionesInterioresInputs['PANALES DE PUERTA']
+    ) as Array<keyof typeof CondicionesInterioresInputs['PANALES DE PUERTA']>;
+
+    keys.forEach(k => {
+      CondicionesInteriores[k] = CondicionesInterioresAll1.value ?? '';
+    });
+  })
+  watch(
+  () => {
+    const keys = Object.keys(
+      CondicionesInterioresInputs['PANALES DE PUERTA']
+    ) as Array<keyof typeof CondicionesInterioresInputs['PANALES DE PUERTA']>;
+
+    return keys.map(k => CondicionesInteriores[k]);
+  },
+  (values) => {
+    if (values.length === 0) return;
+
+    const first = values[0];
+
+    // validar que todos sean iguales
+    const allEqual = values.every(v => v === first);
+
+    if (allEqual) {
+      CondicionesInterioresAll1.value = first ?? '';
+    }else{
+      CondicionesInterioresAll1.value = '';
+    }
+  }
+);
   watch(()=>DetallesGenerales.empresa,()=>{
     DetallesGenerales.cliente=null
   })
@@ -476,6 +511,10 @@ fd<!-- ModalExample.vue -->
   }
   function GetDataVehiculoEconomico() {
     if(Economico.economico){
+      if(Economico.economico.length < 5){
+        MyBasicToast.error('Longitud mínima de N# economico es de 5 caracteres');
+        return;
+      }
       axios.get(route('Vehiculo.Get.Datos'), {
         params: { search: Economico.economico ,filtro:'economico'}
       })
@@ -484,7 +523,7 @@ fd<!-- ModalExample.vue -->
         if (data) {
           Economico.placas = data.placas;
           Economico.vin = data.vin;
-          Economico.anio = data.anio;
+          Economico.anio = data.año;
           Economico.marca = data.modelo.marca.descripcion;
           Economico.modelo = data.modelo.descripcion;
           Economico.tipo_id = data.tipo_id;
@@ -499,11 +538,45 @@ fd<!-- ModalExample.vue -->
       });
     }
   }
+  function GetDataVehiculoPlacas() {
+    if(Economico.placas){
+      console.log(Economico.placas)
+      if(Economico.placas.length < 6){
+        MyBasicToast.error('Longitud mínima de N# placas es de 6 caracteres');
+        return;
+      }
+      axios.get(route('Vehiculo.Get.Datos'), {
+        params: { search: Economico.placas ,filtro:'placas'}
+      })
+      .then(response => {
+        const data = response.data.datos;
+        if (data) {
+          Economico.economico = data.economico;
+          Economico.vin = data.vin;
+          Economico.anio = data.año;
+          Economico.marca = data.modelo.marca.descripcion;
+          Economico.modelo = data.modelo.descripcion;
+          Economico.tipo_id = data.tipo_id;
+        } else {
+          if(!Economico.economico){
+            MyBasicToast.warning('Crearas un nuevo vehículo, no se encontraron datos con el economico proporcionado');
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error al obtener los datos del vehículo:', error);
+      });
+    }
+  }
 
 </script>
 
 <template>
-  <BaseModal modaltitle="Nuevo Presupuesto" :position="'center'" :show="props.show" @close="updateVisibility" :buttonconfirm="buttonconfirm" >
+  <BaseModal modaltitle="Nuevo Presupuesto" 
+  :position="'center'" 
+  :show="props.show" 
+  @close="updateVisibility" 
+  :buttonconfirm="buttonconfirm" >
     <Subtitle>Datos Generales</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2" >
       <InputBasic id="ordenseguimiento" label="Orden De Seguimiento" type="text" v-model="DetallesGenerales.orden_seguimiento" placeholder="Automatico o Ingresar"/>
@@ -548,9 +621,17 @@ fd<!-- ModalExample.vue -->
           v-model="Economico.economico"
           :OnBlur="GetDataVehiculoEconomico"
           placeholder="Buscar o Crear Economico" 
-          :timeout="1"
+          :timeout="400"
           />
-        <Combobox endpoint="Combobox.Vehiculo.Placas" label="Placas" id="placas" v-model="Economico.placas"  placeholder="Buscar o Crear PLacas" />
+        <Combobox 
+        endpoint="Combobox.Vehiculo.Placas" 
+        label="Placas" 
+        id="placas" 
+        v-model="Economico.placas"
+        :OnBlur="GetDataVehiculoPlacas"
+        placeholder="Buscar o Crear PLacas"
+        :timeout="400"
+         />
       </div>
       <InputBasic id="Vin" label="Vin" type="text" v-model="Economico.vin" placeholder="Ej.JJSOE18P388988750 "/>
       <InputBasic id="Año" label="Año" type="number" v-model="Economico.anio"  placeholder="ej. 2024"/>
@@ -604,10 +685,22 @@ fd<!-- ModalExample.vue -->
       </div>
     </div>
     <div class="border-2 rounded-md p-2">
-      <Subtitle>Condiciones Equipo Interior</Subtitle>
+      <Subtitle>
+        Condiciones Equipo Interior
+      </Subtitle>
       <div class="grid sm:grid-cols-2 gap-2">
         <div >
-          <Subtitle bg="bg-[--color4]">Puertas</Subtitle>
+          <Subtitle bg="bg-[--color4]">
+            <div class="flex items-center justify-center gap-2 w-full">
+          Puertas
+          <!-- <OptionsCondicionesEquipo
+            v-model="CondicionesInterioresAll1" 
+            :options="optionsequipo"
+            :toggle="true"
+            :invertClases="true"
+          >
+          </OptionsCondicionesEquipo> -->
+        </div></Subtitle>
           <div class=" justify-center items-center grid lg:grid-cols-2 2xl:grid-cols-4 gap-2">
             <OptionsCondicionesEquipo v-for="(item,index) in CondicionesInterioresInputs['PANALES DE PUERTA']" 
             :label="item" 

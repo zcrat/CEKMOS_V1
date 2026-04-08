@@ -32,25 +32,30 @@ const props = withDefaults(defineProps<{
 const isOpen = ref(false)
 const posibleitems = ref<string[]>([])
 const loading = ref(false)
-const searched = ref(false)
 const abortrequest = ref<AbortController | null>(null)
 const oldvalue = ref()
 const inputRef = ref<HTMLInputElement | null>(null)
 
-const GetOptions = async () => {
+const GetOptions = async ({executeAxios}:{executeAxios:boolean}) => {
   if (abortrequest.value) {
     abortrequest.value.abort()
   }
   abortrequest.value = new AbortController()
-
+  
   try {
-    loading.value = true
-    const response = await axios.get(route(props.endpoint), {
-      params: { search: search.value },
-      signal: abortrequest.value.signal
-    })
-    posibleitems.value = response.data.options
-    searched.value = true
+    if(executeAxios){
+      loading.value = true
+      const searchTerm = search.value || ''
+      const response = await axios.get(route(props.endpoint), {
+        params: { search: searchTerm },
+        signal: abortrequest.value.signal
+      })
+      if(searchTerm == search.value){ 
+        posibleitems.value = response.data.options
+      }
+    }else{
+      posibleitems.value = []
+    }
   } catch (e) {
     console.error(e)
   } finally {
@@ -58,37 +63,40 @@ const GetOptions = async () => {
   }
 }
 
-const getdata = debounce(GetOptions, props.timeout)
+const getdata = debounce(({executeAxios = true}:{executeAxios:boolean}) => GetOptions({ executeAxios }), props.timeout)
 
 watch(search, () => {
-  console.log('Search changed:', search.value)
   if (isOpen.value && (search.value || props.getallways)) {
-    getdata()
+    loading.value = true
+    getdata({executeAxios:true})
+  }else {
+    getdata({executeAxios:false})
+  }
+})
+watch(isOpen, (newValue) => {
+  if(!newValue){
+    inputRef.value?.blur()
+    onBlur()
   }
 })
 
-// 🔥 SELECT
 const selectItem = (value: string) => {
   search.value = value
   isOpen.value = false
-  inputRef.value?.blur()
 }
 
-// 🔥 FOCUS / BLUR
 const onFocus = () => {
   isOpen.value = true
   oldvalue.value = search.value
 }
-
 const onBlur = () => {
-  //isOpen.value = false
   if(oldvalue.value !== search.value){
     props.OnBlur?.()
   }
   //if(search && !posibleitems.find((item) => item === search )){addItem(search)}
 }
 const onInputChange=(event: Event)=> {
- search.value = (event.target as HTMLInputElement).value;
+  search.value = (event.target as HTMLInputElement).value;
 }
 </script>
 <template>
@@ -109,7 +117,6 @@ const onInputChange=(event: Event)=> {
             :placeholder="placeholder"
             class="w-full border rounded px-2 py-2"
             @focus="onFocus"
-            @blur="onBlur"
           />
         </ComboboxInput>
       </ComboboxAnchor>
@@ -130,21 +137,21 @@ const onInputChange=(event: Event)=> {
             <div v-if="loading" class="p-2 text-center">
               Cargando...
             </div>
-
             <!-- ITEMS -->
             <template v-else>
-              <ComboboxEmpty v-if="searched && posibleitems.length === 0">
-                <div class="p-2 text-center text-gray-500">
-                  Sin Coincidencias...
-                </div>
-              </ComboboxEmpty>
+              <template v-if=" posibleitems.length === 0">
+                <ComboboxEmpty v-if="search">
+                  <div class="p-2 text-center text-gray-500">
+                    Sin Coincidencias...
+                  </div>
+                </ComboboxEmpty>
 
-              <div v-else-if="!searched">
-                <div class="p-2 text-center text-gray-500">
-                  Escribe para buscar...
+                <div v-else>
+                  <div class="p-2 text-center text-gray-500">
+                    Escribe para buscar...
+                  </div>
                 </div>
-              </div>
-
+              </template>
               <ComboboxItem
                 v-for="item in posibleitems"
                 :key="item"
@@ -156,7 +163,6 @@ const onInputChange=(event: Event)=> {
                   {{ item }}
                 </div>
               </ComboboxItem>
-
             </template>
 
           </ComboboxViewport>

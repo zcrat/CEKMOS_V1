@@ -19,6 +19,12 @@ input{
   --color4: #aaaaaa;
   --color5: #faaaaa;
 }
+.ButtonOptionsEquipo1 {
+  @apply bg-[--micolor] font-semibold text-[--color2];
+}
+.ButtonOptionsEquipo2 {
+  @apply bg-[--color2] font-semibold text-[--color1];
+}
 .multiselect__input {
   @apply px-3 py-2 border rounded focus:outline-none;
 }

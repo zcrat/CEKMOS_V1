@@ -5,6 +5,7 @@
     import axios from 'axios' 
 
     const tiposvehiculos=ref<option[]>([]);
+    const SelectValue=defineModel<string | null>();
 
     onMounted(async () => {
         try {
@@ -17,5 +18,5 @@
 
 </script>
 <template>
-     <Select label="Tipo De Vehiculo" id="tipovehiculo" :options="tiposvehiculos" ></Select>
+     <Select label="Tipo De Vehiculo" id="tipovehiculo" :options="tiposvehiculos" v-model="SelectValue"></Select>
 </template>
