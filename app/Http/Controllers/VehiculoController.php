@@ -20,6 +20,4 @@ class VehiculoController extends Controller
         
     return response()->json(['datos'=>$vehiculo]);
     }
-
-    
 }
