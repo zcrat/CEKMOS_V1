@@ -23,7 +23,7 @@ class OrdenesServicio extends Model
         'notas_mecanico',
         'notas_retraso',
         'telefono',
-        'ubicacion',
+        'ubicacion_id',
     ];
     protected $casts = [
         'update_fotos' => 'boolean',
@@ -97,5 +97,8 @@ class OrdenesServicio extends Model
     }
     public function hoja_conceptos(){
         return $this->hasMany(HojaConceptos::class,'orden_servicio_id');
+    }
+    public function ubicacion(){
+        return $this->belongsTo(Ubicaciones::class,'ubicacion_id');
     }
 }

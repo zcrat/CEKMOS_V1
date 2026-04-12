@@ -27,7 +27,7 @@ return new class extends Migration
             $table->text('notas_mecanico')->nullable();
             $table->text('notas_retraso')->nullable();
             $table->integer('telefono')->nullable();
-            $table->string('ubicacion')->nullable();
+            $table->foreignId('ubicacion_id')->constrained('Ubicaciones');
             $table->timestamps();
             $table->softDeletes();
         });

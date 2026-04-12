@@ -13,6 +13,7 @@ use App\Models\Vehiculos;
 use App\Services\Vehiculo;
 use App\Models\ResponsablesOrdenServicio;
 use App\Models\DatosEntrada;
+use App\Models\Ubicaciones;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Rules\ExistTipo;
@@ -35,6 +36,7 @@ class PresupuestosController extends Controller
                 'vehiculo_concepto',
                 'empresa',
                 'cliente',
+                'ubicacion'
             ])->first();
             if($data){
                 if(!in_array($data->modulo_orden_id,$user->modulos_orden->pluck('modulo_orden_id')->toarray())){
@@ -44,7 +46,7 @@ class PresupuestosController extends Controller
                     'orden_servicio'=> $data->orden_servicio,
                     'folio'=> '',
                     'orden_seguimiento'=> '',
-                    'ubicacion'=> $data->ubicacion,
+                    'ubicacion'=> $data->ubicacion->nombre,
                     'telefono'=> $data->telefono,
                     'empresa_id'=> $data->empresa_id,
                     'cliente_id'=>$data->cliente_id,
@@ -151,7 +153,7 @@ class PresupuestosController extends Controller
                 'economico' => $request->economico,
                 'placas' => $request->placas,
             ], [
-                'año' => $request->ubicacion,
+                'año' => $request->anio,
                 'vin' => $request->vin,
                 'modelo_id' => Modelos::firstOrCreate([
                     'descripcion' => $request->modelo,
@@ -160,7 +162,9 @@ class PresupuestosController extends Controller
                 'tipo_id' => 1,
                 'color_id' => 1,
             ]);
-
+            $ubicacion=Ubicaciones::firstorCreate([
+                'nombre'=>strtoupper(trim($request->ubicacion))
+            ]);
 
             $ordenservicio=new OrdenesServicio();
             $ordenservicio->orden_servicio=$orden;
@@ -177,7 +181,7 @@ class PresupuestosController extends Controller
             $ordenservicio->notas_mecanico=$request->descripcion_mo;
             $ordenservicio->notas_retraso=$request->observaciones;
             $ordenservicio->telefono=$request->telefono;
-            $ordenservicio->ubicacion=$request->ubicacion;
+            $ordenservicio->ubicacion_id=$ubicacion->id;
             $ordenservicio->save();
 
             // Crear datos de entrada

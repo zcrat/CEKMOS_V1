@@ -17,7 +17,7 @@
     <div :class="clases">
         <h2 class="text-wrap break-all font-semibold" v-if="label">{{ label }}</h2>
         <div class="inline-flex gap-1">
-          <button @click="()=>(selected= (selected ==='17' && toggle) ? '' :'17')" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='17' ? (invertClases ? 'ButtonOptionsEquipo2' : 'ButtonOptionsEquipo1') : '']">D</button>
+          <button @click="selected= (selected ==='17' && toggle) ? '' :'17'" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='17' ? (invertClases ? 'ButtonOptionsEquipo2' : 'ButtonOptionsEquipo1') : '']">D</button>
           <button @click="()=>(selected= (selected ==='15' && toggle) ? '' :'15')" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='15' ? (invertClases ? 'ButtonOptionsEquipo2' : 'ButtonOptionsEquipo1') : '']">O</button>
           <button @click="()=>(selected= (selected ==='16' && toggle) ? '' :'16')" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='16' ? (invertClases ? 'ButtonOptionsEquipo2' : 'ButtonOptionsEquipo1') : '']">F</button>
           <button @click="()=>(selected= (selected ==='18' && toggle) ? '' :'18')" :class="['border-2 border-gray-00 px-2 rounded-md font-medium',selected==='18' ? (invertClases ? 'ButtonOptionsEquipo2' : 'ButtonOptionsEquipo1') : '']">R</button>

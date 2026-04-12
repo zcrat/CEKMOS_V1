@@ -7,6 +7,8 @@ export interface option{
   value:number|string;
   label:string;
 }
+export type zdbinario = "0" | "1";
+
 
 
 export interface presupuestos{
