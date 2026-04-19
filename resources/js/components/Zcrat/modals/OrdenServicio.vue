@@ -2,7 +2,7 @@
   import InputBasic from '../Inputs/form/InputBasic.vue'
   import Textarea from '../Inputs/form/Textarea.vue'
   import BaseModal from '@/components/Zcrat/modals/BaseModal.vue'
-  import { ref, watch ,reactive, onMounted,computed} from 'vue' 
+  import { ref, watch ,reactive, onMounted,computed, nextTick} from 'vue' 
   import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
   import {type option} from '@/types/generales'
   import {type buttonconfirmed} from '@/types/modals'
@@ -12,7 +12,7 @@
   import Select2 from '@/components/Zcrat/Elements/Select2.vue';
   import GetNivelesGasolina from '@/utils/functions/select/NivelesGasolina';
   import GetModulosDisponibles  from '@/utils/functions/select/ModulosCortana';
-  import ZDCanvas from '../Elements/ZDCanvas.vue'
+  import ZDCanvas, { StrokesArray } from '../Elements/ZDCanvas.vue'
   import TiposVehiculos from '../Forms/TiposVehiculos.vue';
   import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
   import {EconomicoForm,OrdenServicioForm,ImagenesForm,CondicionesInterioresForm,CondicionesExterioresForm, PinturaForm, InventarioForm} from '@/types/OrdenServicio'
@@ -25,11 +25,18 @@
   import ValuesCondicionesEquipo from './partes/ordenservicio/ValuesCondicionesEquipo.vue';
   import InventarioTemplate from './partes/ordenservicio/InventarioTemplate.vue';
   import PinturaTemplate from './partes/ordenservicio/PinturaTemplate.vue';
+  import { ZdAlert } from '@/utils/ZdAlert';
+  import Loading from '../Elements/Loading.vue';
+  import { Create } from '@/services/orden-servicio/Crud';
+import VehiculoModal from './VehiculoModal.vue';
+
   const emit = defineEmits(['close'])
   const props = defineProps<{show: boolean}>()
   const optionsgasolima=ref<option[]>([])
   const optionsequipo=ref<option[]>([])
   const modulosdisponibles=ref<option[]>([])
+  const ImagenesCanvas=ref<{'firma'?:StrokesArray , 'carro'?:StrokesArray}>({})
+  const OpenModal = ref<null|1>(null);
   const CanEditImages = ref<boolean>(true)
   const updateVisibility = () => {
     emit('close')
@@ -41,6 +48,7 @@
   });
   const Economico = reactive<EconomicoForm>(EconomicoDefault)
   const Imagenes = ref<ImagenesForm[]>([])
+  const loading = ref<boolean>(false)
   const DetallesGenerales = reactive<OrdenServicioForm>(DetallesGeneralesBase);
   const CondicionesInteriores=ref<CondicionesInterioresForm>(CondicionesInterioresBase)
   const CondicionesExteriores=ref<CondicionesExterioresForm>(CondicionesExterioresBase)
@@ -54,25 +62,25 @@
       text:'Crear Presupuesto',
       classname:'bg-blue-600 text-white',
       onClick:async ()=>{
+        
+        ImagenesCanvas.value.carro=ImageVehiculoEntrada.value?.GetStrokes();
+        ImagenesCanvas.value.firma=ImageFirmaEntrada.value?.GetStrokes();
         await SaveCarAndFirma({Carro:ImageVehiculoEntrada.value,Firma:ImageFirmaEntrada.value,Imagenes:Imagenes.value})
+        const confirm=await ZdAlert({});
+        if(!confirm){return}
+        
+        loading.value=true
+        const Form={
+          DetallesGenerales,
+          Economico,
+          Imagenes,
+        }
+        const response=await Create({})
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        loading.value=false
+
       },
-      disabled:Object.entries(DetallesGenerales)
-      .filter(([key]) => !KeysOptional.includes(key))
-      .some(([_,value]) => value === null || value === '') 
-      ||
-      Object.entries(Economico)
-      .filter(([key]) => !['id'].includes(key))
-      .some(([_,value]) => value === null || value === '')
-      ||
-      Object.entries(CondicionesExteriores.value)
-      .filter(([key]) => !['id','DetallesGeneralesId'].includes(key))
-      .some(([_,value]) => value === null || value === '')
-      ||
-      Object.entries(CondicionesInteriores.value)
-      .filter(([key]) => !['id','DetallesGeneralesId'].includes(key))
-      .some(([_,value]) => value === null || value === '')
-      ||
-      Imagenes.value.filter(item=>item.tipo_id ===3).length < 6
+      disabled:  loading.value
     }
 
   })  
@@ -88,13 +96,48 @@
   watch(Inventario,(val)=>{
     console.log(Inventario.value)
   })
+  const OpenOtherModal= (val:1)=>{
+    ImagenesCanvas.value.carro=ImageVehiculoEntrada.value?.GetStrokes();
+    ImagenesCanvas.value.firma=ImageFirmaEntrada.value?.GetStrokes();
+    OpenModal.value = val;
+  }
+  const CloseOtherModal= ()=>{
+    OpenModal.value = null;
+  }
+  watch([OpenModal,loading],async ()=>{
+    if(OpenModal.value === null && loading.value=== false){
+      const firmablob=ImagenesCanvas.value.firma;
+      const carroblob=ImagenesCanvas.value.carro;
+      await nextTick();
+      if(firmablob){
+        ImageFirmaEntrada.value?.SetStrokes(firmablob) 
+      }
+      if(carroblob){
+        ImageVehiculoEntrada.value?.SetStrokes(carroblob) 
+      }
+      ImagenesCanvas.value={}
+    }
+  })
 </script>
 <template>
+  <VehiculoModal
+    :show="OpenModal==1"
+    @close="CloseOtherModal"
+    :id="DetallesGenerales.vehiculo?.value"
+    :returnSave="(val)=>{DetallesGenerales.vehiculo={value:val.id??'0',label:(val.economico+'-'+val.placas)}}"
+  />
   <BaseModal modaltitle="Nueva Orden De Servicio" 
-  :position="'center'" 
-  :show="props.show" 
+  :position="'center'"
+  :show="props.show && OpenModal === null" 
   @close="updateVisibility" 
-  :buttonconfirm="buttonconfirm" >
+  :buttonconfirm="buttonconfirm"
+  :loading="loading"
+  :textLoading="DetallesGenerales.id ? 'Espere a que termine de actualizar' : 'Espere a que termine de Crear'"
+  >
+   <template v-if="loading">
+    <Loading  text="Espere Un Momento"/>
+  </template>
+  <template  v-else>
     <Subtitle>Datos Generales</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2" >
       <InputBasic id="ordenseguimiento" label="Orden De Seguimiento" type="text" v-model="DetallesGenerales.orden_seguimiento" placeholder="Automatico o Ingresar"/>
@@ -109,7 +152,6 @@
         v-model="DetallesGenerales.vehiculo_concepto_id" 
         :empty_message="DetallesGenerales.modulo_orden? 'Sin Resultados':'Selecciona Un Modulo'" 
         placeholder="Buscar Vehiculo" 
-        :cleareble="true"
       />
     </div>
     <Subtitle>Datos Cliente</Subtitle>
@@ -132,25 +174,14 @@
     </div>
     <Subtitle>Datos Vehiculo</Subtitle>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-      <div class="flex flex-col sm:flex-row gap-2">
-        <Combobox 
-          endpoint="Combobox.Vehiculo.Economico" 
-          label="Economico" id="economico" 
-          v-model="Economico.economico"
-          :OnBlur="()=>{GetDataVehiculoEconomico(Economico)}"
-          placeholder="Buscar o Crear Economico" 
-          :timeout="400"
-          />
-        <Combobox 
-        endpoint="Combobox.Vehiculo.Placas" 
-        label="Placas" 
-        id="placas" 
-        v-model="Economico.placas"
-        :OnBlur="()=>{GetDataVehiculoPlacas(Economico)}"
-        placeholder="Buscar o Crear PLacas"
-        :timeout="400"
-         />
-      </div>
+      <Select2 
+        label="Vehiculo" 
+        :buttonNew="()=>{OpenOtherModal(1);}"
+        id="Vehiculo" 
+        endpoint="Select2.Economico" 
+        v-model="DetallesGenerales.vehiculo" 
+        placeholder="Buscar por Economico o Placas"
+      />
       <InputBasic id="Vin" label="Vin" type="text" v-model="Economico.vin" placeholder="Ej.JJSOE18P388988750 "/>
       <InputBasic id="Año" label="Año" type="number" v-model="Economico.anio"  placeholder="ej. 2024"/>
       <InputBasic id="Marca" label="Marcas" type="text" v-model="Economico.marca" classname="uppercase" placeholder="ej. AUDI"/>
@@ -159,7 +190,7 @@
     </div>
     <Subtitle>Datos De Ingreso</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-2" >
-      <InputBasic id="telefono" label="Telefono" type="number" v-model="DetallesGenerales.telefono"  placeholder="ej. 2024"/>
+      <InputBasic id="telefono" label="Telefono" type="number" v-model="DetallesGenerales.telefono"  placeholder="ej. 4433221100"/>
       <Datapicker label="Fecha Estimada" v-model="DetallesGenerales.estimacion" :clearable="false" :time="true" :range="false" class="w-full sm:col-span-2 md:col-span-1"/>
       <InputBasic id="kilometraje" label="Kilometraje" type="number" v-model="DetallesGenerales.kilometraje" placeholder="ej. 392.31"/>
       <Select id="gasolina" :canempty="true" v-model="DetallesGenerales.gasolina" label="Gasolina" :options="optionsgasolima"></Select>
@@ -189,6 +220,8 @@
     <ValuesCondicionesEquipo/>
     <CondicionesInterioresTemplate v-model="CondicionesInteriores"/>
     <CondicionesExterioresTemplate v-model="CondicionesExteriores"/>
-    <ImagenesEvidencias v-model="Imagenes" :CanEditImages="CanEditImages"/>
+    <ImagenesEvidencias v-model:Imagenes="Imagenes" :CanEditImages="CanEditImages"/>
+  </template>
+ 
   </BaseModal>
 </template>

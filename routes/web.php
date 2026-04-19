@@ -81,6 +81,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     
     Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');
     Route::get('select2/clientes',[select2controller::class,'Clientes'])->name('Select2.Clientes');
+    Route::get('select2/economicos',[select2controller::class,'Economicos'])->name('Select2.Economico');
     Route::get('select2/vehiculos/conceptos/disponibles',[select2controller::class,'VehiculosConceptosPorModulo'])->name('Select2.Vehiculos.Conceptos.Modulos');
     Route::get('select2/regimenes/fiscales',[select2controller::class,'RegimenesFiscales'])->name('Select2.Regimenes.Fiscales');
     
@@ -99,6 +100,8 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('ComboBox/Vehiculo/Placas',[ComboboxController::class,'GetVehiculoPlacas'])->name('Combobox.Vehiculo.Placas');
 
     Route::get('vehiculo/get/datos',[VehiculoController::class,'GetDatos'])->name('Vehiculo.Get.Datos');
+    Route::get('vehiculo/find/datos',[VehiculoController::class,'FindDatos'])->name('Vehiculo.Find');
+    Route::post('vehiculo/Create/update',[VehiculoController::class,'CreateOrUpdate'])->name('Vehiculo.CreateOrUpdate');
     Route::get('Admin/Caja',[CajaController::class,'View'])->name('Admin.Caja');
     Route::get('Admin/Caja/Read',[CajaController::class,'Read'])->name('Admin.Caja.Read');
   });

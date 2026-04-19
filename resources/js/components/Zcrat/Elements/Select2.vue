@@ -18,9 +18,11 @@ import {
   ComboboxCancel,
   ComboboxPortal
 } from 'reka-ui'
+import Select from './Select.vue'
 
 const props = withDefaults(defineProps<{
     endpoint: string
+    buttonNew?:()=>void
     canNew?:boolean
     searchable?:boolean
     clearable?:boolean
@@ -149,7 +151,9 @@ onBeforeUnmount(() => {
       :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen }]"
       >
       <ComboboxInput asChild>
-        <input
+        <div class="relative flex items-center w-full">
+          <button class="px-2 h-full border-r border-black flex items-center" v-if="buttonNew" @click="buttonNew"><font-awesome-icon :icon="optionselect ? 'fa-regular fa-pen-to-square': 'fa-solid fa-plus' "  :class="optionselect? 'text-xl':''"/></button>
+          <input
           ref="inputRef"
           class="w-full ps-2 pr-8 truncate rounded border-none inputnotfocus"
           @input="onInputChange"
@@ -158,7 +162,8 @@ onBeforeUnmount(() => {
           @focus="onFocus"
           :value="isOpen ? query : optionselect?.label ?? ''"
           @mousedown="onMouseDown"
-        />
+          />
+        </div>
       </ComboboxInput>
         <!-- :class="['w-full ps-2 pr-8 truncate rounded border-none inputnotfocus']"
         @input="onInputChange"

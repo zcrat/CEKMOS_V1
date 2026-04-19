@@ -74,6 +74,7 @@ export interface Vehiculo {
   color_id:number|null,
   modelo_id:number|null
   modelo?:modelo,
+  color?:color,
 }
 export interface marca {
   id?:number,
@@ -84,6 +85,10 @@ export interface modelo {
   descripcion:string,
   marca_id:number|null,
   marca?:marca,
+}
+export interface color {
+  id?:number,
+  descripcion:string
 }
 export interface ResponsablesNombres {
   administrador: string,
@@ -122,6 +127,45 @@ export interface NuevoPresupuesto {
   //datos posibles
   vigencia: Date|null,
  }
+ export interface NuevoOrdenServicio {
+  orden_seguimiento: string,
+  orden_opcional: string,
+  ubicacion: string,
+  tipo_presupuesto_id: number
+  modulo_orden_id: number,
+  vehiculo_concepto_id: number,
+  empresa_id: number,
+  telefono: number,
+  cliente_id:number,
+  vehiculo:{
+    economico:string,
+    placas:string,
+    vin:string,
+    year:string,
+    marca:string,
+    modelo:string,
+  }
+  gasolina: number | string,
+  kilometraje: number | null,
+  estimacion: Date,
+  administrador: string,
+  jefe: string,
+  trabajador: string,
+  tecnico: string,
+  descripcion_mo: string,
+  indicaciones_cliente: string,
+  garantia: string,
+  observaciones: string,//tiempo de entrega
+  
+  economico: string,
+  placas: string,
+  vin: string,
+  marca: string,
+  modelo: string,
+  año: number|null,
+  //datos posibles
+  vigencia: Date|null,
+ }
  export interface FormEmployee{
   name:string,
   paterno:string,
@@ -141,6 +185,27 @@ export interface NuevoPresupuesto {
   password:string,
   password_confirmation:string,
  }
+ export interface VehiculoForm {
+  id?:number,
+  placas:string,
+  economico:string,
+  año:string,
+  tipo_id:number|null,
+  color:string,
+  modelo:string,
+  marca:string,
+  vin:string,
+  error?:{
+    placas?:string[],
+    economico?:string[],
+    año?:string[],
+    tipo_id?:string[],
+    color?:string[],
+    modelo?:string[],
+    marca?:string[],
+    vin?:string[],
+  }
+}
  export interface datagetpresupuestos{
     presupuesto: NuevoPresupuesto | null;
     empresa: option;

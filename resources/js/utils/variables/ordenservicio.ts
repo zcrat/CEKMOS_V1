@@ -73,6 +73,7 @@ export const DetallesGeneralesBase: OrdenServicioForm ={
     ubicacion: '',
     tipo_id:7,
     modulo_orden:'',
+    vehiculo:null,
     vehiculo_concepto_id: null,
     empresa: null,
     cliente:null,
@@ -164,5 +165,5 @@ export const EconomicoDefault:EconomicoForm={
     anio:"",
     marca:"",
     modelo:"",
-    tipo_id:""
+    tipo_id:null
 }

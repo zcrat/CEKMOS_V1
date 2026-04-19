@@ -76,13 +76,9 @@ class CortanaController extends Controller
             if ($request->filled('modulo_orden') && !in_array($request->modulo_orden, $modulosPermitidos)) {
                 $validator->errors()->add('modulo_orden', 'El usuario no tiene permiso para este módulo de orden.');
             }
-            if(!Vehiculos::where('economico',$request->economico)->orWhere('placas',$request->placas)->exists()){
-                if(Vehiculos::where('economico',$request->economico)->exists()){
-                    $validator->errors()->add('economico', 'el economico registrado con otras placas');
-                }
-                if(Vehiculos::where('placas',$request->placas)->exists()){
-                    $validator->errors()->add('placas', 'las placas registradas en otro economico'); 
-                }
+            if(Vehiculos::where('economico','!=',$request->economico,true)->Where('placas',$request->placas)->exists())
+            {
+                $validator->errors()->add('placas', 'las placas registradas en otro economico'); 
             }
         });
 

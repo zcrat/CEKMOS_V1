@@ -9,20 +9,31 @@ import {
   DialogRoot,
   DialogTitle,
 } from 'reka-ui'
+import MyBasicToast from '@/utils/ToastNotificationBasic';
 
 const props = withDefaults(defineProps<{
   show: boolean
+  loading?: boolean
+  textLoading?: string
   buttonconfirm?: buttonconfirmed
   modaltitle?: string
   position?: 'start' | 'center' | 'end'
+  z?: 'z-[50]' | 'z-[999]' 
 }>(), {
   position: 'start',
+  loading:false,
 })
 
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 function closeModal() {
-  emit('close')
+  if(props.loading){
+    if(props.textLoading){
+      MyBasicToast.warning(props.textLoading)
+    }
+  }else{
+    emit('close')
+  }
 }
 
 const classtitleposition = computed(() => ({
@@ -39,8 +50,9 @@ const classtitleposition = computed(() => ({
   v-slot="{ close }"
 >
     <DialogPortal >
-      <DialogOverlay class="fixed inset-0 bg-black/40" />
-      <DialogContent class="fixed inset-0 flex items-center justify-center">
+      <DialogOverlay :class="'fixed inset-0 bg-black/40 '+z" />
+      <DialogContent 
+      :class="['fixed inset-0 flex items-center justify-center',z??'' ]" >
         <div class=" relative max-w-screen w-full m-4 sm:w-auto px-6 bg-white rounded-xl shadow-xl max-h-[90vh] overflow-auto">
           <div v-if="modaltitle" class="flex justify-between items-center pt-4 pb-2 sticky top-0 z-10 bg-white">
           <DialogTitle

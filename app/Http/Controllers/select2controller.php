@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Clientes;
 use App\Models\Empresas;
 use App\Models\RegimenesFiscales;
+use App\Models\Vehiculos;
 use App\Models\VehiculosConceptos;
 use App\Models\VehiculosConceptosDisponibles;
 use Illuminate\Http\Request;
@@ -44,6 +45,19 @@ class select2controller extends Controller
 
         return response()->json(compact('options'));
     }
+    public function Economicos(Request $request){
+        $options=Vehiculos::query();
+        if($request->filled('query')){
+            $search='%'.($request->input('query')).'%';
+            $options=$options->where('economico','LIKE',$search)->orWhere('placas','LIKE' ,$search);
+        }
+        $options=$options->take(20)->get()->map(fn($item)=> [
+            'value'=>$item->id,
+            'label'=>$item->economico.'-'.$item->placas
+        ]);
+
+        return response()->json(compact('options'));
+    }
     public function RegimenesFiscales(Request $request){
         $options=RegimenesFiscales::query();
         if($request->filled('query')){
@@ -63,7 +77,7 @@ class select2controller extends Controller
         $options=[];
         if (!$validation->fails()){
             $search="%".$validation->validated()['query']."%";
-            $options=VehiculosConceptos::join('vehiculos_conceptos_disponibles','vehiculos_conceptos_disponibles.vehiculo_concepto_id','=','vehiculos_conceptos.id')
+            $options=VehiculosConceptos::query()->join('vehiculos_conceptos_disponibles','vehiculos_conceptos_disponibles.vehiculo_concepto_id','=','vehiculos_conceptos.id')
             ->where('vehiculos_conceptos_disponibles.modulo_orden_id',$validation->validated()['id_modulo'])
             ->where('descripcion','LIKE',$search)
             ->get()->map(fn($item)=> [

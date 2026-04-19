@@ -7,7 +7,7 @@
     anio:number|"",
     marca:string,
     modelo:string,
-    tipo_id: string|null|undefined
+    tipo_id: number|null
   }
   export interface OrdenServicioForm {
     id?:number
@@ -16,6 +16,7 @@
     ubicacion: string,
     tipo_id: 5|6|7
     modulo_orden: number|string,
+    vehiculo: option| null,
     vehiculo_concepto_id: option| null,
     empresa:option|null,
     cliente:option|null,

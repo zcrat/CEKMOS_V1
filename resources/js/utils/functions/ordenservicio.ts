@@ -4,7 +4,7 @@ import ZDCanvas from '@/components/Zcrat/Elements/ZDCanvas.vue';
 import { EconomicoForm, ImagenesForm } from '@/types/OrdenServicio';
 import { Ref } from 'vue';
   
-export const GetImageTipoVehiculo = async ({Canvas,Tipo}:{Canvas:InstanceType<typeof ZDCanvas> | null,Tipo:string}) => {
+export const GetImageTipoVehiculo = async ({Canvas,Tipo}:{Canvas:InstanceType<typeof ZDCanvas> | null,Tipo:number}) => {
     try {
       const response = await axios.get(route('image.tipo.vehiculo', { type: Tipo }), {
         responseType: 'blob'

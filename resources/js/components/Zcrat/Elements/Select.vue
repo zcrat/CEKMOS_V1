@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<{
   empty_message:'Sin Opciones',
   placeholder:'Seleccionar',
   searchable:false,
-  clearable:true,
+  clearable:false,
   close_when_selected:true,
 })
 const selected = defineModel<string | number |null>()
@@ -80,18 +80,21 @@ watch(optionselect, (val) => {
   selected.value = val ? val.value : null
 })
 
-watch(selected, (val) => {
-  if (val == null || val === undefined) {
+
+
+watch([selected,() => props.options], () => {
+  if (selected.value == null || selected.value === undefined) {
     optionselect.value = null
   } else {
-    const found = props.options.find(o => o.value === val)
+    const found = props.options.find(o => o.value === selected.value)
     if (found) {
       optionselect.value = found
-    } else {
-      selected.value = null
+    }else if(props.options.length > 0){
+      selected.value=null
+      optionselect.value = null
     }
   }
-})
+}, { immediate: true })
 const onInputChange=(event: Event)=> {
   if (props.searchable === false) {
     event.preventDefault();

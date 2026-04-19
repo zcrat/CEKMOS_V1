@@ -4,7 +4,7 @@ import { Head } from '@inertiajs/vue3';
 import BarNavegation from '@/components/Zcrat/BarNavegation.vue';
 import BarNavegation_Smartphone from '@/components/Zcrat/BarNavegation_Smartphone.vue';
 import Loading from '@/components/Zcrat/Elements/Loading.vue';
-
+import ZdAlert from '@/utils/ZdAlert.vue';
 import axios from 'axios' 
 
 const userId = ref<number | null>(null)
@@ -56,6 +56,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <ZdAlert>
         <Head :title="title" />
         <div  v-if="userId !== null" :class="['min-h-screen relative h-screen bg-gray-100 pt-2 px-2 flex flex-col overflow-auto',showingNavigationtop ? '' : 'sm:flex-row' ]">
             <BarNavegation :IdUser="userId" :IsRow="showingNavigationtop" @toggle="toggleshowingNavigationtop()" @toggle_smartphone_active="Barnav_smartphone_active = !Barnav_smartphone_active"/>
@@ -84,4 +85,5 @@ onMounted(() => {
             </footer>
           </main>
         </div>
+  </ZdAlert>
 </template>

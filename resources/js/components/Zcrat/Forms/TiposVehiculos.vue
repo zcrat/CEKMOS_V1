@@ -5,7 +5,7 @@
     import axios from 'axios' 
 
     const tiposvehiculos=ref<option[]>([]);
-    const SelectValue=defineModel<string | null>();
+    const SelectValue=defineModel<number | null>();
 
     onMounted(async () => {
         try {

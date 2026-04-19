@@ -6,6 +6,12 @@ interface Point {
   x: number
   y: number
 }
+export interface StrokesArray {
+  Strokes: Point[][]
+  StrokesDelete: Point[][]
+  currentStroke: Point[]
+  ImageDraw: Blob | null
+}
 
 const props = withDefaults(defineProps<{
   classnamedivcanvas?: string
@@ -22,6 +28,12 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 let ctx: CanvasRenderingContext2D | null = null
 let drawing = false
 
+export interface StrokesArray {
+  Strokes: Point[][]
+  StrokesDelete: Point[][]
+  currentStroke: Point[]
+  ImageDraw: Blob | null
+}
 const Strokes = ref<Point[][]>([])
 const StrokesDelete = ref<Point[][]>([])
 const ImageDraw = ref<Blob | null>(null)
@@ -147,6 +159,21 @@ async function getCanvasBlob(): Promise<Blob | null> {
     canvas.toBlob(blob => resolve(blob), "image/png")
   })
 }
+function GetStrokes():StrokesArray {
+  return {
+    Strokes:Strokes.value,
+    StrokesDelete:StrokesDelete.value,
+    ImageDraw:ImageDraw.value,
+    currentStroke:currentStroke.value,
+  }
+}
+function SetStrokes(val:StrokesArray) {
+  Strokes.value=val.Strokes;
+  StrokesDelete.value=val.StrokesDelete;
+  ImageDraw.value=val.ImageDraw;
+  currentStroke.value=val.currentStroke;
+  redraw();
+}
 
 function clearCanvas() {
   StrokesDelete.value = [...Strokes.value]
@@ -196,7 +223,9 @@ function redo() {
 
 defineExpose({
   dibujarImagen,
-  getCanvasBlob
+  getCanvasBlob,
+  GetStrokes,
+  SetStrokes
 })
 </script>
 
