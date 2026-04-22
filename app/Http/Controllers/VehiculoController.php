@@ -29,7 +29,7 @@ class VehiculoController extends Controller
         $request->validate([
             'id'=>['required','exists:vehiculos,id']
         ]);
-        $vehiculo=Vehiculos::with('modelo.marca')->find($request->id);
+        $vehiculo=Vehiculos::with(['modelo.marca','color'])->find($request->id);
         return response()->json(['vehiculo'=>$vehiculo]);
     }
     public function CreateOrUpdate(Request $request){

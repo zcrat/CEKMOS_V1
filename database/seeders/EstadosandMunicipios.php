@@ -16,41 +16,41 @@ class EstadosandMunicipios extends Seeder
      */
     public function run(): void
     {
-    $urlestado="https://gaia.inegi.org.mx/wscatgeo/v2/mgee/";
-    $urlmunicipio="https://gaia.inegi.org.mx/wscatgeo/v2/mgem/";
-    $allMunicipios = [];
-    $response2 = Http::withoutVerifying()->get($urlestado);
+        $urlestado="https://gaia.inegi.org.mx/wscatgeo/v2/mgee/";
+        $urlmunicipio="https://gaia.inegi.org.mx/wscatgeo/v2/mgem/";
+        $allMunicipios = [];
+        $response2 = Http::withoutVerifying()->get($urlestado);
 
-    $estados = array_map(function($estado) {
-        return [
-            "id" => $estado["cve_ent"],
-            "descripcion" => $estado["nomgeo"]
-        ];
-    }, $response2["datos"]);
+        $estados = array_map(function($estado) {
+            return [
+                "id" => $estado["cve_ent"],
+                "descripcion" => $estado["nomgeo"]
+            ];
+        }, $response2["datos"]);
 
 
-    foreach($estados as $estado){
-    $id=$estado['id'];
-    Estados::create([
-        'descripcion' => $estado['descripcion'],
-        'clave' => $estado['id']
-    ]);
-    $response = Http::withoutVerifying()->get($urlmunicipio.$id);
+        foreach($estados as $estado){
+            $id=$estado['id'];
+            Estados::create([
+                'descripcion' => $estado['descripcion'],
+                'clave' => $estado['id']
+            ]);
+            $response = Http::withoutVerifying()->get($urlmunicipio.$id);
 
-    $municipios = array_map(function($municipio) {
-        Municipios::create([
-            'estado_id' => $municipio["cve_ent"],
-            'clave' => $municipio["cve_mun"],
-            'descripcion' => $municipio["nomgeo"],
-        ]);
-        return [
-            "estado_id" => $municipio["cve_ent"],
-            "clave" => $municipio["cve_mun"],
-            "descripcion" => $municipio["nomgeo"]
-        ];
+            $municipios = array_map(function($municipio) {
+                Municipios::create([
+                    'estado_id' => $municipio["cve_ent"],
+                    'clave' => $municipio["cve_mun"],
+                    'descripcion' => $municipio["nomgeo"],
+                ]);
+                return [
+                    "estado_id" => $municipio["cve_ent"],
+                    "clave" => $municipio["cve_mun"],
+                    "descripcion" => $municipio["nomgeo"]
+                ];
 
-    }, $response["datos"]);
-    $allMunicipios = array_merge($allMunicipios, $municipios);
-}
+            }, $response["datos"]);
+            $allMunicipios = array_merge($allMunicipios, $municipios);
+        }
     }
 }

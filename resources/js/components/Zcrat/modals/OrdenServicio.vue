@@ -15,10 +15,10 @@
   import ZDCanvas, { StrokesArray } from '../Elements/ZDCanvas.vue'
   import TiposVehiculos from '../Forms/TiposVehiculos.vue';
   import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
-  import {EconomicoForm,OrdenServicioForm,ImagenesForm,CondicionesInterioresForm,CondicionesExterioresForm, PinturaForm, InventarioForm} from '@/types/OrdenServicio'
+  import {EconomicoForm,OrdenServicioForm,ImagenesForm,CondicionesInterioresForm,CondicionesExterioresForm, PinturaForm, InventarioForm, DetallesGeneralesBaseProps} from '@/types/OrdenServicio'
   import {optionstipos} from '@/utils/variables/options'
-  import {DetallesGeneralesBase,CondicionesInterioresBase,CondicionesExterioresBase,EconomicoDefault, PinturaBase, InventarioBase} from '@/utils/variables/ordenservicio'
-  import {GetDataVehiculoEconomico, GetDataVehiculoPlacas, GetImageTipoVehiculo, SaveCarAndFirma } from '@/utils/functions/ordenservicio';
+  import {DetallesGeneralesBase,CondicionesInterioresBase,CondicionesExterioresBase,EconomicoBase, PinturaBase, InventarioBase} from '@/utils/variables/ordenservicio'
+  import {GetImageTipoVehiculo, SaveCarAndFirma } from '@/utils/functions/ordenservicio';
   import ImagenesEvidencias from './partes/ordenservicio/ImagenesEvidencias.vue';
   import CondicionesInterioresTemplate from './partes/ordenservicio/CondicionesInteriores.vue';
   import CondicionesExterioresTemplate from './partes/ordenservicio/CondicionesExteriores.vue';
@@ -27,9 +27,11 @@
   import PinturaTemplate from './partes/ordenservicio/PinturaTemplate.vue';
   import { ZdAlert } from '@/utils/ZdAlert';
   import Loading from '../Elements/Loading.vue';
-  import { Create } from '@/services/orden-servicio/Crud';
-import VehiculoModal from './VehiculoModal.vue';
-
+  import { Create } from '@/services/orden-servicio/crud';
+  import VehiculoModal from './VehiculoModal.vue';
+  import MyBasicToast from '@/utils/ToastNotificationBasic';
+  import {type Vehiculo as VehiculoProps} from '@/types/generales'
+  import axios from 'axios';
   const emit = defineEmits(['close'])
   const props = defineProps<{show: boolean}>()
   const optionsgasolima=ref<option[]>([])
@@ -46,15 +48,14 @@ import VehiculoModal from './VehiculoModal.vue';
     optionsequipo.value = await GetStatusPerCategory(11);
     modulosdisponibles.value=await GetModulosDisponibles();
   });
-  const Economico = reactive<EconomicoForm>(EconomicoDefault)
+  const Vehiculo = reactive<EconomicoForm>(EconomicoBase)
   const Imagenes = ref<ImagenesForm[]>([])
   const loading = ref<boolean>(false)
-  const DetallesGenerales = reactive<OrdenServicioForm>(DetallesGeneralesBase);
+  const DetallesGenerales = reactive<DetallesGeneralesBaseProps>(DetallesGeneralesBase);
   const CondicionesInteriores=ref<CondicionesInterioresForm>(CondicionesInterioresBase)
   const CondicionesExteriores=ref<CondicionesExterioresForm>(CondicionesExterioresBase)
   const Pintura=ref<PinturaForm>({...PinturaBase})
   const Inventario=ref<InventarioForm>({...InventarioBase})
-  const KeysOptional=['orden_opcional','orden_seguimiento','id'];
   const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const buttonconfirm=computed<buttonconfirmed>(()=>{ 
@@ -62,29 +63,86 @@ import VehiculoModal from './VehiculoModal.vue';
       text:'Crear Presupuesto',
       classname:'bg-blue-600 text-white',
       onClick:async ()=>{
-        
+        console.log('click')
+        console.log(Imagenes.value)
         ImagenesCanvas.value.carro=ImageVehiculoEntrada.value?.GetStrokes();
         ImagenesCanvas.value.firma=ImageFirmaEntrada.value?.GetStrokes();
         await SaveCarAndFirma({Carro:ImageVehiculoEntrada.value,Firma:ImageFirmaEntrada.value,Imagenes:Imagenes.value})
         const confirm=await ZdAlert({});
         if(!confirm){return}
-        
         loading.value=true
-        const Form={
-          DetallesGenerales,
-          Economico,
-          Imagenes,
+        const Form:OrdenServicioForm={
+          orden_seguimiento: DetallesGenerales.orden_seguimiento,
+          orden_opcional: DetallesGenerales.orden_opcional,
+          ubicacion: DetallesGenerales.ubicacion,
+          tipo_presupuesto_id: DetallesGenerales.tipo_id,
+          modulo_orden_id: Number(DetallesGenerales.modulo_orden),
+          vehiculo_concepto_id: DetallesGenerales.vehiculo_concepto_id?.value,
+          empresa_id: DetallesGenerales.empresa?.value,
+          cliente_id: DetallesGenerales.cliente?.value,
+          vehiculo_id: DetallesGenerales.vehiculo?.value,
+          telefono: DetallesGenerales.telefono ?? 0,
+          estimacion: DetallesGenerales.estimacion,
+          kilometraje: DetallesGenerales.kilometraje ?? 0,
+          gasolina: Number(DetallesGenerales.gasolina) ?? 0,
+          administrador: DetallesGenerales.administrador,
+          jefe: DetallesGenerales.jefe,
+          trabajador: DetallesGenerales.trabajador,
+          tecnico: DetallesGenerales.tecnico,
+          indicaciones_cliente: DetallesGenerales.indicaciones_cliente,
+          descripcion_mo: DetallesGenerales.descripcion_mo,
+          garantia: DetallesGenerales.garantia,
+          observaciones: DetallesGenerales.observaciones,
+          imagenes_evidencia: Imagenes.value.map(img=>img.tipo_id === 3 ? img.image : null).filter(img=>img !== null) as Blob[],
+          carro: Imagenes.value.find((item) => item.tipo_id === 1) ? Imagenes.value.find((item) => item.tipo_id === 1)!.image : null,
+          firma: Imagenes.value.find((item) => item.tipo_id === 2) ? Imagenes.value.find((item) => item.tipo_id === 2)!.image : null,
+          condiciones_exteriores: CondicionesExteriores.value,
+          condiciones_interiores: CondicionesInteriores.value,
+          pintura: Pintura.value,
+          inventario: Inventario.value
         }
-        const response=await Create({})
+        const response=await Create(Form);
+        if(response.status){
+          MyBasicToast.success(response.data.message??'Orden De Servicio Creada Con Exito')
+          updateVisibility();
+        }else{
+          MyBasicToast.error(response.data.message??'Error Al Crear La Orden De Servicio' )
+        }
+
         await new Promise(resolve => setTimeout(resolve, 1000));
         loading.value=false
 
       },
-      disabled:  loading.value
+      disabled:(
+        !DetallesGenerales.ubicacion ||
+        !DetallesGenerales.tipo_id ||
+        !DetallesGenerales.modulo_orden ||
+        !DetallesGenerales.vehiculo ||
+        !DetallesGenerales.vehiculo_concepto_id ||
+        !DetallesGenerales.empresa ||
+        !DetallesGenerales.cliente ||
+        !DetallesGenerales.telefono ||
+        !DetallesGenerales.estimacion ||
+        !DetallesGenerales.kilometraje ||
+        !DetallesGenerales.gasolina||
+        !DetallesGenerales.administrador ||
+        !DetallesGenerales.jefe ||
+        !DetallesGenerales.trabajador ||
+        !DetallesGenerales.tecnico ||
+        !DetallesGenerales.indicaciones_cliente ||
+        !DetallesGenerales.descripcion_mo ||
+        !DetallesGenerales.garantia ||
+        !DetallesGenerales.observaciones ||
+        Imagenes.value.filter(img=>img.tipo_id === 3).length === 0 ||
+        Object.entries(CondicionesInteriores.value).filter(([key]) => !['id','DetallesGeneralesId'].includes(key)).
+        some(([_,value]) => value === null || value === '')||
+        Object.entries(CondicionesInteriores.value).filter(([key]) => !['id','DetallesGeneralesId'].includes(key)).
+        some(([_,value]) => value === null || value === '')
+      )
     }
 
   })  
-  watch(()=>Economico.tipo_id,(val)=>{
+  watch(()=>Vehiculo.tipo_id,(val)=>{
     if(val){GetImageTipoVehiculo({Canvas:ImageVehiculoEntrada.value, Tipo:val})}
   })
   watch(()=>DetallesGenerales.modulo_orden,()=>{
@@ -93,8 +151,19 @@ import VehiculoModal from './VehiculoModal.vue';
   watch(()=>DetallesGenerales.empresa,()=>{
     DetallesGenerales.cliente=null
   })
-  watch(Inventario,(val)=>{
-    console.log(Inventario.value)
+  watch(()=>DetallesGenerales.vehiculo,()=>{
+    if(DetallesGenerales.vehiculo?.value){
+      Read();
+    }else{
+      Vehiculo.placas='';
+      Vehiculo.economico='';
+      Vehiculo.vin='';
+      Vehiculo.anio='';
+      Vehiculo.tipo_id=null;
+      Vehiculo.color='';
+      Vehiculo.modelo='';
+      Vehiculo.marca='';
+    }
   })
   const OpenOtherModal= (val:1)=>{
     ImagenesCanvas.value.carro=ImageVehiculoEntrada.value?.GetStrokes();
@@ -103,6 +172,23 @@ import VehiculoModal from './VehiculoModal.vue';
   }
   const CloseOtherModal= ()=>{
     OpenModal.value = null;
+  }
+  const Read = async () => {
+    try {
+      const response = await axios.get(route('Vehiculo.Find'),{params:{id:DetallesGenerales.vehiculo?.value} })
+      const data:VehiculoProps=response.data.vehiculo;
+      Vehiculo.placas=data.placas;
+      Vehiculo.economico=data.economico;
+      Vehiculo.vin=data.vin;
+      Vehiculo.color=data.color?.descripcion ?? 'No Encontrado';
+      Vehiculo.anio=data.año ?? '';
+      Vehiculo.tipo_id=data.tipo_id;
+      Vehiculo.modelo=data.modelo?.descripcion ?? 'No Encontrado';
+      Vehiculo.marca=data.modelo?.marca?.descripcion ?? 'No Encontrado';
+    } catch (error: any) {
+      console.error('Error:', error)
+      emit('close')
+    }
   }
   watch([OpenModal,loading],async ()=>{
     if(OpenModal.value === null && loading.value=== false){
@@ -182,11 +268,14 @@ import VehiculoModal from './VehiculoModal.vue';
         v-model="DetallesGenerales.vehiculo" 
         placeholder="Buscar por Economico o Placas"
       />
-      <InputBasic id="Vin" label="Vin" type="text" v-model="Economico.vin" placeholder="Ej.JJSOE18P388988750 "/>
-      <InputBasic id="Año" label="Año" type="number" v-model="Economico.anio"  placeholder="ej. 2024"/>
-      <InputBasic id="Marca" label="Marcas" type="text" v-model="Economico.marca" classname="uppercase" placeholder="ej. AUDI"/>
-      <InputBasic id="Modelo" label="Modelo" type="text" v-model="Economico.modelo" classname="uppercase" placeholder="ej. A3"/>
-      <TiposVehiculos label="Tipo De Vehiculo" id="tipovehiculo" v-model="Economico.tipo_id" />
+      <template v-if="DetallesGenerales.vehiculo">
+        <InputBasic id="Vin" disabled label="Vin" type="text" v-model="Vehiculo.vin" placeholder="Ej.JJSOE18P388988750 "/>
+        <InputBasic id="Año" label="Año" type="number" v-model="Vehiculo.anio"  placeholder="ej. 2024"/>
+        <InputBasic id="Marca" label="Marcas" type="text" v-model="Vehiculo.marca" classname="uppercase" placeholder="ej. AUDI"/>
+        <InputBasic id="Modelo" label="Modelo" type="text" v-model="Vehiculo.modelo" classname="uppercase" placeholder="ej. A3"/>
+        <InputBasic id="Color" label="Color" type="text" v-model="Vehiculo.color" classname="uppercase" placeholder="ej. Rojo"/>
+        <TiposVehiculos disabled label="Tipo De Vehiculo" id="tipovehiculo" v-model="Vehiculo.tipo_id" />
+      </template>
     </div>
     <Subtitle>Datos De Ingreso</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-2" >

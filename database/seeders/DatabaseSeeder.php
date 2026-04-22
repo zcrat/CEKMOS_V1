@@ -13,6 +13,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-         $this->call([Categorias::class,Tipos::class,asignarrolesypermisos::class,users::class,regimenes::class,modulos::class,Estatus::class,NivelesCombustible::class,VehiculosConceptos::class,VehiculosConceptosDisponibles::class,EstadosandMunicipios::class,DatosPrueba::class]);
+         $this->call([
+            Categorias::class,
+            Tipos::class,
+            asignarrolesypermisos::class,
+            users::class,
+            regimenes::class,
+            modulos::class,
+            Estatus::class,
+            NivelesCombustible::class,
+            VehiculosConceptos::class,
+            VehiculosConceptosDisponibles::class,
+            EstadosandMunicipios::class,
+            DatosPrueba::class
+        ]);
     }
 }

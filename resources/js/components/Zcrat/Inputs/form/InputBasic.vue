@@ -14,6 +14,8 @@ const props = defineProps<{
   classname?: string
   classdiv?: string
   placeholder?: string
+  disabled?: boolean
+  readonly?: boolean
   label?: string
   errors?: string[]
   icon?: string
@@ -37,6 +39,8 @@ const props = defineProps<{
         :class="['rounded-md inputfocus w-full', props.classname, icon ? 'ps-[2rem]' : '']"
         v-model="modelValue"
         :id="id"
+        :readonly="props.readonly"
+        :disabled="props.disabled"
         :name="id"
         @focus="OnFocus"
         @blur="OnBlur"
@@ -48,7 +52,7 @@ const props = defineProps<{
       />
     </div>
     <div v-if="props.errors">
-      <h4  v-for="value in props.errors" class="text-red-500 font-light capitalize italic ">* {{ value }}</h4>
+      <h4  v-for="(value,index) in props.errors"  :key="index" class="text-red-500 font-light capitalize italic ">{{ value }}</h4>
     </div>
     
   </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\OrdenesServicio;
+use App\Models\Ubicaciones;
 use App\Models\usuariosTaller;
 use App\Models\Vehiculos;
 
@@ -18,7 +19,7 @@ class ComboboxController extends Controller
     }
     public function GetUbicaciones(Request $request){
         $search=$request->search??'';
-        $ubicaciones=OrdenesServicio::where('ubicacion','LIKE','%'.$search.'%')->pluck('ubicacion')->unique()->values();
+        $ubicaciones=Ubicaciones::where('descripcion','LIKE','%'.$search.'%')->pluck('descripcion')->unique()->values();
         return response()->json(['options'=>$ubicaciones]);
     }
     public function GetAdministradoresTrasporte(Request $request){

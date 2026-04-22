@@ -22,6 +22,7 @@ const props = withDefaults(defineProps<{
   empty_message?:string
   clearable?:boolean
   searchable?:boolean
+  disabled?:boolean
   close_when_selected?:boolean
   options:option[]
 }>(), {
@@ -96,7 +97,7 @@ watch([selected,() => props.options], () => {
   }
 }, { immediate: true })
 const onInputChange=(event: Event)=> {
-  if (props.searchable === false) {
+  if (props.searchable === false || props.disabled) {
     event.preventDefault();
     return;
   }
@@ -111,7 +112,7 @@ const clearSelect = () => {
 <template>
   <div class="flex flex-col w-full" >
     <label for="" v-if="props.label">{{ props.label }}</label>
-  <ComboboxRoot class="relative" v-model="optionselect" v-model:open="isOpen">
+  <ComboboxRoot :disabled="props.disabled" class="relative" v-model="optionselect" v-model:open="isOpen">
     <ComboboxAnchor :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen }]">
       <ComboboxInput
         :class="['w-full ps-2 pr-8 truncate rounded border-none inputnotfocus']"

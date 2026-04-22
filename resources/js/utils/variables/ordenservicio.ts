@@ -1,4 +1,6 @@
-import { CondicionesExterioresForm, CondicionesInterioresForm, EconomicoForm, InventarioForm, OrdenServicioForm, PinturaForm } from "@/types/OrdenServicio"
+import { color } from './../../types/generales';
+
+import { CondicionesExterioresForm, CondicionesInterioresForm, DetallesGeneralesBaseProps, EconomicoForm, InventarioForm, PinturaForm } from "@/types/OrdenServicio"
 import { sumarDiasSinDomingo } from '@/utils/functions/generales/fechas';
   
 export const CondicionesExterioresInputs={
@@ -55,7 +57,7 @@ export const InventarioInputs={
     'placas':'PLACAS'
   }
 export const PinturaInputs={
-    'decolarada':'DECOLORADA',
+    'decolorada':'DECOLORADA',
     'color_desigual':'COLOR NO IGULADO',
     'rayonnes':'EXCESO DE RAYONES',
     'grietas':'PEQUEÑAS GRIETAS',
@@ -66,7 +68,7 @@ export const PinturaInputs={
     'granizo':'DAÑOS POR GRANIZO',
     'lluvia':'LLUVIA ACIDA'
   }
-export const DetallesGeneralesBase: OrdenServicioForm ={
+export const DetallesGeneralesBase: DetallesGeneralesBaseProps ={
     id:undefined,
     orden_seguimiento: '',
     orden_opcional: '',
@@ -108,7 +110,7 @@ export const InventarioBase: InventarioForm ={
 export const PinturaBase: PinturaForm ={
     id:undefined,
     DetallesGeneralesId:undefined,
-    decolarada:"0",
+    decolorada:"0",
     color_desigual:"0",
     rayonnes:"0",
     grietas:"0",
@@ -156,14 +158,15 @@ export const CondicionesExterioresBase: CondicionesExterioresForm ={
     limpiaparabrisas:"",
     luces:"",
     espejos_laterales:""
-  }
-export const EconomicoDefault:EconomicoForm={ 
+}
+export const EconomicoBase: EconomicoForm ={
     id:undefined,
-    economico: "",
-    placas: "",
-    vin: "",
-    anio:"",
-    marca:"",
-    modelo:"",
-    tipo_id:null
+    economico: '',
+    placas: '',
+    vin: '',
+    anio:'',
+    marca:'',
+    modelo:'',
+    color:'',
+    tipo_id: null
 }

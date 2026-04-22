@@ -1,3 +1,4 @@
+import { color } from './generales';
   import {type option} from '@/types/generales'
   export interface EconomicoForm {
     id?:number,
@@ -7,9 +8,41 @@
     anio:number|"",
     marca:string,
     modelo:string,
+    color:string,
     tipo_id: number|null
   }
   export interface OrdenServicioForm {
+    id?:number,
+    orden_seguimiento: string,
+    orden_opcional: string,
+    ubicacion: string,
+    tipo_presupuesto_id: number
+    modulo_orden_id: number,
+    vehiculo_concepto_id: number | string | undefined,
+    empresa_id: number | string | undefined,
+    cliente_id:number | string | undefined,
+    vehiculo_id: number | string | undefined,
+    telefono: number,
+    estimacion: Date,
+    kilometraje: number,
+    gasolina: number,
+    administrador: string,
+    jefe: string,
+    trabajador: string,
+    tecnico: string,
+    indicaciones_cliente: string,
+    descripcion_mo: string,
+    garantia: string,
+    observaciones: string,//tiempo de entrega
+    inventario:InventarioForm,
+    pintura:PinturaForm,
+    condiciones_interiores:CondicionesInterioresForm,
+    condiciones_exteriores:CondicionesExterioresForm,
+    imagenes_evidencia:Blob[],
+    carro:Blob|null,
+    firma:Blob|null,
+  }
+  export interface DetallesGeneralesBaseProps {
     id?:number
     orden_seguimiento: string,
     orden_opcional: string,
@@ -44,7 +77,7 @@
   export interface PinturaForm{
     id?:number,
     DetallesGeneralesId?:number,
-    decolarada:"1"|"0",
+    decolorada:"1"|"0",
     color_desigual:"1"|"0",
     rayonnes:"1"|"0",
     grietas:"1"|"0",

@@ -98,6 +98,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('ComboBox/Tecnicos',[ComboboxController::class,'GetTecnicos'])->name('Combobox.Tecnicos');
     Route::get('ComboBox/Vehiculo/Economico',[ComboboxController::class,'GetVehiculoEconomico'])->name('Combobox.Vehiculo.Economico');
     Route::get('ComboBox/Vehiculo/Placas',[ComboboxController::class,'GetVehiculoPlacas'])->name('Combobox.Vehiculo.Placas');
+    Route::get('ComboBox/ubicaciones',[ComboboxController::class,'GetUbicaciones'])->name('Combobox.ubicaciones');
 
     Route::get('vehiculo/get/datos',[VehiculoController::class,'GetDatos'])->name('Vehiculo.Get.Datos');
     Route::get('vehiculo/find/datos',[VehiculoController::class,'FindDatos'])->name('Vehiculo.Find');

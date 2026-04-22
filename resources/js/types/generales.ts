@@ -1,4 +1,5 @@
 import { Ref } from "vue";
+import { CondicionesExterioresForm, CondicionesInterioresForm, ImagenesForm, InventarioForm, PinturaForm } from "./OrdenServicio";
 export interface modulosorden{
   id:number;
   descripcion:string;
@@ -11,6 +12,12 @@ export type zdbinario = "0" | "1";
 
 
 
+export interface responseBasic{
+  status:boolean;
+  code:number;
+  data:any;
+  validationErrors?:Record<string, string[]>;
+}
 export interface presupuestos{
   id:number;
   folio:string;
@@ -127,45 +134,7 @@ export interface NuevoPresupuesto {
   //datos posibles
   vigencia: Date|null,
  }
- export interface NuevoOrdenServicio {
-  orden_seguimiento: string,
-  orden_opcional: string,
-  ubicacion: string,
-  tipo_presupuesto_id: number
-  modulo_orden_id: number,
-  vehiculo_concepto_id: number,
-  empresa_id: number,
-  telefono: number,
-  cliente_id:number,
-  vehiculo:{
-    economico:string,
-    placas:string,
-    vin:string,
-    year:string,
-    marca:string,
-    modelo:string,
-  }
-  gasolina: number | string,
-  kilometraje: number | null,
-  estimacion: Date,
-  administrador: string,
-  jefe: string,
-  trabajador: string,
-  tecnico: string,
-  descripcion_mo: string,
-  indicaciones_cliente: string,
-  garantia: string,
-  observaciones: string,//tiempo de entrega
-  
-  economico: string,
-  placas: string,
-  vin: string,
-  marca: string,
-  modelo: string,
-  año: number|null,
-  //datos posibles
-  vigencia: Date|null,
- }
+
  export interface FormEmployee{
   name:string,
   paterno:string,
