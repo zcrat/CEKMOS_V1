@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('orden_servicio')->unique();
             $table->string('orden_seguimiento')->unique();
+            $table->string('orden_opcional')->nullable();
             $table->foreignId('modulo_orden_id')->constrained('modulo_ordenes_servicios');
             $table->foreignId('vehiculo_id')->constrained('vehiculos');
             $table->foreignId('vehiculo_concepto_id')->constrained('vehiculos_conceptos');

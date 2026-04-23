@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ModuloOrdenesServicio;
 use Illuminate\Http\Request;
 use App\Models\Modulos;
+use App\Models\OrdenesServicio;
 use App\Models\Presupuestos;
+use App\Models\Ubicaciones;
 use App\Models\Vehiculos;
 use App\Rules\ExistTipo;
+use BcMath\Number;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -100,7 +105,7 @@ class CortanaController extends Controller
         } 
         $validator=Validator::make($request->all(),[
             'orden_seguimiento'=>['nullable','string','max:20'],
-            'orden_servicio'=>['nullable','string','max:20'],
+            'orden_opcional'=>['nullable','string','max:20'],
             'ubicacion'=>['required','string','max:100'],
             'tipo_presupuesto_id'=>['required',new ExistTipo(2, $request->tipo_presupuesto_id)],
             'modulo_orden_id'=>['required','integer','exists:modulo_ordenes_servicios,id'],
@@ -142,11 +147,69 @@ class CortanaController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
         try{
-            
+            DB::beginTransaction();
+            $ubicacion=Ubicaciones::FirstOrCreate(['nombre'=>
+                strtolower(trim($request->ubicacion))
+            ]);
+            $orden=$this->GetClave($request->modulo_orden_id);
+            $seguimiento=$request->orden_seguimiento;
+            $opcional=$request->orden_seguimiento;
+            $ordenservicio=OrdenesServicio::create([
+                'orden_servicio'=>$orden,
+                'orden_seguimiento'=>$seguimiento ?? $orden,
+                'orden_opcional'=>$opcional,
+                'modulo_orden_id'=>$request->modulo_orden_id,
+                'vehiculo_id'=>$request->vehiculo_id,
+                'vehiculo_concepto_id'=>$request->vehiculo_concepto_id,
+                'user_id'=>$request->user()->id,
+                'empresa_id'=>$request->empresa_id,
+                'cliente_id'=>$request->cliente_id,
+                'update_fotos'=>false,
+                'diagnostico'=>null,
+                'indicaciones_cliente'=>$request->indicaciones_cliente,
+                'notas_mecanico'=>$request->descripcion_mo,
+                'notas_retraso'=>'',
+                'telefono'=>$request->telefono,
+                'ubicacion_id'=>$ubicacion->id,
+            ]);
+            $presupuesto=Presupuestos::create([
+                'orden_servicio_id'=>$ordenservicio->id,
+                'observaciones'=>$request->observaciones,
+                'descripcion_mo'=> $request->descripcion_mo,
+                'garantia'=>$request->garantia,
+                'folio'=>$this->GetFolio($ordenservicio->id,$orden,$request->tipo_presupuesto_id,),
+                'vigencia'=>null,
+                'factura_id'=>null,
+                'tipo_id'=>$request->tipo_presupuesto_id,
+                'estatus_id'=>1,
+            ]);
+
+
+            DB::commit();
             return response()->json(['message' => 'funciona'], 400);
         }catch(\Exception $e){
+            DB::rollBack();
             return response()->json(['message' => 'Error al crear la orden de servicio: '.$e->getMessage()], 500);
         }
         
+    }
+    public function GetClave(Number $modulo_orden_id){
+        $anteriores=0;
+        $clave=ModuloOrdenesServicio::find($modulo_orden_id);
+        $num=OrdenesServicio::withTrashed()->where('modulo_orden_id',$modulo_orden_id)->count() + 1;
+        do{
+            $numeroConCeros = str_pad($num + $anteriores, 5, "0", STR_PAD_LEFT);
+            $orden= ($clave->clave??'Desc').$numeroConCeros;
+            $anteriores++;
+        }while(OrdenesServicio::where('orden_servicio',$orden)->exist());
+        return $orden;
+    }
+    public function GetFolio(Number $ordenservicio_id,$clave,$tipo){
+
+        $tipos=[5=>'C',6=>'P',7=>''];
+        $num=Presupuestos::withTrashed()->where('orden_servicio_id',$ordenservicio_id)->count()  + 1;
+        $numeroConCeros = str_pad($num, 2, "0", STR_PAD_LEFT);
+        $folio= $clave.'-'.$numeroConCeros.$tipos[$tipo];
+        return $folio;
     }
 }

@@ -11,6 +11,7 @@ class OrdenesServicio extends Model
     protected $fillable = [
         'orden_servicio',
         'orden_seguimiento',
+        'orden_opcional',
         'modulo_orden_id',
         'vehiculo_id',
         'vehiculo_concepto_id',
