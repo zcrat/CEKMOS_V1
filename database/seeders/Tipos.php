@@ -76,6 +76,8 @@ class Tipos extends Seeder
             ['descripcion' => 'se actualizo roles de un usuario', 'categoria_id' => 10],
             ['descripcion' => 'se actualizo permisos de un usuario', 'categoria_id' => 10],
             ['descripcion' => 'se restauro  un usuario', 'categoria_id' => 10],
+            ['descripcion' => 'Files Evidencias', 'categoria_id' => 4],
+            
         ];
         foreach ($usuarios_taller as $data) {
             TiposModel::create($data);

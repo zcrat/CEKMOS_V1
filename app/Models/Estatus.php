@@ -23,4 +23,7 @@ class Estatus extends Model
     public function presupuestos(){
         return $this->hasMany(Presupuestos::class,'estatus_id');
     }
+    public function rutas_archivo(){
+        return $this->hasMany(RutasArchivo::class, 'estatus_id');
+    }
 }

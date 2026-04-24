@@ -16,9 +16,9 @@ export const Create = async (data: OrdenServicioForm): Promise<responseBasic> =>
       if (Array.isArray(value)) {
         value.forEach((item, index) => {
           if (item instanceof Blob) {
-            formData.append(`${key}[${index}]`, item);
+            formData.append(`${key}[]`, item);
           } else {
-            formData.append(`${key}[${index}]`, JSON.stringify(item));
+            formData.append(`${key}[]`, JSON.stringify(item));
           }
         });
         return;

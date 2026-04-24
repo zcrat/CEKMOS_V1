@@ -60,7 +60,7 @@
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const buttonconfirm=computed<buttonconfirmed>(()=>{ 
     return {
-      text:'Crear Presupuesto',
+      text:'Crear Orden De Servicio',
       classname:'bg-blue-600 text-white',
       onClick:async ()=>{
         console.log('click')

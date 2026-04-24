@@ -33,6 +33,9 @@ class Estatus extends Seeder
             ['descripcion' => 'DANADA', 'categoria_id' => 11],
             ['descripcion' => 'REPARACION NECESARIA', 'categoria_id' => 11],
             ['descripcion' => 'NO APLICA', 'categoria_id' => 11],
+            ['descripcion' => 'Procesando', 'categoria_id' => 4],
+            ['descripcion' => 'Exitoso', 'categoria_id' => 4],
+            ['descripcion' => 'Erroneo', 'categoria_id' => 4],
         ];
         foreach ($estatus as $data) {
             EstatusModel::create($data);

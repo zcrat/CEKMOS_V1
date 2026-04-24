@@ -14,6 +14,7 @@ class Archivos extends Model
         'orden_servicio_id',
         'presupuesto_id',
         'tipo_id',
+        'estatus_id',
     ];
     public function orden_servicio(){
         return $this->belongsTo(OrdenesServicio::class, 'orden_servicio_id');
@@ -22,6 +23,9 @@ class Archivos extends Model
         return $this->belongsTo(Presupuestos::class, 'presupuesto_id');
     }
     public function tipo(){
+        return $this->belongsTo(Tipos::class, 'tipo_id');
+    }
+    public function estatus(){
         return $this->belongsTo(Tipos::class, 'tipo_id');
     }
 

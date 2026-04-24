@@ -11,6 +11,7 @@
   },{ deep: true })
 
   watch(() => ModelValue.value,(val) => {
+    console.log('lakdl');
     Object.assign(Inventario, val)
   },{ deep: true })
 </script>

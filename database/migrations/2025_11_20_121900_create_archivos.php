@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
             $table->foreignId('presupuesto_id')->constrained('presupuestos')->nullable();
             $table->foreignId('tipo_id')->constrained('tipos');
+            $table->foreignId('estatus_id')->constrained('estatus');
             $table->timestamps();
             $table->softDeletes();
         });

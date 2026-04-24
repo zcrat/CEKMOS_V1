@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             VehiculosConceptos::class,
             VehiculosConceptosDisponibles::class,
             EstadosandMunicipios::class,
+            RutasArchivoSeeder::class,
             DatosPrueba::class
         ]);
     }

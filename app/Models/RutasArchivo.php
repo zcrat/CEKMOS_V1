@@ -4,16 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-class RutasTiposArchivo extends Model
+class RutasArchivo extends Model
 {
     use SoftDeletes;
-    protected $table = 'rutas_tipos_archivos';
+    protected $table = 'rutas_archivos';
     protected $fillable = [
-        'descripcion',
-        'tipo_id'
+        'disk','folder','tipo_id','estatus_id'
     ];
     public function tipo()
     {
         return $this->belongsTo(Tipos::class, 'tipo_id');
+    }
+    public function estatus()
+    {
+        return $this->belongsTo(Estatus::class, 'estatus_id');
     }
 }
