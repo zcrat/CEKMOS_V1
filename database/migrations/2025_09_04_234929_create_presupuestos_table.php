@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('descripcion_mo');
             $table->text('garantia');
             $table->string('folio');
-            $table->dateTime('vigencia');
+            $table->timestamp('vigencia')->nullable();
             $table->foreignId('factura_id')->constrained('facturas')->nullable();
             $table->foreignId('tipo_id')->constrained('tipos');
             $table->foreignId('estatus_id')->constrained('estatus');
