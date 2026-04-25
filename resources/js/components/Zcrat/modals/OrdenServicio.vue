@@ -15,7 +15,7 @@
   import ZDCanvas, { StrokesArray } from '../Elements/ZDCanvas.vue'
   import TiposVehiculos from '../Forms/TiposVehiculos.vue';
   import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
-  import {EconomicoForm,OrdenServicioForm,ImagenesForm,CondicionesInterioresForm,CondicionesExterioresForm, PinturaForm, InventarioForm, DetallesGeneralesBaseProps} from '@/types/OrdenServicio'
+  import {EconomicoForm,OrdenServicioForm,FilesForm,CondicionesInterioresForm,CondicionesExterioresForm, PinturaForm, InventarioForm, DetallesGeneralesBaseProps} from '@/types/OrdenServicio'
   import {optionstipos} from '@/utils/variables/options'
   import {DetallesGeneralesBase,CondicionesInterioresBase,CondicionesExterioresBase,EconomicoBase, PinturaBase, InventarioBase} from '@/utils/variables/ordenservicio'
   import {GetImageTipoVehiculo, SaveCarAndFirma } from '@/utils/functions/ordenservicio';
@@ -49,7 +49,7 @@
     modulosdisponibles.value=await GetModulosDisponibles();
   });
   const Vehiculo = reactive<EconomicoForm>(EconomicoBase)
-  const Imagenes = ref<ImagenesForm[]>([])
+  const Imagenes = ref<FilesForm[]>([])
   const loading = ref<boolean>(false)
   const DetallesGenerales = reactive<DetallesGeneralesBaseProps>(DetallesGeneralesBase);
   const CondicionesInteriores=ref<CondicionesInterioresForm>(CondicionesInterioresBase)
@@ -93,9 +93,9 @@
           descripcion_mo: DetallesGenerales.descripcion_mo,
           garantia: DetallesGenerales.garantia,
           observaciones: DetallesGenerales.observaciones,
-          imagenes_evidencia: Imagenes.value.map(img=>img.tipo_id === 3 ? img.image : null).filter(img=>img !== null) as Blob[],
-          carro: Imagenes.value.find((item) => item.tipo_id === 1) ? Imagenes.value.find((item) => item.tipo_id === 1)!.image : null,
-          firma: Imagenes.value.find((item) => item.tipo_id === 2) ? Imagenes.value.find((item) => item.tipo_id === 2)!.image : null,
+          imagenes_evidencia: Imagenes.value.map(img=>img.tipo_id === 3 ? img.file : null).filter(img=>img !== null) as File[],
+          carro: Imagenes.value.find((item) => item.tipo_id === 1) ? Imagenes.value.find((item) => item.tipo_id === 1)!.file : null,
+          firma: Imagenes.value.find((item) => item.tipo_id === 2) ? Imagenes.value.find((item) => item.tipo_id === 2)!.file : null,
           condiciones_exteriores: CondicionesExteriores.value,
           condiciones_interiores: CondicionesInteriores.value,
           pintura: Pintura.value,
@@ -113,7 +113,7 @@
         loading.value=false
 
       },
-      disabled:(
+      disabled: 1!=1 &&(
         !DetallesGenerales.ubicacion ||
         !DetallesGenerales.tipo_id ||
         !DetallesGenerales.modulo_orden ||
@@ -182,7 +182,7 @@
       Vehiculo.vin=data.vin;
       Vehiculo.color=data.color?.descripcion ?? 'No Encontrado';
       Vehiculo.anio=data.año ?? '';
-      Vehiculo.tipo_id=data.tipo_id;
+      Vehiculo.tipo_id=Number(data.tipo_id);
       Vehiculo.modelo=data.modelo?.descripcion ?? 'No Encontrado';
       Vehiculo.marca=data.modelo?.marca?.descripcion ?? 'No Encontrado';
     } catch (error: any) {

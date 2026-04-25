@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
 import Button from '@/components/Zcrat/Inputs/Button.vue';
-import { ImagenesForm } from '@/types/OrdenServicio';
+import { FilesForm } from '@/types/OrdenServicio';
 import { CovertBlobToURL, DeleteImage, DeleteImagesNew, SaveImagesEvidencia } from '@/utils/functions/ordenservicio';
 import { ref } from 'vue';
 
-const Imagenes = defineModel<ImagenesForm[]>('Imagenes', { default: [] })
+const Imagenes = defineModel<FilesForm[]>('Imagenes', { default: [] })
 const LoadImages = ref<HTMLInputElement | null>(null)
 const imagepreview=ref<string>('')
 defineProps<{CanEditImages:boolean}>()
@@ -22,7 +22,7 @@ defineProps<{CanEditImages:boolean}>()
         </div>
         <div :class="'overflow-x-auto flex gap-2 flex-row'">
           <div :key="index" v-for="(value,index) in Imagenes.filter(item=>item.tipo_id ===3)" class="border-2 rounded-md border-gray-700 p-2 w-fit flex flex-col justify-end">
-             <img :src="CovertBlobToURL(value.image)" class="max-w-[200px] max-h-[200px]" @click="imagepreview=CovertBlobToURL(value.image)" />
+             <img :src="CovertBlobToURL(value.file)" class="max-w-[200px] max-h-[200px]" @click="imagepreview=CovertBlobToURL(value.file)" />
             <Button text="Eliminar"  type="delete" @click="DeleteImage({index,Imagenes})" v-if="CanEditImages"/>
           </div>
         </div>

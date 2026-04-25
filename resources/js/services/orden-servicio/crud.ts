@@ -5,39 +5,65 @@ import { OrdenServicioForm } from '@/types/OrdenServicio';
 export const Create = async (data: OrdenServicioForm): Promise<responseBasic> => {
   try {
     const formData = new FormData();
+    // 🔹 simples
+    formData.append('orden_seguimiento', data.orden_seguimiento);
+    formData.append('orden_opcional', data.orden_opcional);
+    formData.append('ubicacion', data.ubicacion);
+    formData.append('tipo_presupuesto_id', String(data.tipo_presupuesto_id));
+    formData.append('modulo_orden_id', String(data.modulo_orden_id));
+    formData.append('vehiculo_concepto_id', String(data.vehiculo_concepto_id ?? ''));
+    formData.append('empresa_id', String(data.empresa_id ?? ''));
+    formData.append('cliente_id', String(data.cliente_id ?? ''));
+    formData.append('vehiculo_id', String(data.vehiculo_id ?? ''));
+    formData.append('telefono', String(data.telefono));
+    formData.append('estimacion', data.estimacion.toISOString());
+    formData.append('kilometraje', String(data.kilometraje));
+    formData.append('gasolina', String(data.gasolina));
+    formData.append('administrador', data.administrador);
+    formData.append('jefe', data.jefe);
+    formData.append('trabajador', data.trabajador);
+    formData.append('tecnico', data.tecnico);
+    formData.append('indicaciones_cliente', data.indicaciones_cliente);
+    formData.append('descripcion_mo', data.descripcion_mo);
+    formData.append('garantia', data.garantia);
+    formData.append('observaciones', data.observaciones);
 
-    // 🔹 recorrer todo
-    Object.entries(data).forEach(([key, value]) => {
-      if (value === null || value === undefined) return;
-      if (value instanceof Blob) {
-        formData.append(key, value);
-        return;
-      }
-      if (Array.isArray(value)) {
-        value.forEach((item, index) => {
-          if (item instanceof Blob) {
-            formData.append(`${key}[]`, item);
-          } else {
-            formData.append(`${key}[]`, JSON.stringify(item));
-          }
-        });
-        return;
-      }
-      if (typeof value === 'object') {
-        if (value instanceof Date) {
-          formData.append(key, value.toISOString()); // o formato que necesites
-          return;
-        }
-        Object.entries(value).forEach(([subkey, subvalue]) => {
-          if (subvalue != null && subvalue !== undefined) {
-            formData.append(`${key}[${subkey}]`, String(subvalue));
-          } 
-        });
-        return;
-      }
-      formData.append(key, String(value));
+    // 🔹 objetos (Laravel los entiende así)
+    Object.entries(data.inventario).forEach(([k, v]) => {
+      if (v != null) formData.append(`inventario[${k}]`, String(v));
     });
 
+    Object.entries(data.pintura).forEach(([k, v]) => {
+      if (v != null) formData.append(`pintura[${k}]`, String(v));
+    });
+
+    Object.entries(data.condiciones_interiores).forEach(([k, v]) => {
+      if (v != null) formData.append(`condiciones_interiores[${k}]`, String(v));
+    });
+
+    Object.entries(data.condiciones_exteriores).forEach(([k, v]) => {
+      if (v != null) formData.append(`condiciones_exteriores[${k}]`, String(v));
+    });
+
+    // 🔥 archivos múltiples (SIEMPRE [] sin índice)
+    data.imagenes_evidencia.forEach((file, index) => {
+      formData.append(
+        'imagenes_evidencia[]',
+        file
+      );
+    });
+    if (data.carro) {
+      formData.append(
+        'carro',
+        data.carro
+      );
+    }
+    if (data.firma) {
+      formData.append(
+        'firma',
+        data.firma,
+      );
+    }
     const response = await axios.post(
       route('Cortana.OrdenServicio.Create'),
       formData,

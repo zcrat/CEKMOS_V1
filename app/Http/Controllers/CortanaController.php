@@ -119,7 +119,7 @@ class CortanaController extends Controller
             'orden_seguimiento'=>['nullable','string','max:20'],
             'orden_opcional'=>['nullable','string','max:20'],
             'ubicacion'=>['required','string','max:100'],
-            'tipo_presupuesto_id'=>['required',new ExistTipo(2, $request->tipo_presupuesto_id)],
+            'tipo_presupuesto_id'=>['required',new ExistTipo(2, $request->tipo_presupuesto_id ??'')],
             'modulo_orden_id'=>['required','integer','exists:modulo_ordenes_servicios,id'],
             'vehiculo_concepto_id'=>['required','exists:vehiculos_conceptos,id'],
             'empresa_id'=>['required','exists:empresas,id'],
@@ -143,9 +143,9 @@ class CortanaController extends Controller
             'condiciones_interiores'=>['required','array'],
             'condiciones_exteriores'=>['required','array'],
             'imagenes_evidencia'=>['required','array','min:6'],
-            'imagenes_evidencia.*'=>['required','file','image','max:2048'],
-            'carro'=>['required','file','image','max:2048'],
-            'firma'=>['required','file','image','max:2048'],
+            'imagenes_evidencia.*'=>['required','file','image','max:20048'],
+            'carro'=>['required','file','image','max:20048'],
+            'firma'=>['required','file','image','max:20048'],
             ...$rulesExtra,
         ]);
        
@@ -167,6 +167,7 @@ class CortanaController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
+        Log::info('pasa');
         try{
             DB::beginTransaction();
             $ubicacion=Ubicaciones::FirstOrCreate(['nombre'=>

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import MyBasicToast from "@/utils/ToastNotificationBasic";
 import ZDCanvas from '@/components/Zcrat/Elements/ZDCanvas.vue';
-import { EconomicoForm, ImagenesForm } from '@/types/OrdenServicio';
+import { EconomicoForm, FilesForm } from '@/types/OrdenServicio';
 import { Ref } from 'vue';
   
 export const GetImageTipoVehiculo = async ({Canvas,Tipo}:{Canvas:InstanceType<typeof ZDCanvas> | null,Tipo:number}) => {
@@ -26,7 +26,7 @@ export const GetImageTipoVehiculo = async ({Canvas,Tipo}:{Canvas:InstanceType<ty
       }
     }
 }
-export const SaveImagesEvidencia = ({event,Imagenes}: {event:Event,Imagenes:ImagenesForm[]}) => {
+export const SaveImagesEvidencia = ({event,Imagenes}: {event:Event,Imagenes:FilesForm[]}) => {
     const target = event.target as HTMLInputElement
     if (target.files) {
       if (Array.from(target.files).some(file => !file.type.startsWith('image/'))) {
@@ -34,34 +34,27 @@ export const SaveImagesEvidencia = ({event,Imagenes}: {event:Event,Imagenes:Imag
           return;
       } 
       Array.from(target.files).forEach(file => { 
-        Imagenes.push({ tipo_id: 3, image: file })
+        Imagenes.push({ tipo_id: 3, file: file })
       })
     }
     target.value = '';
   }
-export function CovertBlobToURL(file: Blob) {
+export function CovertBlobToURL(file: Blob | File) {
     return window.URL.createObjectURL(file)
 }
-export const DeleteImage=({index,Imagenes}:{index:number,Imagenes:ImagenesForm[]})=>{
+export const DeleteImage=({index,Imagenes}:{index:number,Imagenes:FilesForm[]})=>{
     const registro=Imagenes[index];
     if(registro){
-      if(registro.ids?.id){
-        // Aquí podrías hacer una petición al servidor para eliminar la imagen usando el ID
-        // Por ejemplo: await axios.delete(`/api/imagenes/${registro.id}`);
-      }else{
-        Imagenes.splice(index, 1);
-      }
+      Imagenes.splice(index, 1);
     }
   }
-export const DeleteImagesNew=(Imagenes:ImagenesForm[])=>{
-    const imagenesNuevas = Imagenes.filter(img => !img.ids?.id);
-    if (imagenesNuevas.length > 0) {
-      imagenesNuevas.forEach((img) => {
-        const index = Imagenes.findIndex(i => i.image === img.image);
-        if (index !== -1) {
-          Imagenes.splice(index, 1);
+export const DeleteImagesNew=(Imagenes:FilesForm[])=>{
+    if (Imagenes.some(items => items.tipo_id == 3)) {
+      for (let i = Imagenes.length - 1; i >= 0; i--) {
+        if (Imagenes[i].tipo_id === 3) {
+          Imagenes.splice(i, 1);
         }
-      });
+      }
     }else{
       MyBasicToast.error('No hay imágenes nuevas para eliminar');
     }
@@ -125,14 +118,17 @@ export const GetDataVehiculoPlacas=(Economico:EconomicoForm)=>{
       });
     }
   }
-export const SaveCarAndFirma = async({Carro,Firma,Imagenes}:{Carro:InstanceType<typeof ZDCanvas> | null,Firma:InstanceType<typeof ZDCanvas> | null,Imagenes:ImagenesForm[]})=>{
+export const SaveCarAndFirma = async({Carro,Firma,Imagenes}:{Carro:InstanceType<typeof ZDCanvas> | null,Firma:InstanceType<typeof ZDCanvas> | null,Imagenes:FilesForm[]})=>{
     const carro =await Carro?.getCanvasBlob();
     const existingIndexCarro = Imagenes.findIndex(img => img.tipo_id === 1);
     if(carro != null){
+      const file = new File([carro], 'carro.png', {
+        type: carro.type,
+      });
       if (existingIndexCarro !== -1) {
-        Imagenes[existingIndexCarro].image = carro;
+        Imagenes[existingIndexCarro].file = file;
       } else {
-        Imagenes.push({tipo_id:1,image:carro});
+        Imagenes.push({tipo_id:1,file:file});
       }
     } else {
       if (existingIndexCarro !== -1) {
@@ -142,10 +138,13 @@ export const SaveCarAndFirma = async({Carro,Firma,Imagenes}:{Carro:InstanceType<
     const firma=await Firma?.getCanvasBlob();
     const existingIndexFirma = Imagenes.findIndex(img => img.tipo_id === 2);
     if(firma != null){
+      const file = new File([firma], 'carro.png', {
+        type: firma.type,
+      });
       if (existingIndexFirma !== -1) {
-        Imagenes[existingIndexFirma].image = firma;
+        Imagenes[existingIndexFirma].file = file;
       } else {
-        Imagenes.push({tipo_id:2,image:firma});
+        Imagenes.push({tipo_id:2,file:file});
       }
     } else {
       if (existingIndexFirma !== -1) {

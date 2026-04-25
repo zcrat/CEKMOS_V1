@@ -38,9 +38,9 @@ import { color } from './generales';
     pintura:PinturaForm,
     condiciones_interiores:CondicionesInterioresForm,
     condiciones_exteriores:CondicionesExterioresForm,
-    imagenes_evidencia:Blob[],
-    carro:Blob|null,
-    firma:Blob|null,
+    imagenes_evidencia:File[],
+    carro:File|null,
+    firma:File|null,
   }
   export interface DetallesGeneralesBaseProps {
     id?:number
@@ -66,12 +66,8 @@ import { color } from './generales';
     garantia: string,
     observaciones: string,
   }
-  export interface ImagenesForm {
-    ids?:{
-      id:number
-      DetallesGeneralesid:number
-    },
-    image:Blob,
+  export interface FilesForm {
+    file:File,
     tipo_id:number
   }
   export interface PinturaForm{
