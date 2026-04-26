@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 import Button from "../Inputs/Button.vue"
+import ZDListErrors from "./ZDListErrors.vue"
+import ZDIconError from "./ZDIconError.vue"
 
 interface Point {
   x: number
@@ -18,6 +20,8 @@ const props = withDefaults(defineProps<{
   disabled?: boolean
   title?: string
   strokecolor?: 'red' | 'black'
+  errors?: string[]
+  DeleteErrors?: ()=>void
 }>(), {
   disabled: false,
   strokecolor: 'black',
@@ -38,6 +42,13 @@ const Strokes = ref<Point[][]>([])
 const StrokesDelete = ref<Point[][]>([])
 const ImageDraw = ref<Blob | null>(null)
 const currentStroke = ref<Point[]>([])
+
+watch(
+  () => [Strokes.value.length, ImageDraw.value],
+  () => {
+    props.DeleteErrors?.();
+  }
+);
 
 onMounted(() => {
   const canvas = canvasRef.value
@@ -232,20 +243,21 @@ defineExpose({
 <template>
   <div>
     <h2 v-if="title" class="w-full text-center text-3xl font-semibold capitalize">
-      {{ title }}
+     <ZDIconError :errors="props.errors" hidden-absolute/> {{ title }}
     </h2>
 
-    <div :class="classnamedivcanvas">
+    <div :class="[classnamedivcanvas]">
       <canvas
         ref="canvasRef"
-        class="border-4 rounded border-[--micolor] w-full h-full touch-none"
+        :class="['border-4 rounded border-[--micolor] w-full h-full touch-none',props.errors && props.errors.length > 0 ? 'inputerror':'']"
       ></canvas>
     </div>
 
-    <div class="flex w-fit gap-2 mt-2">
+    <div class="flex w-fit max-w-full gap-2 mt-2">
       <Button text="Limpiar" :disabled="Strokes.length <= 0" @click="clearCanvas" type="delete"/>
       <Button icon="fa-solid fa-angle-left" :disabled="Strokes.length <= 0" @click="undo" type="secondary"/>
       <Button icon="fa-solid fa-angle-right" :disabled="StrokesDelete.length <= 0" @click="redo" type="secondary"/>
+      <ZDListErrors :errors="props.errors"/>
     </div>
   </div>
 </template>

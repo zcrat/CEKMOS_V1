@@ -10,13 +10,13 @@ export interface option{
 }
 export type zdbinario = "0" | "1";
 
-
+export type ArrayAsociativo = Record<string, string[]>;
 
 export interface responseBasic{
   status:boolean;
   code:number;
   data:any;
-  validationErrors?:Record<string, string[]>;
+  validationErrors?:ArrayAsociativo
 }
 export interface presupuestos{
   id:number;

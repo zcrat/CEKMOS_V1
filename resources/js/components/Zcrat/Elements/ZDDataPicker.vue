@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import ZDListErrors from './ZDListErrors.vue';
+import ZDIconError from './ZDIconError.vue';
 
 const date = defineModel<Date>();
 const props = withDefaults(defineProps<{
@@ -10,18 +12,24 @@ const props = withDefaults(defineProps<{
   time?:boolean
   range?:boolean
   class?:string
-
+  errors?: string[]
+  DeleteErrors?: ()=>void
 }>(),{
   clearable:true,
   time:false,
   range:true,
 })
+  watch(date, () => {
+    props.DeleteErrors?.();
+  }) 
 </script>
 <template>
     <div :class="['h-full flex flex-col',props.class??'w-[16rem]']">
-      <label for="" v-if="props.label">{{props.label }}</label>
-      <div class="border-gray-500 border rounded-md">
-        <VueDatePicker v-model="date" :range="range?{ partialRange: false }:false" 
+      <label for="" v-if="props.label"><ZDIconError :errors="props.errors" hidden-absolute/> {{props.label }}</label>
+      <div :class="['border-gray-500 border rounded-md',props.errors && props.errors.length > 0 ? 'inputerror':'']">
+        <VueDatePicker 
+        v-model="date" 
+        :range="range?{ partialRange: false }:false" 
         :locale="'es'"
         auto-apply
         :ui="{ input:'py-8 inputfocus' }"
@@ -29,20 +37,6 @@ const props = withDefaults(defineProps<{
         :enable-time-picker="time" :placeholder="'Seleccionar Fechas'" :clearable="clearable">
         </VueDatePicker>
       </div>
+      <ZDListErrors :errors="props.errors"/>
     </div>
 </template>
-         <!-- <VueDatePicker v-model="date" :range="{ partialRange: false } " 
-         :locale="'es'"
-         auto-apply
-         :ui="{ input:'py-8' }"
-          :style="{ '--dp-input-padding': 'auto' }"
-         :enable-time-picker="false" :placeholder="'Seleccionar Rango De Fechas'" :clearable="true"><template #dp-input="{ value, onInput, onFocus, onBlur }">
-    <input
-      :value="value"
-      @input="onInput"
-      @focus="onFocus"
-      @blur="onBlur"
-      class="rounded-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-3 py-2 w-full"
-      placeholder="Selecciona un día"
-    />
-  </template></VueDatePicker> -->

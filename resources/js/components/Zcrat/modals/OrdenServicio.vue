@@ -4,7 +4,7 @@
   import BaseModal from '@/components/Zcrat/modals/BaseModal.vue'
   import { ref, watch ,reactive, onMounted,computed, nextTick} from 'vue' 
   import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
-  import {type option} from '@/types/generales'
+  import {ArrayAsociativo, type option} from '@/types/generales'
   import {type buttonconfirmed} from '@/types/modals'
   import Combobox from '@/components/Zcrat/Elements/ZdCombobox.vue'
   import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
@@ -48,6 +48,7 @@
     optionsequipo.value = await GetStatusPerCategory(11);
     modulosdisponibles.value=await GetModulosDisponibles();
   });
+  const ValidationErrors = ref<ArrayAsociativo>({'carro':['kasfjha'],'condiciones_interiores.puerta_izq_f':['FUNCIONA'],'condiciones_interiores.puerta_der_f':['FUNCIONA']})
   const Vehiculo = reactive<EconomicoForm>(EconomicoBase)
   const Imagenes = ref<FilesForm[]>([])
   const loading = ref<boolean>(false)
@@ -105,10 +106,11 @@
         if(response.status){
           MyBasicToast.success(response.data.message??'Orden De Servicio Creada Con Exito')
           updateVisibility();
+        }else if(response.code === 422){
+          ValidationErrors.value=response.validationErrors ?? {};
         }else{
           MyBasicToast.error(response.data.message??'Error Al Crear La Orden De Servicio' )
         }
-
         await new Promise(resolve => setTimeout(resolve, 1000));
         loading.value=false
 
@@ -226,10 +228,39 @@
   <template  v-else>
     <Subtitle>Datos Generales</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2" >
-      <InputBasic id="ordenseguimiento" label="Orden De Seguimiento" type="text" v-model="DetallesGenerales.orden_seguimiento" placeholder="Automatico o Ingresar"/>
-      <InputBasic id="ordenopcional" label="Orden Opcional" type="text" v-model="DetallesGenerales.orden_opcional" placeholder="Opcional"/>
-      <Combobox id="ubicacion" label="Ubicacion" v-model="DetallesGenerales.ubicacion" endpoint="Combobox.ubicaciones" placeholder="Buscar o Crear"/>
-      <Select label="Tipo De Presupuesto"  v-model="DetallesGenerales.tipo_id" id="presupuestotipo"  :options="optionstipos"></Select>
+      <InputBasic 
+        id="ordenseguimiento" 
+        label="Orden De Seguimiento" 
+        type="text" 
+        v-model="DetallesGenerales.orden_seguimiento" 
+        placeholder="Automatico o Ingresar" 
+        :errors="ValidationErrors['orden_seguimiento']" 
+        :DeleteErrors="()=>{ValidationErrors['orden_seguimiento']}"
+      />
+      <InputBasic 
+        id="ordenopcional" 
+        label="Orden Opcional" 
+        type="text" 
+        v-model="DetallesGenerales.orden_opcional"
+        placeholder="Opcional"
+        :errors="ValidationErrors['orden_opcional']" 
+        :DeleteErrors="()=>{delete ValidationErrors['orden_opcional']}"
+      />
+      <Combobox 
+        id="ubicacion" 
+        label="Ubicacion" 
+        v-model="DetallesGenerales.ubicacion" 
+        endpoint="Combobox.ubicaciones" 
+        placeholder="Buscar o Crear" 
+        :errors="ValidationErrors['ubicacion']" 
+        :deleteError="()=>{delete ValidationErrors['ubicacion']}" 
+      />
+      <Select 
+        label="Tipo De Presupuesto"  
+        v-model="DetallesGenerales.tipo_id" 
+        id="presupuestotipo"  
+        :options="optionstipos"
+        />
       <Select label="Modulo Orden"  v-model="DetallesGenerales.modulo_orden" id="modulooreden" :canempty="true" :options="modulosdisponibles"></Select>
       <Select2
         :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
@@ -256,6 +287,7 @@
       :empty_message="DetallesGenerales.empresa ? 'Sin Resultados' : 'Selecciona una empresa'"
       v-model="DetallesGenerales.cliente" 
       id="presupuestoempresa" 
+      :errors="['lasa']"
       placeholder="Buscar Cliente"/>
     </div>
     <Subtitle>Datos Vehiculo</Subtitle>
@@ -267,24 +299,27 @@
         endpoint="Select2.Economico" 
         v-model="DetallesGenerales.vehiculo" 
         placeholder="Buscar por Economico o Placas"
+        :errors="[]"
       />
       <template v-if="DetallesGenerales.vehiculo">
-        <InputBasic id="Vin" disabled label="Vin" type="text" v-model="Vehiculo.vin" placeholder="Ej.JJSOE18P388988750 "/>
-        <InputBasic id="Año" label="Año" type="number" v-model="Vehiculo.anio"  placeholder="ej. 2024"/>
-        <InputBasic id="Marca" label="Marcas" type="text" v-model="Vehiculo.marca" classname="uppercase" placeholder="ej. AUDI"/>
-        <InputBasic id="Modelo" label="Modelo" type="text" v-model="Vehiculo.modelo" classname="uppercase" placeholder="ej. A3"/>
-        <InputBasic id="Color" label="Color" type="text" v-model="Vehiculo.color" classname="uppercase" placeholder="ej. Rojo"/>
+        <InputBasic id="Vin" disabled label="Vin" type="text" v-model="Vehiculo.vin" placeholder="Ej.JJSOE18P388988750 " />
+        <InputBasic id="Año" disabled label="Año" type="number" v-model="Vehiculo.anio"  placeholder="ej. 2024"/>
+        <InputBasic id="Marca" disabled label="Marcas" type="text" v-model="Vehiculo.marca" classname="uppercase" placeholder="ej. AUDI"/>
+        <InputBasic id="Modelo" disabled label="Modelo" type="text" v-model="Vehiculo.modelo" classname="uppercase" placeholder="ej. A3"/>
+        <InputBasic id="Color" disabled label="Color" type="text" v-model="Vehiculo.color" classname="uppercase" placeholder="ej. Rojo"/>
         <TiposVehiculos disabled label="Tipo De Vehiculo" id="tipovehiculo" v-model="Vehiculo.tipo_id" />
       </template>
     </div>
     <Subtitle>Datos De Ingreso</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-2" >
       <InputBasic id="telefono" label="Telefono" type="number" v-model="DetallesGenerales.telefono"  placeholder="ej. 4433221100"/>
-      <Datapicker label="Fecha Estimada" v-model="DetallesGenerales.estimacion" :clearable="false" :time="true" :range="false" class="w-full sm:col-span-2 md:col-span-1"/>
+      <Datapicker label="Fecha Estimada" :errors="['s']" v-model="DetallesGenerales.estimacion" :clearable="false" :time="true" :range="false" class="w-full sm:col-span-2 md:col-span-1"/>
       <InputBasic id="kilometraje" label="Kilometraje" type="number" v-model="DetallesGenerales.kilometraje" placeholder="ej. 392.31"/>
       <Select id="gasolina" :canempty="true" v-model="DetallesGenerales.gasolina" label="Gasolina" :options="optionsgasolima"></Select>
       <div class="md:col-span-4 sm:col-span-2 flex flex-col md:flex-row gap-2" >
-        <ZDCanvas class="md:w-[70%]" ref="ImageVehiculoEntrada" title="Detalles Del Vehiculo" strokecolor="red"></ZDCanvas>
+        <ZDCanvas class="md:w-[70%]" 
+          :errors="ValidationErrors['carro']" 
+          :DeleteErrors="()=>{delete ValidationErrors['carro']}" ref="ImageVehiculoEntrada" title="Detalles Del Vehiculo" strokecolor="red"></ZDCanvas>
         <ZDCanvas class="md:w-[30%]" classnamedivcanvas="w-full h-[10rem]" ref="ImageFirmaEntrada" title="Firma"></ZDCanvas>
       </div>
     </div>
@@ -307,8 +342,13 @@
       <PinturaTemplate v-model="Pintura"/>
     </div>
     <ValuesCondicionesEquipo/>
-    <CondicionesInterioresTemplate v-model="CondicionesInteriores"/>
-    <CondicionesExterioresTemplate v-model="CondicionesExteriores"/>
+    <CondicionesInterioresTemplate 
+      v-model="CondicionesInteriores" 
+      :DeleteErrors="(key)=>{delete ValidationErrors[key]}" 
+      :errors="Object.entries(ValidationErrors).filter(([key]) => key.includes('condiciones_interiores')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
+    <CondicionesExterioresTemplate v-model="CondicionesExteriores"
+      :DeleteErrors="(key)=>{delete ValidationErrors[key]}" 
+      :errors="Object.entries(ValidationErrors).filter(([key]) => key.includes('condiciones_exteriores')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
     <ImagenesEvidencias v-model:Imagenes="Imagenes" :CanEditImages="CanEditImages"/>
   </template>
  

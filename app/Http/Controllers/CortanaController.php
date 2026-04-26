@@ -20,6 +20,7 @@ use App\Models\RutasArchivo;
 use App\Models\Ubicaciones;
 use App\Models\UsuariosTaller;
 use App\Models\Vehiculos;
+use App\Models\VehiculosConceptosDisponibles;
 use App\Rules\ExistTipo;
 use BcMath\Number;
 use Carbon\Carbon;
@@ -133,8 +134,8 @@ class CortanaController extends Controller
             'jefe'=>['required','string','max:100'],
             'trabajador'=>['required','string','max:100'],
             'tecnico'=>['required','string','max:100'],
-            'indicaciones_cliente'=>['required','string'],
-            'descripcion_mo'=>['required','string'],
+            'indicaciones_cliente'=>['nullable','string'],
+            'descripcion_mo'=>['nullable','string'],
             'folio'=>['nullable','string','max:20'],
             'garantia'=>['required','string'],
             'observaciones'=>['required','string'],
@@ -151,12 +152,7 @@ class CortanaController extends Controller
        
         $validator->after(function ($validator) use ($request, $user) {
             $modulosPermitidos = $user->modulos_orden->pluck('modulo_orden_id')->toArray();
-            $vehiculosdisponiblesPermitidos = $user->modulos_orden
-                ->pluck('modulo_orden.vehiculos_conceptos')
-                ->flatten()
-                ->pluck('id')
-                ->toArray();
-            Log::info($vehiculosdisponiblesPermitidos);
+            $vehiculosdisponiblesPermitidos = VehiculosConceptosDisponibles::where('modulo_orden_id',$request->modulo_orden_id)->pluck('vehiculo_concepto_id')->toArray();
             if ($request->filled('modulo_orden_id') && !(in_array($request->modulo_orden_id, $modulosPermitidos) || $request->user()->hasRole('Super Admin'))) {
                 $validator->errors()->add('modulo_orden', 'El usuario no tiene permiso para este módulo de orden.');
             }
@@ -188,8 +184,8 @@ class CortanaController extends Controller
                 'cliente_id'=>$request->cliente_id,
                 'update_fotos'=>false,
                 'diagnostico'=>null,
-                'indicaciones_cliente'=>$request->indicaciones_cliente,
-                'notas_mecanico'=>$request->descripcion_mo,
+                'indicaciones_cliente'=>$request->indicaciones_cliente ?? '',
+                'notas_mecanico'=>$request->descripcion_mo ?? '',
                 'notas_retraso'=>'',
                 'telefono'=>$request->telefono,
                 'ubicacion_id'=>$ubicacion->id,
@@ -226,11 +222,11 @@ class CortanaController extends Controller
             ]);
             $presupuesto=Presupuestos::create([
                 'orden_servicio_id'=>$ordenservicio->id,
-                'observaciones'=>$request->observaciones,
-                'descripcion_mo'=> $request->descripcion_mo,
+                'observaciones'=>$request->observaciones ?? '',
+                'descripcion_mo'=> $request->descripcion_mo ?? '',
                 'garantia'=>$request->garantia,
                 'folio'=>$this->GetFolio($ordenservicio->id,$orden,$request->tipo_presupuesto_id,),
-                'vigencia'=>null,
+                'vigencia'=>Carbon::now(),
                 'factura_id'=>null,
                 'tipo_id'=>$request->tipo_presupuesto_id,
                 'estatus_id'=>1,
@@ -359,7 +355,7 @@ class CortanaController extends Controller
         }
         
     }
-    public function GetClave(Number $modulo_orden_id){
+    public function GetClave(string $modulo_orden_id){
         $anteriores=0;
         $clave=ModuloOrdenesServicio::find($modulo_orden_id);
         $num=OrdenesServicio::withTrashed()->where('modulo_orden_id',$modulo_orden_id)->count() + 1;
@@ -367,10 +363,10 @@ class CortanaController extends Controller
             $numeroConCeros = str_pad($num + $anteriores, 5, "0", STR_PAD_LEFT);
             $orden= ($clave->clave??'Desc').$numeroConCeros;
             $anteriores++;
-        }while(OrdenesServicio::where('orden_servicio',$orden)->exist());
+        }while(OrdenesServicio::where('orden_servicio',$orden)->exists());
         return $orden;
     }
-    public function GetFolio(Number $ordenservicio_id,$clave,$tipo){
+    public function GetFolio(string $ordenservicio_id,$clave,$tipo){
 
         $tipos=[5=>'C',6=>'P',7=>''];
         $num=Presupuestos::withTrashed()->where('orden_servicio_id',$ordenservicio_id)->count()  + 1;

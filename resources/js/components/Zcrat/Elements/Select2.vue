@@ -18,7 +18,8 @@ import {
   ComboboxCancel,
   ComboboxPortal
 } from 'reka-ui'
-import Select from './Select.vue'
+import ZDListErrors from './ZDListErrors.vue'
+import ZDIconError from './ZDIconError.vue'
 
 const props = withDefaults(defineProps<{
     endpoint: string
@@ -34,6 +35,8 @@ const props = withDefaults(defineProps<{
     empty_message?:string
     loading_message?:string
     close_when_selected?:boolean
+    DeleteErrors?: () => void
+    errors?: string[]
 }>(), {
   timeout: 400,
   canNew:false,
@@ -116,6 +119,9 @@ watch(() => props.params, (newVal, oldVal) => {
     GetOptions()
   }
 })
+watch(optionselect, () => {
+  props.DeleteErrors?.();
+})
 
 const onInputChange=(event: Event)=> {
   if (props.searchable === false) {
@@ -128,11 +134,19 @@ const clearSelect = () => {
   query.value = ''
   optionselect.value = null
 }
-const handleScroll = () => {
+const handleScroll = (e: Event) => {
+  const target = e.target as HTMLElement;
+
+  // 🔥 ignorar scroll del dropdown
+  if (target.closest('.select2-dropdown')) return;
+  
+  // opcional: ignorar input
+  if (target === inputRef.value) return;
+
   if (isOpen.value) {
-    isOpen.value = false
+    isOpen.value = false;
   }
-}
+};
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, true) // 👈 CAPTURE
@@ -144,37 +158,33 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full" >
+  <div class="flex flex-col w-full relative" >
     <label for="" v-if="props.label">{{ props.label }}</label>
   <ComboboxRoot class="relative" v-model="optionselect" v-model:open="isOpen">
     <ComboboxAnchor 
-      :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen }]"
+      :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen },{inputerror: props.errors && props.errors.length > 0}]"
       >
       <ComboboxInput asChild>
         <div class="relative flex items-center w-full">
           <button class="px-2 h-full border-r border-black flex items-center" v-if="buttonNew" @click="buttonNew"><font-awesome-icon :icon="optionselect ? 'fa-regular fa-pen-to-square': 'fa-solid fa-plus' "  :class="optionselect? 'text-xl':''"/></button>
-          <input
-          ref="inputRef"
-          class="w-full ps-2 pr-8 truncate rounded border-none inputnotfocus"
-          @input="onInputChange"
-          :readonly="props.searchable === false"
-          :placeholder="placeholder"
-          @focus="onFocus"
-          :value="isOpen ? query : optionselect?.label ?? ''"
-          @mousedown="onMouseDown"
+          <div class="relative flex w-full">
+            <ZDIconError :errors="props.errors"/>
+            <input
+            ref="inputRef"
+            :class="['w-full ps-2 pr-8 rounded border-none inputnotfocus',
+                        props.errors && props.errors.length > 0 ? 'ps-[2rem]' : ''
+                    ]"
+            @input="onInputChange"
+            :readonly="props.searchable === false"
+            :placeholder="placeholder"
+            @focus="onFocus"
+            :value="isOpen ? query : optionselect?.label ?? ''"
+            @mousedown="onMouseDown"
+            @blur="()=>{console.log('blurr')}"
           />
+          </div>
         </div>
       </ComboboxInput>
-        <!-- :class="['w-full ps-2 pr-8 truncate rounded border-none inputnotfocus']"
-        @input="onInputChange"
-        ref="inputRef"
-        :readonly="props.searchable === false"
-        :placeholder="placeholder"
-        @focus="onFocus"
-        @blur="()=>{console.log('ajdsh')}"
-        @mousedown="onMouseDown"
-        :displayValue="(option: option | null) => option?.label ?? ''"
-      /> -->
       <ComboboxTrigger class="absolute inset-y-0 right-0 px-2 w-8" v-if="!optionselect || !clearable">
         <font-awesome-icon icon="fa-solid fa-angle-down" class="text-[1.25rem]" v-if="!isOpen"/>
         <font-awesome-icon icon="fa-solid fa-angle-up" class="text-[1.25rem]" v-else/>
@@ -190,7 +200,7 @@ onBeforeUnmount(() => {
       :avoidCollisions="true"
       :collisionPadding="8"
       :sideOffset="4"
-      class="z-15 w-[var(--reka-combobox-trigger-width)] bg-white border-2 border-gray-500 rounded-md">
+      class="z-15 w-[var(--reka-combobox-trigger-width)] bg-white border-2 border-gray-500 rounded-md select2-dropdown">
       <ComboboxViewport>
         <div v-if="loading" class="text-mauve8 text-xs font-medium text-center py-2">
           {{ loading_message }}
@@ -218,5 +228,6 @@ onBeforeUnmount(() => {
     </ComboboxContent>
     </ComboboxPortal>
   </ComboboxRoot>
+   <ZDListErrors :errors="props.errors"/>
   </div>
 </template>

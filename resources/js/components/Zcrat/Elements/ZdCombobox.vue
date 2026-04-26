@@ -12,6 +12,9 @@ import {
   ComboboxEmpty,
   ComboboxPortal
 } from 'reka-ui'
+import ZDListErrors from './ZDListErrors.vue'
+import ZDIconError from './ZDIconError.vue'
+import { Delete } from 'lucide-vue-next'
 
 const search = defineModel<string | null>()
 
@@ -22,7 +25,9 @@ const props = withDefaults(defineProps<{
   label?: string
   timeout?: number
   OnBlur?: () => void
-  getallways?: boolean
+  getallways?: boolean,
+  errors?: string[],
+  DeleteErrors?: ()=>void
 }>(), {
   timeout: 500,
   placeholder: 'Buscar...',
@@ -72,6 +77,7 @@ watch(search, () => {
   }else {
     getdata({executeAxios:false})
   }
+    props.DeleteErrors?.()
 })
 watch(isOpen, (newValue) => {
   if(!newValue){
@@ -100,7 +106,7 @@ const onInputChange=(event: Event)=> {
 }
 </script>
 <template>
-  <div class="flex flex-col w-full">
+  <div class="flex flex-col w-full relative">
     
     <label v-if="label">{{ label }}</label>
 
@@ -109,15 +115,19 @@ const onInputChange=(event: Event)=> {
       <!-- INPUT -->
       <ComboboxAnchor class="relative w-full">
         <ComboboxInput asChild>
-          <input
+          <div class="relative">
+            <ZDIconError :errors="props.errors"/>
+            <input
             ref="inputRef"
             type="text"
             :value="search"
             @input="onInputChange"
             :placeholder="placeholder"
-            class="w-full border rounded px-2 py-2"
+            :class="['w-full border rounded px-2 py-2',
+            props.errors && props.errors.length > 0 ? 'inputerror ps-[2rem]' : '']"
             @focus="onFocus"
-          />
+            />
+          </div>
         </ComboboxInput>
       </ComboboxAnchor>
 
@@ -170,5 +180,6 @@ const onInputChange=(event: Event)=> {
       </ComboboxPortal>
 
     </ComboboxRoot>
+    <ZDListErrors :errors="props.errors"/>
   </div>
 </template>

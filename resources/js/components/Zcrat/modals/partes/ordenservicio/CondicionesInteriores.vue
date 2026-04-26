@@ -8,10 +8,15 @@
   import { CondicionesInterioresBase, CondicionesInterioresInputs } from '@/utils/variables/ordenservicio';
   import { onMounted, reactive, ref, watch } from 'vue';
 
+
+  const props = defineProps<{
+    errors?: {Key:string,errors:string[]}[]
+    DeleteErrors?: (val:string)=>void
+  }>()
   const ModelValue=defineModel<CondicionesInterioresForm>()
   const CondicionesInteriores=reactive<CondicionesInterioresForm>(
     {...CondicionesInterioresBase})
-  
+
   const optionsequipo=ref<option[]>([])
   const CondicionesInterioresAll1=ref<string|null>(null);
   const CondicionesInterioresAll2=ref<string|null>(null);
@@ -137,13 +142,17 @@
           >
           </OptionsCondicionesEquipo>
         </div></Subtitle>
-          <div class=" justify-center items-center grid lg:grid-cols-2 2xl:grid-cols-4 gap-2">
+          <div class=" justify-center items-center grid lg:grid-cols-2 zd1800:grid-cols-4 gap-2">
             
             <OptionsCondicionesEquipo v-for="(item,key) in CondicionesInterioresInputs['PANALES DE PUERTA']" 
             :label="item" 
-            :key="'inventario-'+key" 
+            :key="'condiciones_interiores.'+key" 
             v-model="CondicionesInteriores[key]" 
-            :options="optionsequipo">
+            :options="optionsequipo"
+            :DeleteErrors="()=>DeleteErrors?.('condiciones_interiores.'+key)"
+            :errors="errors?.find(item=> item.Key == 'condiciones_interiores.'+key )?.errors"
+            >
+            
           </OptionsCondicionesEquipo>
           </div>
         </div>
@@ -157,12 +166,16 @@
           >
           </OptionsCondicionesEquipo>
         </div></Subtitle>
-          <div class="flex flex-col items-center lg:grid lg:grid-cols-2 2xl:grid-cols-4 gap-2">
+          <div class="flex flex-col items-center lg:grid lg:grid-cols-2 zd1800:grid-cols-4 gap-2">
             <OptionsCondicionesEquipo v-for="(item,key) in CondicionesInterioresInputs['ASIENTOS']" 
             :label="item" 
-            :key="'inventario-'+key" 
+            :key="'condiciones_interiores.'+key" 
             v-model="CondicionesInteriores[key]" 
-            :options="optionsequipo">
+            :options="optionsequipo"
+            :DeleteErrors="()=>DeleteErrors?.('condiciones_interiores.'+key)"
+            :errors="errors?.find(item=> item.Key == 'condiciones_interiores.'+key )?.errors"
+            >
+            
           </OptionsCondicionesEquipo>
           </div>
         </div>
@@ -180,9 +193,12 @@
         <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-2">
             <OptionsCondicionesEquipo v-for="(item,key) in CondicionesInterioresInputs['OTROS']" 
             :label="item" 
-            :key="'inventario-'+key" 
+            :key="'condiciones_interiores.'+key" 
             v-model="CondicionesInteriores[key]" 
-            :options="optionsequipo">
+            :options="optionsequipo"
+            :DeleteErrors="()=>DeleteErrors?.('condiciones_interiores.'+key)"
+            :errors="errors?.find(item=> item.Key == 'condiciones_interiores.'+key )?.errors"
+            >
           </OptionsCondicionesEquipo>
         </div>
       </div>

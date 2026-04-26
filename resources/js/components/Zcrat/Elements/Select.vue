@@ -14,6 +14,8 @@ import {
   ComboboxPortal
 } from 'reka-ui'
 import { type option } from '@/types/generales'
+import ZDListErrors from './ZDListErrors.vue';
+import ZDIconError from './ZDIconError.vue';
 
 const props = withDefaults(defineProps<{
   id?:string
@@ -25,6 +27,8 @@ const props = withDefaults(defineProps<{
   disabled?:boolean
   close_when_selected?:boolean
   options:option[]
+  DeleteErrors?: () => void
+  errors?: string[]
 }>(), {
   empty_message:'Sin Opciones',
   placeholder:'Seleccionar',
@@ -81,7 +85,9 @@ watch(optionselect, (val) => {
   selected.value = val ? val.value : null
 })
 
-
+watch(selected, () => {
+  props.DeleteErrors?.()
+})
 
 watch([selected,() => props.options], () => {
   if (selected.value == null || selected.value === undefined) {
@@ -96,6 +102,7 @@ watch([selected,() => props.options], () => {
     }
   }
 }, { immediate: true })
+
 const onInputChange=(event: Event)=> {
   if (props.searchable === false || props.disabled) {
     event.preventDefault();
@@ -110,54 +117,63 @@ const clearSelect = () => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full" >
+  <div class="flex flex-col w-full relative" >
     <label for="" v-if="props.label">{{ props.label }}</label>
-  <ComboboxRoot :disabled="props.disabled" class="relative" v-model="optionselect" v-model:open="isOpen">
-    <ComboboxAnchor :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen }]">
-      <ComboboxInput
-        :class="['w-full ps-2 pr-8 truncate rounded border-none inputnotfocus']"
-        @input="onInputChange"
-        :readonly="props.searchable === false"
-        :placeholder="placeholder"
-        @focus="onFocus"
-          @mousedown="onMouseDown"
-        :displayValue="(option: option | null) => option?.label ?? ''"
-      />
-      <ComboboxTrigger class="absolute inset-y-0 right-0 px-2 w-8" v-if="!optionselect || !clearable">
-        <font-awesome-icon icon="fa-solid fa-angle-down" class="text-[1.25rem]" v-if="!isOpen"/>
-        <font-awesome-icon icon="fa-solid fa-angle-up" class="text-[1.25rem]" v-else/>
-      </ComboboxTrigger>
-      <ComboboxCancel class="absolute inset-y-0 right-0 px-2 w-8" v-if="optionselect && clearable && !isOpen" @click="clearSelect">
-        <font-awesome-icon icon="fa-solid fa-x" class="text-[0.8rem]"/>
-      </ComboboxCancel>
-    </ComboboxAnchor>
-    <ComboboxPortal>
-    <ComboboxContent 
-      position="popper"
-      :avoidCollisions="true"
-      :collisionPadding="8"
-      :sideOffset="4"
-      class="z-15 w-[var(--reka-combobox-trigger-width)] bg-white border-2 border-gray-500 rounded-md">
-      <ComboboxViewport>
-        <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2">
-         {{empty_message }}
-        </ComboboxEmpty>
-        <ComboboxGroup class="max-h-[25rem] overflow-auto">
-          <ComboboxItem
-            v-for="option in filtered_options"
-            :key="option.value"
-            :value="option"
-            @select="onSelect"
-            as="template"
-            > 
-            <div :class="['px-4 py-2 rounded-sm ', option.value === optionselect?.value ? 'optionactive' : 'hoveroptionselect']">
-              {{ option.label }}
-            </div>
-          </ComboboxItem>
-        </ComboboxGroup>
-      </ComboboxViewport>
-    </ComboboxContent>
-    </ComboboxPortal>
-  </ComboboxRoot>
+    <ComboboxRoot :disabled="props.disabled" class="relative" v-model="optionselect" v-model:open="isOpen">
+      <ComboboxAnchor :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen }]">
+
+        <ComboboxInput asChild>
+          <div class="relative flex items-center w-full">
+            <ZDIconError :errors="props.errors"/>
+            <input
+              :class="['w-full ps-2 pr-8 truncate rounded border-none inputnotfocus',
+                        props.errors && props.errors.length > 0 ? 'inputerror ps-[2rem]' : ''
+                      ]"
+              @input="onInputChange"
+              :readonly="!props.searchable"
+              :placeholder="placeholder"
+              @focus="onFocus"
+              :value="(isOpen && props.searchable)? query : optionselect?.label ?? ''"
+              @mousedown="onMouseDown"
+              />
+          </div>
+        </ComboboxInput>
+        <ComboboxTrigger class="absolute inset-y-0 right-0 px-2 w-8" v-if="!optionselect || !clearable">
+          <font-awesome-icon icon="fa-solid fa-angle-down" class="text-[1.25rem]" v-if="!isOpen"/>
+          <font-awesome-icon icon="fa-solid fa-angle-up" class="text-[1.25rem]" v-else/>
+        </ComboboxTrigger>
+        <ComboboxCancel class="absolute inset-y-0 right-0 px-2 w-8" v-if="optionselect && clearable && !isOpen" @click="clearSelect">
+          <font-awesome-icon icon="fa-solid fa-x" class="text-[0.8rem]"/>
+        </ComboboxCancel>
+      </ComboboxAnchor>
+      <ComboboxPortal>
+      <ComboboxContent 
+        position="popper"
+        :avoidCollisions="true"
+        :collisionPadding="8"
+        :sideOffset="4"
+        class="z-15 w-[var(--reka-combobox-trigger-width)] bg-white border-2 border-gray-500 rounded-md">
+        <ComboboxViewport>
+          <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2">
+          {{empty_message }}
+          </ComboboxEmpty>
+          <ComboboxGroup class="max-h-[25rem] overflow-auto">
+            <ComboboxItem
+              v-for="option in filtered_options"
+              :key="option.value"
+              :value="option"
+              @select="onSelect"
+              as="template"
+              > 
+              <div :class="['px-4 py-2 rounded-sm ', option.value === optionselect?.value ? 'optionactive' : 'hoveroptionselect']">
+                {{ option.label }}
+              </div>
+            </ComboboxItem>
+          </ComboboxGroup>
+        </ComboboxViewport>
+      </ComboboxContent>
+      </ComboboxPortal>
+    </ComboboxRoot>
+    <ZDListErrors :errors="props.errors"/>
   </div>
 </template>

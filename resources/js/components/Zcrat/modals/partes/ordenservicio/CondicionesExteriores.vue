@@ -8,6 +8,11 @@ import { CondicionesExterioresBase, CondicionesExterioresInputs } from '@/utils/
 import { onMounted, reactive, ref, watch } from 'vue';
 
 const ModelValue = defineModel<CondicionesExterioresForm>()
+
+const props = defineProps<{
+  errors?: {Key:string,errors:string[]}[]
+  DeleteErrors?: (val:string)=>void
+}>()
 const CondicionesExteriores=reactive<CondicionesExterioresForm>({...CondicionesExterioresBase})
 watch(CondicionesExteriores,(val) => {
   ModelValue.value = { ...val }
@@ -67,7 +72,13 @@ watch(
         </OptionsCondicionesEquipo>
       </div></Subtitle>
     <div class="grid gap-2 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ">
-      <OptionsCondicionesEquipo  :key="'equipo-exterior-'+index"  v-for="(item,index) in CondicionesExterioresInputs" :label="item" v-model="CondicionesExteriores[index]"/>
+      <OptionsCondicionesEquipo  
+        :key="'equipo-exterior-'+index"  
+        v-for="(item,index) in CondicionesExterioresInputs" :label="item"
+        v-model="CondicionesExteriores[index]"
+        :DeleteErrors="()=>DeleteErrors?.('condiciones_exteriores.'+index)"
+        :errors="errors?.find(item=> item.Key == 'condiciones_exteriores.'+index)?.errors"
+      />
     </div>
   </div>
 </template>

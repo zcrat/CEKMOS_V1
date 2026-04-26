@@ -38,14 +38,17 @@ input{
 .multiselect__tag {
   @apply bg-blue-100 px-2 rounded mr-1 inline-block;
 }
+.inputerror{
+   @apply shadow-[0px_0px_1rem] shadow-red-700 ring-red-700 border-red-700;
+}
 .inputfocus {
-  @apply focus:shadow-[0px_0px_1rem] focus:shadow-red-700 focus:ring-red-700 focus:border-red-700;
+  @apply focus:shadow-[0px_0px_1rem] focus:shadow-[--micolor] focus:ring-[--micolor] focus:border-[--micolor];
 }
 .inputnotfocus {
   @apply focus:shadow-none focus:ring-0 focus:border-none;
 }
 .inputfocusalways {
-  @apply shadow-[0px_0px_1rem] shadow-red-700 ring-red-700 border-red-700;
+  @apply shadow-[0px_0px_1rem] shadow-[--micolor] ring-[--micolor] border-[--micolor];
 }
 .hoveroptionselect {
   @apply hover:bg-blue-500 hover:text-white hover:cursor-pointer
@@ -87,6 +90,9 @@ input{
 }
 .PageInactive:disabled{
   @apply opacity-65;
+}
+.ButtonCondicionesEquipo{
+   @apply border-2 border-gray-500 px-2 rounded-md font-medium
 }
 .barra{
     margin: 0;
