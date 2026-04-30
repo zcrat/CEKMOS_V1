@@ -87,7 +87,7 @@ const Read = async () => {
     Vehiculo.economico=data.economico;
     Vehiculo.vin=data.vin;
     Vehiculo.año=''+data.año;
-    Vehiculo.tipo_id=data.tipo_id;
+    Vehiculo.tipo_id=Number(data.tipo_id);
     Vehiculo.color=data.color?.descripcion ?? 'No Encontrado';
     Vehiculo.modelo=data.modelo?.descripcion ?? 'No Encontrado';
     Vehiculo.marca=data.modelo?.marca?.descripcion ?? 'No Encontrado';

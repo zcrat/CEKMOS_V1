@@ -8,6 +8,7 @@
     import {type Vehiculo as VehiculoProps} from '@/types/generales'
     import axios from 'axios';
     import Select2 from '@/components/Zcrat/Elements/Select2.vue';
+import Button from '@/components/Zcrat/Inputs/Button.vue';
     const props = defineProps<{
         GetImage?: (val:number)=>void
         Close?: ()=>void
@@ -130,5 +131,9 @@
         :DeleteErrors="()=>{delete ValidationErrors?.['modelo']}"
         />
         </template>
+    </div>
+    <div class="flex gap-2 mt-2">
+        <Button text="Guardar" />
+        <Button text="Cancelar" type="delete"/>
     </div>
 </template>

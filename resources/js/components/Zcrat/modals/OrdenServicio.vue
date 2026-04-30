@@ -274,6 +274,7 @@
      <VehiculoForm
         :GetImage="(id)=>{GetImageTipoVehiculo({Canvas:ImageVehiculoEntrada, Tipo:id})}"
         :Close="()=>emit('close')"
+        v-model="DetallesGenerales.vehiculo"
         :errors="ValidationErrors?.['vehiculo']"
         :DeleteErrors="()=>{delete ValidationErrors?.['vehiculo']}"
         :OpenModal="()=>OpenOtherModal(1)" 
@@ -424,7 +425,6 @@
       :CanEditImages="CanEditImages"
       :DeleteErrorss="(key:string)=>{delete ValidationErrors?.[key]}" 
       :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('imagenes_evidencia')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
-    />
   </template>
  
   </BaseModal>
