@@ -42,17 +42,19 @@ export const SaveImagesEvidencia = ({event,Imagenes}: {event:Event,Imagenes:File
 export function CovertBlobToURL(file: Blob | File) {
     return window.URL.createObjectURL(file)
 }
-export const DeleteImage=({index,Imagenes}:{index:number,Imagenes:FilesForm[]})=>{
+export const DeleteImage=({index,Imagenes,DeleteErrors}:{index:number,Imagenes:FilesForm[],DeleteErrors?:(val:string)=>void})=>{
     const registro=Imagenes[index];
     if(registro){
       Imagenes.splice(index, 1);
+      DeleteErrors?.('imagenes_evidencia.'+(index+1))
     }
   }
-export const DeleteImagesNew=(Imagenes:FilesForm[])=>{
+export const DeleteImagesNew=(Imagenes:FilesForm[],DeleteErrors?:(val:string)=>void )=>{
     if (Imagenes.some(items => items.tipo_id == 3)) {
       for (let i = Imagenes.length - 1; i >= 0; i--) {
         if (Imagenes[i].tipo_id === 3) {
           Imagenes.splice(i, 1);
+          DeleteErrors?.('imagenes_evidencia.'+(i+1))
         }
       }
     }else{

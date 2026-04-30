@@ -13,13 +13,12 @@
   import GetNivelesGasolina from '@/utils/functions/select/NivelesGasolina';
   import GetModulosDisponibles  from '@/utils/functions/select/ModulosCortana';
   import ZDCanvas, { StrokesArray } from '../Elements/ZDCanvas.vue'
-  import TiposVehiculos from '../Forms/TiposVehiculos.vue';
   import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
-  import {EconomicoForm,OrdenServicioForm,FilesForm,CondicionesInterioresForm,CondicionesExterioresForm, PinturaForm, InventarioForm, DetallesGeneralesBaseProps} from '@/types/OrdenServicio'
+  import {OrdenServicioForm,FilesForm,CondicionesInterioresForm,CondicionesExterioresForm, PinturaForm, InventarioForm, DetallesGeneralesBaseProps} from '@/types/OrdenServicio'
   import {optionstipos} from '@/utils/variables/options'
   import {DetallesGeneralesBase,CondicionesInterioresBase,CondicionesExterioresBase,EconomicoBase, PinturaBase, InventarioBase} from '@/utils/variables/ordenservicio'
   import {GetImageTipoVehiculo, SaveCarAndFirma } from '@/utils/functions/ordenservicio';
-  import ImagenesEvidencias from './partes/ordenservicio/ImagenesEvidencias.vue';
+  import ImagenesEvidencias from '@/components/Zcrat/modals/partes/ordenservicio/ImagenesEvidencias.vue';
   import CondicionesInterioresTemplate from './partes/ordenservicio/CondicionesInteriores.vue';
   import CondicionesExterioresTemplate from './partes/ordenservicio/CondicionesExteriores.vue';
   import ValuesCondicionesEquipo from './partes/ordenservicio/ValuesCondicionesEquipo.vue';
@@ -30,8 +29,7 @@
   import { Create } from '@/services/orden-servicio/crud';
   import VehiculoModal from './VehiculoModal.vue';
   import MyBasicToast from '@/utils/ToastNotificationBasic';
-  import {type Vehiculo as VehiculoProps} from '@/types/generales'
-  import axios from 'axios';
+  import VehiculoForm from '@/components/Zcrat/modals/partes/ordenservicio/VehiculoForm.vue'
   const emit = defineEmits(['close'])
   const props = defineProps<{show: boolean}>()
   const optionsgasolima=ref<option[]>([])
@@ -48,8 +46,7 @@
     optionsequipo.value = await GetStatusPerCategory(11);
     modulosdisponibles.value=await GetModulosDisponibles();
   });
-  const ValidationErrors = ref<ArrayAsociativo>({'carro':['kasfjha'],'condiciones_interiores.puerta_izq_f':['FUNCIONA'],'condiciones_interiores.puerta_der_f':['FUNCIONA']})
-  const Vehiculo = reactive<EconomicoForm>(EconomicoBase)
+  const ValidationErrors = ref<ArrayAsociativo>()
   const Imagenes = ref<FilesForm[]>([])
   const loading = ref<boolean>(false)
   const DetallesGenerales = reactive<DetallesGeneralesBaseProps>(DetallesGeneralesBase);
@@ -144,28 +141,12 @@
     }
 
   })  
-  watch(()=>Vehiculo.tipo_id,(val)=>{
-    if(val){GetImageTipoVehiculo({Canvas:ImageVehiculoEntrada.value, Tipo:val})}
-  })
+
   watch(()=>DetallesGenerales.modulo_orden,()=>{
     DetallesGenerales.vehiculo_concepto_id=null
   })
   watch(()=>DetallesGenerales.empresa,()=>{
     DetallesGenerales.cliente=null
-  })
-  watch(()=>DetallesGenerales.vehiculo,()=>{
-    if(DetallesGenerales.vehiculo?.value){
-      Read();
-    }else{
-      Vehiculo.placas='';
-      Vehiculo.economico='';
-      Vehiculo.vin='';
-      Vehiculo.anio='';
-      Vehiculo.tipo_id=null;
-      Vehiculo.color='';
-      Vehiculo.modelo='';
-      Vehiculo.marca='';
-    }
   })
   const OpenOtherModal= (val:1)=>{
     ImagenesCanvas.value.carro=ImageVehiculoEntrada.value?.GetStrokes();
@@ -174,23 +155,6 @@
   }
   const CloseOtherModal= ()=>{
     OpenModal.value = null;
-  }
-  const Read = async () => {
-    try {
-      const response = await axios.get(route('Vehiculo.Find'),{params:{id:DetallesGenerales.vehiculo?.value} })
-      const data:VehiculoProps=response.data.vehiculo;
-      Vehiculo.placas=data.placas;
-      Vehiculo.economico=data.economico;
-      Vehiculo.vin=data.vin;
-      Vehiculo.color=data.color?.descripcion ?? 'No Encontrado';
-      Vehiculo.anio=data.año ?? '';
-      Vehiculo.tipo_id=Number(data.tipo_id);
-      Vehiculo.modelo=data.modelo?.descripcion ?? 'No Encontrado';
-      Vehiculo.marca=data.modelo?.marca?.descripcion ?? 'No Encontrado';
-    } catch (error: any) {
-      console.error('Error:', error)
-      emit('close')
-    }
   }
   watch([OpenModal,loading],async ()=>{
     if(OpenModal.value === null && loading.value=== false){
@@ -234,8 +198,8 @@
         type="text" 
         v-model="DetallesGenerales.orden_seguimiento" 
         placeholder="Automatico o Ingresar" 
-        :errors="ValidationErrors['orden_seguimiento']" 
-        :DeleteErrors="()=>{ValidationErrors['orden_seguimiento']}"
+        :errors="ValidationErrors?.['orden_seguimiento']" 
+        :DeleteErrorss="()=>{ValidationErrors?.['orden_seguimiento']}"
       />
       <InputBasic 
         id="ordenopcional" 
@@ -243,8 +207,8 @@
         type="text" 
         v-model="DetallesGenerales.orden_opcional"
         placeholder="Opcional"
-        :errors="ValidationErrors['orden_opcional']" 
-        :DeleteErrors="()=>{delete ValidationErrors['orden_opcional']}"
+        :errors="ValidationErrors?.['orden_opcional']" 
+        :DeleteErrorss="()=>{delete ValidationErrors?.['orden_opcional']}"
       />
       <Combobox 
         id="ubicacion" 
@@ -252,16 +216,25 @@
         v-model="DetallesGenerales.ubicacion" 
         endpoint="Combobox.ubicaciones" 
         placeholder="Buscar o Crear" 
-        :errors="ValidationErrors['ubicacion']" 
-        :deleteError="()=>{delete ValidationErrors['ubicacion']}" 
+        :errors="ValidationErrors?.['ubicacion']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['ubicacion']}" 
       />
       <Select 
         label="Tipo De Presupuesto"  
         v-model="DetallesGenerales.tipo_id" 
         id="presupuestotipo"  
         :options="optionstipos"
+        :errors="ValidationErrors?.['tipo_id']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['tipo_id']}" 
         />
-      <Select label="Modulo Orden"  v-model="DetallesGenerales.modulo_orden" id="modulooreden" :canempty="true" :options="modulosdisponibles"></Select>
+      <Select label="Modulo Orden" 
+        v-model="DetallesGenerales.modulo_orden" 
+        id="modulooreden"
+        :canempty="true" 
+        :options="modulosdisponibles"
+        :errors="ValidationErrors?.['modulo_orden']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['modulo_orden']}" 
+      />
       <Select2
         :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
         label="Vehiculo De Los Conceptos" 
@@ -269,7 +242,9 @@
         v-model="DetallesGenerales.vehiculo_concepto_id" 
         :empty_message="DetallesGenerales.modulo_orden? 'Sin Resultados':'Selecciona Un Modulo'" 
         placeholder="Buscar Vehiculo" 
-      />
+        :errors="ValidationErrors?.['vehiculo_concepto_id']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['vehiculo_concepto_id']}" 
+        />
     </div>
     <Subtitle>Datos Cliente</Subtitle>
     <div class="grid sm:grid-cols-2 gap-2">
@@ -279,63 +254,157 @@
         endpoint="Select2.Empresas" 
         v-model="DetallesGenerales.empresa" 
         placeholder="Buscar Empresas"
+        :errors="ValidationErrors?.['empresa']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['empresa']}"
       />
       <Select2   
-      label="Cliente" 
-      :params="{'empresa_id':DetallesGenerales.empresa?.value}" 
-      endpoint="Select2.Clientes" 
-      :empty_message="DetallesGenerales.empresa ? 'Sin Resultados' : 'Selecciona una empresa'"
-      v-model="DetallesGenerales.cliente" 
-      id="presupuestoempresa" 
-      :errors="['lasa']"
-      placeholder="Buscar Cliente"/>
+        label="Cliente" 
+        :params="{'empresa_id':DetallesGenerales.empresa?.value}" 
+        endpoint="Select2.Clientes" 
+        :empty_message="DetallesGenerales.empresa ? 'Sin Resultados' : 'Selecciona una empresa'"
+        v-model="DetallesGenerales.cliente" 
+        id="presupuestoempresa" 
+        placeholder="Buscar Cliente"
+        :errors="ValidationErrors?.['cliente']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['cliente']}"
+      />
+      
     </div>
     <Subtitle>Datos Vehiculo</Subtitle>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-      <Select2 
-        label="Vehiculo" 
-        :buttonNew="()=>{OpenOtherModal(1);}"
-        id="Vehiculo" 
-        endpoint="Select2.Economico" 
-        v-model="DetallesGenerales.vehiculo" 
-        placeholder="Buscar por Economico o Placas"
-        :errors="[]"
+     <VehiculoForm
+        :GetImage="(id)=>{GetImageTipoVehiculo({Canvas:ImageVehiculoEntrada, Tipo:id})}"
+        :Close="()=>emit('close')"
+        :errors="ValidationErrors?.['vehiculo']"
+        :DeleteErrors="()=>{delete ValidationErrors?.['vehiculo']}"
+        :OpenModal="()=>OpenOtherModal(1)" 
       />
-      <template v-if="DetallesGenerales.vehiculo">
-        <InputBasic id="Vin" disabled label="Vin" type="text" v-model="Vehiculo.vin" placeholder="Ej.JJSOE18P388988750 " />
-        <InputBasic id="Año" disabled label="Año" type="number" v-model="Vehiculo.anio"  placeholder="ej. 2024"/>
-        <InputBasic id="Marca" disabled label="Marcas" type="text" v-model="Vehiculo.marca" classname="uppercase" placeholder="ej. AUDI"/>
-        <InputBasic id="Modelo" disabled label="Modelo" type="text" v-model="Vehiculo.modelo" classname="uppercase" placeholder="ej. A3"/>
-        <InputBasic id="Color" disabled label="Color" type="text" v-model="Vehiculo.color" classname="uppercase" placeholder="ej. Rojo"/>
-        <TiposVehiculos disabled label="Tipo De Vehiculo" id="tipovehiculo" v-model="Vehiculo.tipo_id" />
-      </template>
-    </div>
     <Subtitle>Datos De Ingreso</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-2" >
-      <InputBasic id="telefono" label="Telefono" type="number" v-model="DetallesGenerales.telefono"  placeholder="ej. 4433221100"/>
-      <Datapicker label="Fecha Estimada" :errors="['s']" v-model="DetallesGenerales.estimacion" :clearable="false" :time="true" :range="false" class="w-full sm:col-span-2 md:col-span-1"/>
-      <InputBasic id="kilometraje" label="Kilometraje" type="number" v-model="DetallesGenerales.kilometraje" placeholder="ej. 392.31"/>
-      <Select id="gasolina" :canempty="true" v-model="DetallesGenerales.gasolina" label="Gasolina" :options="optionsgasolima"></Select>
+      <InputBasic 
+        id="telefono" 
+        label="Telefono" 
+        type="number" 
+        v-model="DetallesGenerales.telefono"  
+        placeholder="ej. 4433221100"
+        :errors="ValidationErrors?.['ubicacion']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['ubicacion']}"
+      />
+      <Datapicker 
+        label="Fecha Estimada" 
+        v-model="DetallesGenerales.estimacion" 
+        :clearable="false" 
+        :time="true" 
+        :range="false" 
+        class="w-full sm:col-span-2 md:col-span-1"
+        :errors="ValidationErrors?.['ubicacion']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['ubicacion']}"
+      />
+      <InputBasic 
+        id="kilometraje" 
+        label="Kilometraje" 
+        type="number" 
+        v-model="DetallesGenerales.kilometraje" 
+        placeholder="ej. 392.31"
+        :errors="ValidationErrors?.['ubicacion']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['firma']}"
+      />
+      <Select 
+        id="gasolina" 
+        :canempty="true" 
+        v-model="DetallesGenerales.gasolina" 
+        label="Gasolina" 
+        :options="optionsgasolima"
+        :errors="ValidationErrors?.['gasolina']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['gasolina']}"
+      />
       <div class="md:col-span-4 sm:col-span-2 flex flex-col md:flex-row gap-2" >
-        <ZDCanvas class="md:w-[70%]" 
-          :errors="ValidationErrors['carro']" 
-          :DeleteErrors="()=>{delete ValidationErrors['carro']}" ref="ImageVehiculoEntrada" title="Detalles Del Vehiculo" strokecolor="red"></ZDCanvas>
-        <ZDCanvas class="md:w-[30%]" classnamedivcanvas="w-full h-[10rem]" ref="ImageFirmaEntrada" title="Firma"></ZDCanvas>
+        <ZDCanvas 
+          class="md:w-[70%]" 
+          strokecolor="red"
+          ref="ImageVehiculoEntrada" 
+          title="Detalles Del Vehiculo" 
+          :errors="ValidationErrors?.['carro']" 
+          :DeleteErrorss="()=>{delete ValidationErrors?.['carro']}" 
+          />
+        <ZDCanvas 
+          class="md:w-[30%]" 
+          classnamedivcanvas="w-full h-[10rem]" 
+          ref="ImageFirmaEntrada" 
+          title="Firma"
+          :errors="ValidationErrors?.['firma']" 
+          :DeleteErrors="()=>{delete ValidationErrors?.['firma']}"
+        />
       </div>
     </div>
     <Subtitle>Empleados Encargados</Subtitle>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2" >
-      <Combobox endpoint="Combobox.Administradores_Trasporte" label="Administrador de Trasportes" id="administradortrasporte" v-model="DetallesGenerales.administrador"  placeholder="Buscar o Crear "/>
-      <Combobox endpoint="Combobox.Jefes_Procesos" label="Jefe De Procesos" id="jefeproceso" v-model="DetallesGenerales.jefe"  placeholder="Buscar o Crear"/>
-      <Combobox endpoint="Combobox.Trabajadores" label="Trabajador" id="trabajador" v-model="DetallesGenerales.trabajador"  placeholder="Buscar o Crear"/>
-      <Combobox endpoint="Combobox.Tecnicos" label="Tecnico" id="tecnico" v-model="DetallesGenerales.tecnico"  placeholder="Buscar o Crear"/>
+      <Combobox 
+        endpoint="Combobox.Administradores_Trasporte" 
+        label="Administrador de Trasportes" 
+        id="administradortrasporte" 
+        v-model="DetallesGenerales.administrador" 
+        placeholder="Buscar o Crear "
+        :errors="ValidationErrors?.['administrador']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['administrador']}"
+      />
+      <Combobox 
+        endpoint="Combobox.Jefes_Procesos" 
+        label="Jefe De Procesos" 
+        id="jefeproceso" 
+        v-model="DetallesGenerales.jefe"  
+        placeholder="Buscar o Crear"
+        :errors="ValidationErrors?.['jefe']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['jefe']}"
+      />
+      <Combobox 
+        endpoint="Combobox.Trabajadores" 
+        label="Trabajador" 
+        id="trabajador" 
+        v-model="DetallesGenerales.trabajador"  
+        placeholder="Buscar o Crear"
+        :errors="ValidationErrors?.['trabajador']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['trabajador']}"
+      />
+      <Combobox 
+        endpoint="Combobox.Tecnicos" 
+        label="Tecnico" 
+        id="tecnico" 
+        v-model="DetallesGenerales.tecnico"  
+        placeholder="Buscar o Crear"
+        :errors="ValidationErrors?.['tecnico']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['tecnico']}"
+      />
     </div>
     <Subtitle>Notas</Subtitle>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2" >
-      <Textarea id="indicacionescliente" label="Indicaciones Del Cliente" v-model="DetallesGenerales.indicaciones_cliente" placeholder="Escribe las indicaciones del cliente aqui..." classname="h-24"/>
-      <Textarea id="notasmecanico" label="Descripcion Mano De Obra" v-model="DetallesGenerales.descripcion_mo" placeholder="Escribe las notas del mecanico aqui..." classname="h-24"/>
-      <Textarea id="observaciones" label="Garantia" v-model="DetallesGenerales.garantia" placeholder="Escribe las observaciones aqui..." classname="h-24"/>
-      <Textarea id="descripcionmo" label="Tiempo de Entrega" v-model="DetallesGenerales.observaciones" placeholder="Escribe la descripcion de la mano de obra aqui..." classname="h-24"/>
+      <Textarea id="indicacionescliente" label="Indicaciones Del Cliente" 
+        v-model="DetallesGenerales.indicaciones_cliente" 
+        placeholder="Escribe las indicaciones del cliente aqui..." 
+        classname="h-24"
+        :errors="ValidationErrors?.['indicaciones_cliente']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['indicaciones_cliente']}"
+      />
+      <Textarea id="notasmecanico" label="Descripcion Mano De Obra" 
+        v-model="DetallesGenerales.descripcion_mo" 
+        placeholder="Escribe las notas del mecanico aqui..." 
+        classname="h-24"
+        :errors="ValidationErrors?.['descripcion_mo']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['descripcion_mo']}"
+      />
+      <Textarea id="observaciones" label="Garantia" 
+        v-model="DetallesGenerales.garantia" 
+        placeholder="Escribe las observaciones aqui..." 
+        classname="h-24"
+        :errors="ValidationErrors?.['garantia']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['garantia']}"
+      />
+      <Textarea id="descripcionmo" label="Tiempo de Entrega" 
+        v-model="DetallesGenerales.observaciones" 
+        placeholder="Escribe la descripcion de la mano de obra aqui..." 
+        classname="h-24"
+        :errors="ValidationErrors?.['observaciones']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['observaciones']}"
+      />
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
       <InventarioTemplate v-model="Inventario"/>
@@ -344,12 +413,18 @@
     <ValuesCondicionesEquipo/>
     <CondicionesInterioresTemplate 
       v-model="CondicionesInteriores" 
-      :DeleteErrors="(key)=>{delete ValidationErrors[key]}" 
-      :errors="Object.entries(ValidationErrors).filter(([key]) => key.includes('condiciones_interiores')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
-    <CondicionesExterioresTemplate v-model="CondicionesExteriores"
-      :DeleteErrors="(key)=>{delete ValidationErrors[key]}" 
-      :errors="Object.entries(ValidationErrors).filter(([key]) => key.includes('condiciones_exteriores')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
-    <ImagenesEvidencias v-model:Imagenes="Imagenes" :CanEditImages="CanEditImages"/>
+      :DeleteErrorss="(key:string)=>{delete ValidationErrors?.[key]}" 
+      :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('condiciones_interiores')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
+    <CondicionesExterioresTemplate 
+      v-model="CondicionesExteriores"
+      :DeleteErrorss="(key:string)=>{delete ValidationErrors?.[key]}" 
+      :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('condiciones_exteriores')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
+    <ImagenesEvidencias 
+      v-model:Imagenes="Imagenes" 
+      :CanEditImages="CanEditImages"
+      :DeleteErrorss="(key:string)=>{delete ValidationErrors?.[key]}" 
+      :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('imagenes_evidencia')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
+    />
   </template>
  
   </BaseModal>
