@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import {ref} from 'vue'
+import {computed, reactive, ref, watch} from 'vue'
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
 import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
@@ -8,16 +8,15 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
 import MultiOptionFilter from '@/components/Zcrat/Filters/MultiOptionFilter.vue';
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
 import empresasselect from '@/components/Zcrat/Filters/empresasselect.vue'
-import {presupuestos} from '@/types/generales';
+import {RecepcionesVehiculares} from '@/types/generales';
 import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import OrdenServicio from '@/components/Zcrat/modals/OrdenServicio.vue';
 import { OrderKeyProp } from '@/types/tablecomponent';
 
 const currentPage=ref<number>(1)
 const itemsPerPage=ref<number>(10)
-const totalPages=ref<number>(0)
 const totalItems=ref<number>(0)
-const items=ref<presupuestos[]>([])
+const items=ref<RecepcionesVehiculares[]>([])
 const search = ref<string>('');
 const empresa = ref<string|null>(null);
 const estatus = ref<string[]>([]);
@@ -27,6 +26,12 @@ const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
 const ShowNuevo = ref<boolean>(false)
 const orderBy=ref<null|OrderKeyProp>(null)
 
+const params = computed(() => ({
+  search: search.value,
+  estatus: estatus.value,
+  empresa: empresa.value,
+  modulos: modulos.value
+}))
 </script>
 
 <template>
@@ -47,29 +52,45 @@ const orderBy=ref<null|OrderKeyProp>(null)
                 
         </template>
         <template #content>
-            <Pagination api="Cortana.Presupuesto.Items" :params="{'search':search,'estatus':estatus}" :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
+            
+            <Pagination api="Cortana.OrdenServicio.Items" 
+            :params="params" 
+            v-model:currentPage="currentPage" 
+            v-model:itemsPerPage="itemsPerPage" 
+            v-model:totalItems="totalItems"
+            v-model:items="items"
+            changesItems
+            />
             <Table v-if="items.length>0" 
                 v-model:OrderKey="orderBy"
                 :titles="[
-                    {title:'No. Orden',classname:'uppercase',CanOrder:{'key':'orden',types:'desc'}},
-                    {title:'Empresa',classname:'uppercase',CanOrder:{'key':'empresa_id',types:'asc'}},
-                    {title:'Economico',classname:'uppercase'},
-                    {title:'Placas',classname:'uppercase'},
-                    {title:'Vin',classname:'uppercase'},
-                    {title:'Creacion',classname:'uppercase'},
-                    {title:'Estatus',classname:'uppercase'},
-                    {title:'opciones',classname:'uppercase'},
+                    {title:'No. Orden',CanOrder:{'key':'orden',types:'desc'}},
+                    {title:'No. Seguimiento'},
+                    {title:'Ubicacion'},
+                    {title:'Empresa'},
+                    {title:'Vehiculo',subtittles:[
+                        {title:'Economico'},
+                        {title:'Placas'},
+                        {title:'Marca'},
+                        {title:'Modelo'},
+                    ]},
+                    {title:'Entrada'},
+                    {title:'Estatus'},
+                    {title:'opciones'},
                 ]"
                 :rows="items.map(function(row){return {
                     classname:'bg-grey-300',
                     columns:[
                         {element:row.orden, classname:'capitalize'},
+                        {element:row.seguimiento, classname:'capitalize'},
+                        {element:row.ubicacion, classname:'capitalize'},
                         {element:row.empresa, classname:'lowercase'},
-                        {element:row.economico ? 'Verificado':'Sin Verificar',classname:'uppercase'},
-                        {element:row.placas+'', classname:'uppercase'},
-                        {element:row.vin+'', classname:'uppercase'},
-                        {element:row.creacion+'', classname:'uppercase'},
-                        {element:row.estatus+'', classname:'uppercase'},
+                        {element:row.economico,classname:'uppercase'},
+                        {element:row.placas,classname:'uppercase'},
+                        {element:row.marca, classname:'uppercase'},
+                        {element:row.modelo,classname:'uppercase'},
+                        {element:row.creacion, classname:'uppercase'},
+                        {element:row.estatus, classname:'uppercase'},
                         {element: Dropdown,
                             props: {
                                 father: {

@@ -59,7 +59,7 @@ export const InventarioInputs={
 export const PinturaInputs={
     'decolorada':'DECOLORADA',
     'color_desigual':'COLOR NO IGULADO',
-    'rayonnes':'EXCESO DE RAYONES',
+    'rayones':'EXCESO DE RAYONES',
     'grietas':'PEQUEÑAS GRIETAS',
     'golpes':'CARROCERIA CON GOLPES',
     'emblemas':'EMBLEMAS COMPLETOS',
@@ -112,7 +112,7 @@ export const PinturaBase: PinturaForm ={
     DetallesGeneralesId:undefined,
     decolorada:"0",
     color_desigual:"0",
-    rayonnes:"0",
+    rayones:"0",
     grietas:"0",
     golpes:"0",
     emblemas:"0",

@@ -19,7 +19,8 @@ return new class extends Migration
             $table->text('garantia');
             $table->string('folio');
             $table->timestamp('vigencia')->nullable();
-            $table->foreignId('factura_id')->constrained('facturas')->nullable();
+            $table->unsignedBigInteger('factura_id')->nullable();
+            $table->foreign('factura_id')->references('id')->on('facturas');    
             $table->foreignId('tipo_id')->constrained('tipos');
             $table->foreignId('estatus_id')->constrained('estatus');
             $table->timestamps();

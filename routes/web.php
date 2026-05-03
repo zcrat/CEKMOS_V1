@@ -57,6 +57,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::middleware(['permission:ver_presupuestos'])->group(function () {
       Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
       Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('Cortana.Presupuesto.Items');
+      Route::get('cortana/get/orden-servicio',[CortanaController::class,'GetOrdenServicio'])->name('Cortana.OrdenServicio.Items');
       Route::post('cortana/orden/servicio/create',[CortanaController::class,'CreateOrdenServico'])->name('Cortana.OrdenServicio.Create');
       Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('Presupuesto.Get.Data_Orden');
       Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('Presupuesto.Create');

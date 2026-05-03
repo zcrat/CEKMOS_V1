@@ -112,7 +112,7 @@
         loading.value=false
 
       },
-      disabled: 1!=1 &&(
+      disabled:(
         !DetallesGenerales.ubicacion ||
         !DetallesGenerales.tipo_id ||
         !DetallesGenerales.modulo_orden ||
@@ -287,8 +287,8 @@
         type="number" 
         v-model="DetallesGenerales.telefono"  
         placeholder="ej. 4433221100"
-        :errors="ValidationErrors?.['ubicacion']" 
-        :DeleteErrors="()=>{delete ValidationErrors?.['ubicacion']}"
+        :errors="ValidationErrors?.['telefono']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['telefono']}"
       />
       <Datapicker 
         label="Fecha Estimada" 
@@ -297,8 +297,8 @@
         :time="true" 
         :range="false" 
         class="w-full sm:col-span-2 md:col-span-1"
-        :errors="ValidationErrors?.['ubicacion']" 
-        :DeleteErrors="()=>{delete ValidationErrors?.['ubicacion']}"
+        :errors="ValidationErrors?.['estimacion']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['estimacion']}"
       />
       <InputBasic 
         id="kilometraje" 
@@ -306,8 +306,8 @@
         type="number" 
         v-model="DetallesGenerales.kilometraje" 
         placeholder="ej. 392.31"
-        :errors="ValidationErrors?.['ubicacion']" 
-        :DeleteErrors="()=>{delete ValidationErrors?.['firma']}"
+        :errors="ValidationErrors?.['kilometraje']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['kilometraje']}"
       />
       <Select 
         id="gasolina" 

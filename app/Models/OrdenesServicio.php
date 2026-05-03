@@ -19,7 +19,7 @@ class OrdenesServicio extends Model
         'empresa_id',
         'cliente_id',
         'update_fotos',
-        'diagnostico',
+        'estatus_id',
         'indicaciones_cliente',
         'notas_mecanico',
         'notas_retraso',
@@ -101,5 +101,11 @@ class OrdenesServicio extends Model
     }
     public function ubicacion(){
         return $this->belongsTo(Ubicaciones::class,'ubicacion_id');
+    }
+    public function seguimiento(){
+        return $this->hasMany(SeguimientoUnidades::class,'orden_servicio_id');
+    }
+    public function last_seguimiento(){
+        return $this->hasOne(SeguimientoUnidades::class,'orden_servicio_id')->orderbydesc('id');
     }
 }

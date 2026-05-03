@@ -29,10 +29,25 @@ export interface presupuestos{
   creacion:string;
   estatus:string;
 }
+export interface RecepcionesVehiculares{
+  id:number;
+  orden:string;
+  seguimiento:string;
+  ubicacion:string;
+  empresa:string;
+  economico:string;
+  placas:string;
+  marca:string;
+  modelo:string;
+  folios:string[];
+  creacion:string;
+  estatus:string;
+}
 
 export interface paginationprops {
   api: string,
   params: Record<string, any>
+  setTotalPages?:(val:number)=>void
   clases?: string;
   changesItems?:boolean;
 }

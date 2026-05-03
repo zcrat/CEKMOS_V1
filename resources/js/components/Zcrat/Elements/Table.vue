@@ -2,6 +2,7 @@
 import { TitleColumn, Row ,OrderKeyProp,OrderKeysProp} from '@/types/tablecomponent'
 import TitleOrderBy from '../Filters/TitleOrderBy.vue'
 import { computed } from 'vue';
+import { forEach } from 'lodash';
 
 
 const props = defineProps<{
@@ -9,6 +10,13 @@ const props = defineProps<{
   rows: Row[]
   titles: (TitleColumn | string)[]
 }>()
+interface TittleArray{
+  title:string,
+  row:number,
+  cols:number,
+  CanOrder?:OrderKeysProp,
+  classname?:string
+}
 
 const OrderKey = defineModel<OrderKeyProp | null>('OrderKey',{default:null})
 
@@ -32,9 +40,47 @@ const OnClickOrder= (Order:OrderKeysProp)=>{
     
   }
 }
-const hassubtitles = computed(() =>
-  props.titles.some(item => typeof item !== 'string' && item.subtittles)
-)
+const titlesComputed = computed(() => {
+  const localtitles: TittleArray[] = []
+  const subtittles: TittleArray[] = []
+
+  const anyhas = props.titles.some(
+    item => typeof item !== 'string' && item.subtittles
+  )
+
+  props.titles.forEach((title) => {
+    if (typeof title === 'string') {
+      localtitles.push({
+        title,
+        row: anyhas ? 2 : 1,
+        cols: 1
+      })
+    } else {
+      localtitles.push({
+        title: title.title,
+        row: anyhas ? (title.subtittles ? 1 : 2) : 1,
+        cols: title.subtittles?.length ?? 1,
+        CanOrder: title.CanOrder
+      })
+
+      if (title.subtittles) {
+        title.subtittles.forEach((subtitle) => {
+          subtittles.push({
+            title: subtitle.title,
+            row: 1,
+            cols: 1,
+            CanOrder: title.CanOrder
+          })
+        })
+      }
+    }
+  })
+
+  return {
+    SimpleTitles: localtitles,
+    Subtittles: subtittles
+  }
+})
 
 </script>
 
@@ -45,33 +91,55 @@ const hassubtitles = computed(() =>
       <thead>
         <tr>
           <th
-            v-for="(col, index) in titles"
+            v-for="(col, index) in titlesComputed.SimpleTitles"
             :key="index"
-            :class="typeof col !== 'string' ? col.classname : ''"
-            
+            :class="col.classname"
+            :rowspan="col.row"
+            :colspan="col.cols"
           >
-            <template v-if="(typeof col !== 'string')" >
-              <TitleOrderBy
-                v-if="col.CanOrder != undefined"
-                @click="()=>{
-                  if(typeof col !== 'string' && col.CanOrder != undefined){
-                    OnClickOrder(col.CanOrder)
-                  }
-                }"
-                :title="col.title"
-                :order="OrderKey?.key == col.CanOrder.key
-                          ? OrderKey.order 
-                          : null"
-              />
-              <span v-else>
-                {{ col.title }}
-              </span>
-          </template>
-          <template v-else>
-            {{ col }}
-          </template>
-        </th>
-      </tr>
+            <TitleOrderBy
+              v-if="col.CanOrder != undefined"
+              @click="()=>{
+                if(typeof col !== 'string' && col.CanOrder != undefined){
+                  OnClickOrder(col.CanOrder)
+                }
+              }"
+              :title="col.title"
+              :order="OrderKey?.key == col.CanOrder.key
+                        ? OrderKey.order 
+                        : null"
+            />
+            <span v-else>
+              {{ col.title }}
+            </span>
+          </th>
+        </tr>
+        <tr v-if="titlesComputed.Subtittles.length>0">
+          <th
+            v-for="(col, index) in titlesComputed.Subtittles"
+            :key="index"
+            :class="col.classname"
+            :rowspan="col.row"
+            :colspan="col.cols"
+          >
+            <TitleOrderBy
+              v-if="col.CanOrder != undefined"
+              @click="()=>{
+                if(typeof col !== 'string' && col.CanOrder != undefined){
+                  OnClickOrder(col.CanOrder)
+                }
+              }"
+              :title="col.title"
+              :order="OrderKey?.key == col.CanOrder.key
+                        ? OrderKey.order 
+                        : null"
+            />
+            <span v-else>
+              {{ col.title }}
+            </span>
+          </th>
+
+        </tr>
       </thead>
       <tbody>
         <tr

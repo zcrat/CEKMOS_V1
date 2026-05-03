@@ -75,7 +75,7 @@ import { color } from './generales';
     DetallesGeneralesId?:number,
     decolorada:"1"|"0",
     color_desigual:"1"|"0",
-    rayonnes:"1"|"0",
+    rayones:"1"|"0",
     grietas:"1"|"0",
     golpes:"1"|"0",
     emblemas:"1"|"0",

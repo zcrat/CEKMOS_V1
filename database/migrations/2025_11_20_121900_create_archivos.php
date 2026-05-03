@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
-            $table->foreignId('presupuesto_id')->constrained('presupuestos')->nullable();
+            $table->unsignedBigInteger('presupuesto_id')->nullable();
+            $table->foreign('presupuesto_id')->references('id')->on('presupuestos');
             $table->foreignId('tipo_id')->constrained('tipos');
             $table->foreignId('estatus_id')->constrained('estatus');
             $table->timestamps();

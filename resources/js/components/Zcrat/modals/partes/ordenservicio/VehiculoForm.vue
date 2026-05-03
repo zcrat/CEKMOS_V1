@@ -14,7 +14,8 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
         Close?: ()=>void
         errors?: string[]
         DeleteErrors?: ()=>void
-        OpenModal?:()=>void       
+        OpenModal?:()=>void 
+        ShowButtons?:boolean      
     }>()
     const Vehiculo = reactive<EconomicoForm>(EconomicoBase)
     const VehiculoId=defineModel<option|null>()
@@ -132,7 +133,7 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
         />
         </template>
     </div>
-    <div class="flex gap-2 mt-2">
+    <div class="flex gap-2 mt-2" v-if="ShowButtons">
         <Button text="Guardar" />
         <Button text="Cancelar" type="delete"/>
     </div>

@@ -57,6 +57,46 @@ class CortanaController extends Controller
             compact('currentPage', 'itemsPerPage', 'totalPages', 'totalItems', 'items')
         );
     }
+    public function GetOrdenServicio(Request $request){
+        $user=Auth::user();
+        $currentPage=$request->currentPage ?? 1;
+        $itemsPerPage=$request->itemsPerPage ?? 10;
+        
+        $query=OrdenesServicio::query()->with(['last_seguimiento','vehiculo.modelo.marca','empresa','ubicacion']);
+        
+        if(!$user->hasRole('Super Admin')){
+            $user->load('modulos_orden');
+            $modulosvisibles=$user->modulos_orden ? $user->modulos_orden->pluck('modulo_orden_id')->toarray(): [] ;
+            $query->whereIn('modulo_orden_id',$modulosvisibles);
+        }
+            
+        $query=$query->paginate($itemsPerPage,['*'],'page',$currentPage);
+        $totalItems=$query->total();
+        $items = $query->map(fn($item) => [
+            'id' => $item->id,
+            'orden' => $item->orden_servicio,
+            'seguimiento' => $item->orden_seguimiento,
+            'ubicacion' => optional($item->ubicacion)->nombre ?? null,
+            'empresa' =>  optional($item->empresa)->nombre ?? null,
+            'economico' => optional($item->vehiculo)->economico ?? null,
+            'placas' => optional($item->vehiculo)->placas ?? null,
+            'marca' => optional($item->vehiculo->modelo->marca)->descripcion ?? null,
+            'modelo' => optional($item->vehiculo->modelo)->descripcion ?? null,
+            'folios' => $item->folios ?? [], // ajusta según tu relación
+            'creacion' => $item->created_at,
+            'estatus' => $item->last_seguimiento ? 
+                ($item->last_seguimiento->tipo_id===1 ? (
+                    'Diagnostico Iniciado'
+                )
+                :'Revisando' ) 
+                :'No Aplica',
+        ]);
+
+        $totalPages=ceil($totalItems/$itemsPerPage);
+        return response()->json(
+            compact('currentPage', 'itemsPerPage', 'totalPages', 'totalItems', 'items')
+        );
+    }
     public function CreateOrdenServico(Request $request){
         $user=Auth::user()->load('modulos_orden');
         $keysinventario=[
@@ -68,7 +108,7 @@ class CortanaController extends Controller
             'tarjeta_circulacion',
             'cubreruedas','candado_rueda','extinguidor','gato','placas'
         ];
-        $keyspintura=['decolorada','color_desigual','rayonnes','grietas','golpes','emblemas','logos','rociado','granizo','lluvia'];
+        $keyspintura=['decolorada','color_desigual','rayones','grietas','golpes','emblemas','logos','rociado','granizo','lluvia'];
         $keycondicionesinterior=[
             'puerta_izq_f',
             'puerta_izq_t',
