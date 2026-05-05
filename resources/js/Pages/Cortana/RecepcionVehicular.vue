@@ -25,6 +25,7 @@ const loading = ref<boolean>(false);
 const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
 const ShowNuevo = ref<boolean>(false)
 const orderBy=ref<null|OrderKeyProp>(null)
+const ModalOrdenServicio = ref<InstanceType<typeof OrdenServicio> | null>(null);
 
 const params = computed(() => ({
   search: search.value,
@@ -100,7 +101,25 @@ const params = computed(() => ({
                                 children: [
                                     {
                                     element: Button,
-                                    props: {text:'Editar Roles Y Permisos', onClick:()=>{console.log(row.id)},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
+                                    props: {
+                                        text:'Editar Recepcion', 
+                                        onClick:()=>{
+                                            ShowNuevo=true
+                                            if(ModalOrdenServicio){
+                                                
+                                                ModalOrdenServicio.OpenEdit(row.id)
+                                            }
+                                        },
+                                        hiddenclases:true,
+                                        classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
+                                    },
+                                    {
+                                    element: Button,
+                                    props: {
+                                        text:'Descargar PDF', 
+                                        onClick:()=>{console.log(row.id)},
+                                        hiddenclases:true,
+                                        classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
                                     },
                                 ]
                                 ,contentClasses:['bg-gray-200']
@@ -116,5 +135,5 @@ const params = computed(() => ({
             </div>
         </template>
     </AppLayout>
-    <OrdenServicio v-model:show="ShowNuevo"  @close="()=>ShowNuevo=false"/>
+    <OrdenServicio v-model:show="ShowNuevo"  @close="()=>ShowNuevo=false" ref="ModalOrdenServicio" />
 </template>

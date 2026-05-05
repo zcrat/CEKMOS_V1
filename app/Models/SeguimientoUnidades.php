@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SeguimientoUnidades extends Model
 {
     protected $fillable = [
-        'ordene_servicio_id',
+        'orden_servicio_id',
         'tipo_id',
     ];
     protected $table='seguimiento_unidades';

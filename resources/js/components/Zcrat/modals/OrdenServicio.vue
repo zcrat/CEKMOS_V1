@@ -170,6 +170,21 @@
       ImagenesCanvas.value={}
     }
   })
+  const OpenEdit = (newId: number) => {
+    DetallesGenerales.orden_opcional = `OS-${newId.toString().padStart(6, '0')}`;
+    if (newId) {
+    } else {
+      Object.assign(DetallesGenerales, DetallesGeneralesBase);
+      CondicionesInteriores.value = CondicionesInterioresBase;
+      CondicionesExteriores.value = CondicionesExterioresBase;
+      Pintura.value = PinturaBase;
+      Inventario.value = InventarioBase;
+      Imagenes.value = [];
+    }
+  };
+  defineExpose({
+    OpenEdit,
+  })
 </script>
 <template>
   <VehiculoModal
