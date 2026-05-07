@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
 import Button from '@/components/Zcrat/Inputs/Button.vue';
-import { FilesForm } from '@/types/OrdenServicio';
 import { CovertBlobToURL, DeleteImage, DeleteImagesNew, SaveImagesEvidencia } from '@/utils/functions/ordenservicio';
 import { ref } from 'vue';
 
-const Imagenes = defineModel<FilesForm[]>('Imagenes', { default: [] })
+const Imagenes = defineModel<File[]>('Imagenes', { default: [] })
 const LoadImages = ref<HTMLInputElement | null>(null)
 const imagepreview=ref<string>('')
 defineProps<{CanEditImages:boolean}>()
@@ -18,11 +17,11 @@ defineProps<{CanEditImages:boolean}>()
           @change="(event)=>{SaveImagesEvidencia({event,Imagenes})}"/>
           <div class="flex flex-row sm:flex-col gap-2 w-full sm:w-[8rem]" >
           <Button text="Tomar Fotos"  @click="()=>{LoadImages?.click()}" />
-          <Button text="Eliminar Fotos" @click="()=>{DeleteImagesNew(Imagenes)}"  type="delete" v-if="Imagenes.some(img => img.tipo_id === 3)"/>
+          <Button text="Eliminar Fotos" @click="()=>{DeleteImagesNew(Imagenes)}"  type="delete" v-if="Imagenes.length > 0"/>
         </div>
         <div :class="'overflow-x-auto flex gap-2 flex-row'">
-          <div :key="index" v-for="(value,index) in Imagenes.filter(item=>item.tipo_id ===3)" class="border-2 rounded-md border-gray-700 p-2 w-fit flex flex-col justify-end">
-             <img :src="CovertBlobToURL(value.file)" class="max-w-[200px] max-h-[200px]" @click="imagepreview=CovertBlobToURL(value.file)" />
+          <div :key="index" v-for="(value,index) in Imagenes" class="border-2 rounded-md border-gray-700 p-2 w-fit flex flex-col justify-end">
+             <img :src="CovertBlobToURL(value)" class="max-w-[200px] max-h-[200px]" @click="imagepreview=CovertBlobToURL(value)" />
             <Button text="Eliminar"  type="delete" @click="DeleteImage({index,Imagenes})" v-if="CanEditImages"/>
           </div>
         </div>

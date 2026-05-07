@@ -22,6 +22,7 @@ const props = withDefaults(defineProps<{
   id: string
   endpoint: string
   placeholder?: string
+  classnamaInput?: string
   label?: string
   timeout?: number
   OnBlur?: () => void
@@ -124,7 +125,7 @@ const onInputChange=(event: Event)=> {
             @input="onInputChange"
             :placeholder="placeholder"
             :class="['w-full border rounded px-2 py-2',
-            props.errors && props.errors.length > 0 ? 'inputerror ps-[2rem]' : '']"
+            props.errors && props.errors.length > 0 ? 'inputerror ps-[2rem]' : '', props.classnamaInput]"
             @focus="onFocus"
             />
           </div>
@@ -142,7 +143,6 @@ const onInputChange=(event: Event)=> {
           class="z-50 w-[var(--reka-combobox-trigger-width)] bg-white border rounded shadow-md"
         >
           <ComboboxViewport class="max-h-[15rem] overflow-auto">
-
             <!-- LOADING -->
             <div v-if="loading" class="p-2 text-center">
               Cargando...

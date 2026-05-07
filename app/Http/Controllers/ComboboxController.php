@@ -19,7 +19,9 @@ class ComboboxController extends Controller
     }
     public function GetUbicaciones(Request $request){
         $search=$request->search??'';
-        $ubicaciones=Ubicaciones::where('descripcion','LIKE','%'.$search.'%')->pluck('descripcion')->unique()->values();
+        $ubicaciones=Ubicaciones::where('nombre','LIKE','%'.$search.'%')->orWhere('descripcion','LIKE','%'.$search.'%')->pluck('nombre')->unique()->values()->map(function($item){
+            return strtoupper($item);
+        });
         return response()->json(['options'=>$ubicaciones]);
     }
     public function GetAdministradoresTrasporte(Request $request){

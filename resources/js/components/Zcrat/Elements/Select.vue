@@ -43,7 +43,7 @@ const query = ref<string>('')
 const isOpen = ref<boolean>(false)
 
 const onFocus = () => {
-  isOpen.value = true
+  isOpen.value = props.disabled? false :true
 }
 const onMouseDown = (e: MouseEvent) => {
   if (isOpen.value) {
@@ -52,7 +52,7 @@ const onMouseDown = (e: MouseEvent) => {
     isOpen.value = false
   } else {
     // Si está cerrado → abrir
-    isOpen.value = true
+    isOpen.value = props.disabled? false :true
   }
 }
 const onSelect = () => {

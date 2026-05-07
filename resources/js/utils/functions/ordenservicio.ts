@@ -1,7 +1,7 @@
 import axios from 'axios'
 import MyBasicToast from "@/utils/ToastNotificationBasic";
 import ZDCanvas from '@/components/Zcrat/Elements/ZDCanvas.vue';
-import { EconomicoForm, FilesForm } from '@/types/OrdenServicio';
+import { EconomicoForm} from '@/types/OrdenServicio';
 import { Ref } from 'vue';
   
 export const GetImageTipoVehiculo = async ({Canvas,Tipo}:{Canvas:InstanceType<typeof ZDCanvas> | null,Tipo:number}) => {
@@ -26,7 +26,7 @@ export const GetImageTipoVehiculo = async ({Canvas,Tipo}:{Canvas:InstanceType<ty
       }
     }
 }
-export const SaveImagesEvidencia = ({event,Imagenes}: {event:Event,Imagenes:FilesForm[]}) => {
+export const SaveImagesEvidencia = ({event,Imagenes}: {event:Event,Imagenes:File[]}) => {
     const target = event.target as HTMLInputElement
     if (target.files) {
       if (Array.from(target.files).some(file => !file.type.startsWith('image/'))) {
@@ -34,7 +34,7 @@ export const SaveImagesEvidencia = ({event,Imagenes}: {event:Event,Imagenes:File
           return;
       } 
       Array.from(target.files).forEach(file => { 
-        Imagenes.push({ tipo_id: 3, file: file })
+        Imagenes.push(file)
       })
     }
     target.value = '';
@@ -42,20 +42,18 @@ export const SaveImagesEvidencia = ({event,Imagenes}: {event:Event,Imagenes:File
 export function CovertBlobToURL(file: Blob | File) {
     return window.URL.createObjectURL(file)
 }
-export const DeleteImage=({index,Imagenes,DeleteErrors}:{index:number,Imagenes:FilesForm[],DeleteErrors?:(val:string)=>void})=>{
+export const DeleteImage=({index,Imagenes,DeleteErrors}:{index:number,Imagenes:File[],DeleteErrors?:(val:string)=>void})=>{
     const registro=Imagenes[index];
     if(registro){
       Imagenes.splice(index, 1);
       DeleteErrors?.('imagenes_evidencia.'+(index+1))
     }
   }
-export const DeleteImagesNew=(Imagenes:FilesForm[],DeleteErrors?:(val:string)=>void )=>{
-    if (Imagenes.some(items => items.tipo_id == 3)) {
+export const DeleteImagesNew=(Imagenes:File[],DeleteErrors?:(val:string)=>void )=>{
+    if (Imagenes.length > 0) {
       for (let i = Imagenes.length - 1; i >= 0; i--) {
-        if (Imagenes[i].tipo_id === 3) {
-          Imagenes.splice(i, 1);
-          DeleteErrors?.('imagenes_evidencia.'+(i+1))
-        }
+        Imagenes.splice(i, 1);
+        DeleteErrors?.('imagenes_evidencia.'+(i+1))
       }
     }else{
       MyBasicToast.error('No hay imágenes nuevas para eliminar');
@@ -120,37 +118,14 @@ export const GetDataVehiculoPlacas=(Economico:EconomicoForm)=>{
       });
     }
   }
-export const SaveCarAndFirma = async({Carro,Firma,Imagenes}:{Carro:InstanceType<typeof ZDCanvas> | null,Firma:InstanceType<typeof ZDCanvas> | null,Imagenes:FilesForm[]})=>{
-    const carro =await Carro?.getCanvasBlob();
-    const existingIndexCarro = Imagenes.findIndex(img => img.tipo_id === 1);
-    if(carro != null){
-      const file = new File([carro], 'carro.png', {
-        type: carro.type,
+export const ImageCanvas = async({Canvas,FileName}:{Canvas:InstanceType<typeof ZDCanvas> | null,FileName:string})=>{
+    const Image =await Canvas?.getCanvasBlob();
+    if(Image != null){
+      return new File([Image], FileName, {
+        type: Image.type,
       });
-      if (existingIndexCarro !== -1) {
-        Imagenes[existingIndexCarro].file = file;
-      } else {
-        Imagenes.push({tipo_id:1,file:file});
-      }
     } else {
-      if (existingIndexCarro !== -1) {
-        Imagenes.splice(existingIndexCarro, 1);
-      }
+      return null;
     }
-    const firma=await Firma?.getCanvasBlob();
-    const existingIndexFirma = Imagenes.findIndex(img => img.tipo_id === 2);
-    if(firma != null){
-      const file = new File([firma], 'carro.png', {
-        type: firma.type,
-      });
-      if (existingIndexFirma !== -1) {
-        Imagenes[existingIndexFirma].file = file;
-      } else {
-        Imagenes.push({tipo_id:2,file:file});
-      }
-    } else {
-      if (existingIndexFirma !== -1) {
-        Imagenes.splice(existingIndexFirma, 1);
-      }
-    }
+    
   }

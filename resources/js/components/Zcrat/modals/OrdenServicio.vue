@@ -14,10 +14,10 @@
   import GetModulosDisponibles  from '@/utils/functions/select/ModulosCortana';
   import ZDCanvas, { StrokesArray } from '../Elements/ZDCanvas.vue'
   import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory'
-  import {OrdenServicioForm,FilesForm,CondicionesInterioresForm,CondicionesExterioresForm, PinturaForm, InventarioForm, DetallesGeneralesBaseProps} from '@/types/OrdenServicio'
+  import {OrdenServicioForm,CondicionesInterioresForm,CondicionesExterioresForm, PinturaForm, InventarioForm, DetallesGeneralesBaseProps} from '@/types/OrdenServicio'
   import {optionstipos} from '@/utils/variables/options'
-  import {DetallesGeneralesBase,CondicionesInterioresBase,CondicionesExterioresBase,EconomicoBase, PinturaBase, InventarioBase} from '@/utils/variables/ordenservicio'
-  import {GetImageTipoVehiculo, SaveCarAndFirma } from '@/utils/functions/ordenservicio';
+  import {DetallesGeneralesBase,CondicionesInterioresBase,CondicionesExterioresBase,PinturaBase,InventarioBase} from '@/utils/variables/ordenservicio'
+  import {GetImageTipoVehiculo, ImageCanvas } from '@/utils/functions/ordenservicio';
   import ImagenesEvidencias from '@/components/Zcrat/modals/partes/ordenservicio/ImagenesEvidencias.vue';
   import CondicionesInterioresTemplate from './partes/ordenservicio/CondicionesInteriores.vue';
   import CondicionesExterioresTemplate from './partes/ordenservicio/CondicionesExteriores.vue';
@@ -26,92 +26,41 @@
   import PinturaTemplate from './partes/ordenservicio/PinturaTemplate.vue';
   import { ZdAlert } from '@/utils/ZdAlert';
   import Loading from '../Elements/Loading.vue';
-  import { Create } from '@/services/orden-servicio/crud';
+  import { CreateorUpdate } from '@/services/orden-servicio/crud';
   import VehiculoModal from './VehiculoModal.vue';
   import MyBasicToast from '@/utils/ToastNotificationBasic';
   import VehiculoForm from '@/components/Zcrat/modals/partes/ordenservicio/VehiculoForm.vue'
+  import axios from 'axios';
+
   const emit = defineEmits(['close'])
-  const props = defineProps<{show: boolean}>()
   const optionsgasolima=ref<option[]>([])
   const optionsequipo=ref<option[]>([])
   const modulosdisponibles=ref<option[]>([])
-  const ImagenesCanvas=ref<{'firma'?:StrokesArray , 'carro'?:StrokesArray}>({})
+  const ImagenesCanvas=ref<{'firma'?:StrokesArray , 'carro'?:StrokesArray,'firma_img'?:File | null , 'carro_img'?:File | null}>({})
   const OpenModal = ref<null|1>(null);
+  const resetvalues = ref<boolean>(true);
+  const show = ref<boolean>(false);
   const CanEditImages = ref<boolean>(true)
-  const updateVisibility = () => {
-    emit('close')
-  }
-  onMounted(async () => {console.log('montado')
-    optionsgasolima.value = await GetNivelesGasolina();
-    optionsequipo.value = await GetStatusPerCategory(11);
-    modulosdisponibles.value=await GetModulosDisponibles();
-  });
   const ValidationErrors = ref<ArrayAsociativo>()
-  const Imagenes = ref<FilesForm[]>([])
+  const ImagenesEvidencia = ref<File[]>([])
   const loading = ref<boolean>(false)
-  const DetallesGenerales = reactive<DetallesGeneralesBaseProps>(DetallesGeneralesBase);
+  const DetallesGenerales = reactive<DetallesGeneralesBaseProps>({...DetallesGeneralesBase});
   const CondicionesInteriores=ref<CondicionesInterioresForm>(CondicionesInterioresBase)
   const CondicionesExteriores=ref<CondicionesExterioresForm>(CondicionesExterioresBase)
-  const Pintura=ref<PinturaForm>({...PinturaBase})
-  const Inventario=ref<InventarioForm>({...InventarioBase})
+  const Pintura=ref<PinturaForm>(PinturaBase)
+  const Inventario=ref<InventarioForm>(InventarioBase)
   const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
+  type filedb = {
+    id: number,
+    url: string
+  }
+  const Archivos = reactive<{carro:filedb|null,firma:filedb|null,evidencias:filedb[]}>({carro:null,firma:null,evidencias:[]})
   const buttonconfirm=computed<buttonconfirmed>(()=>{ 
     return {
       text:'Crear Orden De Servicio',
       classname:'bg-blue-600 text-white',
-      onClick:async ()=>{
-        console.log('click')
-        console.log(Imagenes.value)
-        ImagenesCanvas.value.carro=ImageVehiculoEntrada.value?.GetStrokes();
-        ImagenesCanvas.value.firma=ImageFirmaEntrada.value?.GetStrokes();
-        await SaveCarAndFirma({Carro:ImageVehiculoEntrada.value,Firma:ImageFirmaEntrada.value,Imagenes:Imagenes.value})
-        const confirm=await ZdAlert({});
-        if(!confirm){return}
-        loading.value=true
-        const Form:OrdenServicioForm={
-          orden_seguimiento: DetallesGenerales.orden_seguimiento,
-          orden_opcional: DetallesGenerales.orden_opcional,
-          ubicacion: DetallesGenerales.ubicacion,
-          tipo_presupuesto_id: DetallesGenerales.tipo_id,
-          modulo_orden_id: Number(DetallesGenerales.modulo_orden),
-          vehiculo_concepto_id: DetallesGenerales.vehiculo_concepto_id?.value,
-          empresa_id: DetallesGenerales.empresa?.value,
-          cliente_id: DetallesGenerales.cliente?.value,
-          vehiculo_id: DetallesGenerales.vehiculo?.value,
-          telefono: DetallesGenerales.telefono ?? 0,
-          estimacion: DetallesGenerales.estimacion,
-          kilometraje: DetallesGenerales.kilometraje ?? 0,
-          gasolina: Number(DetallesGenerales.gasolina) ?? 0,
-          administrador: DetallesGenerales.administrador,
-          jefe: DetallesGenerales.jefe,
-          trabajador: DetallesGenerales.trabajador,
-          tecnico: DetallesGenerales.tecnico,
-          indicaciones_cliente: DetallesGenerales.indicaciones_cliente,
-          descripcion_mo: DetallesGenerales.descripcion_mo,
-          garantia: DetallesGenerales.garantia,
-          observaciones: DetallesGenerales.observaciones,
-          imagenes_evidencia: Imagenes.value.map(img=>img.tipo_id === 3 ? img.file : null).filter(img=>img !== null) as File[],
-          carro: Imagenes.value.find((item) => item.tipo_id === 1) ? Imagenes.value.find((item) => item.tipo_id === 1)!.file : null,
-          firma: Imagenes.value.find((item) => item.tipo_id === 2) ? Imagenes.value.find((item) => item.tipo_id === 2)!.file : null,
-          condiciones_exteriores: CondicionesExteriores.value,
-          condiciones_interiores: CondicionesInteriores.value,
-          pintura: Pintura.value,
-          inventario: Inventario.value
-        }
-        const response=await Create(Form);
-        if(response.status){
-          MyBasicToast.success(response.data.message??'Orden De Servicio Creada Con Exito')
-          updateVisibility();
-        }else if(response.code === 422){
-          ValidationErrors.value=response.validationErrors ?? {};
-        }else{
-          MyBasicToast.error(response.data.message??'Error Al Crear La Orden De Servicio' )
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        loading.value=false
-
-      },
+      onClick:Save,
       disabled:(
         !DetallesGenerales.ubicacion ||
         !DetallesGenerales.tipo_id ||
@@ -130,22 +79,106 @@
         !DetallesGenerales.tecnico ||
         !DetallesGenerales.indicaciones_cliente ||
         !DetallesGenerales.descripcion_mo ||
-        !DetallesGenerales.garantia ||
-        !DetallesGenerales.observaciones ||
-        Imagenes.value.filter(img=>img.tipo_id === 3).length === 0 ||
-        Object.entries(CondicionesInteriores.value).filter(([key]) => !['id','DetallesGeneralesId'].includes(key)).
-        some(([_,value]) => value === null || value === '')||
-        Object.entries(CondicionesInteriores.value).filter(([key]) => !['id','DetallesGeneralesId'].includes(key)).
-        some(([_,value]) => value === null || value === '')
+        (DetallesGenerales.id && ImagenesEvidencia.value.length < 6) ||
+        Object.entries(CondicionesInteriores.value).some(([value]) => value === '') ||
+        Object.entries(CondicionesExteriores.value).some(([value]) => value === '')
       )
     }
-
-  })  
-
+  }) 
+  const Read= async (id:number) =>{
+    loading.value=true;
+    try{
+      const response=await axios.get(route('Cortana.OrdenServicio.Read'),{params:{id}});
+      resetvalues.value=false;
+      Object.assign(DetallesGenerales,response.data.generales);
+      CondicionesInteriores.value=response.data.interiores;
+      CondicionesExteriores.value=response.data.exteriores;
+      Pintura.value=response.data.pintura;
+      Inventario.value=response.data.inventario;
+      const urls = response.data.urls;
+      loading.value=false;
+      Archivos.carro = urls.carro;
+      Archivos.firma = urls.firma;
+      Archivos.evidencias = urls.evidencias;
+      await nextTick();
+      resetvalues.value=true;
+    }catch(error:any){
+      if (error.response) {
+        MyBasicToast.error(error.response.data.mensaje || "Error Indefinido.");
+      }else {
+        MyBasicToast.error(error.message || "Error Indefinido.");
+      }
+      loading.value=false;
+    }
+  }
+  
+  const Save = async() =>{
+    ImagenesCanvas.value.carro=ImageVehiculoEntrada.value?.GetStrokes();
+    ImagenesCanvas.value.firma=ImageFirmaEntrada.value?.GetStrokes();
+    ImagenesCanvas.value.carro_img = await ImageCanvas({Canvas:ImageVehiculoEntrada.value,FileName:'carro.png'});
+    ImagenesCanvas.value.firma_img = await ImageCanvas({Canvas:ImageFirmaEntrada.value,FileName:'firma.png'});
+    const confirm=await ZdAlert({});
+    if(!confirm){return}
+    loading.value=true
+    const Form:OrdenServicioForm={
+      orden_seguimiento: DetallesGenerales.orden_seguimiento,
+      orden_opcional: DetallesGenerales.orden_opcional,
+      ubicacion: DetallesGenerales.ubicacion,
+      tipo_presupuesto_id: DetallesGenerales.tipo_id,
+      modulo_orden_id: Number(DetallesGenerales.modulo_orden),
+      vehiculo_concepto_id: DetallesGenerales.vehiculo_concepto_id?.value,
+      empresa_id: DetallesGenerales.empresa?.value,
+      cliente_id: DetallesGenerales.cliente?.value,
+      vehiculo_id: DetallesGenerales.vehiculo?.value,
+      telefono: DetallesGenerales.telefono ?? 0,
+      estimacion: DetallesGenerales.estimacion,
+      kilometraje: DetallesGenerales.kilometraje ?? 0,
+      gasolina: Number(DetallesGenerales.gasolina) ?? 0,
+      administrador: DetallesGenerales.administrador,
+      jefe: DetallesGenerales.jefe,
+      trabajador: DetallesGenerales.trabajador,
+      tecnico: DetallesGenerales.tecnico,
+      indicaciones_cliente: DetallesGenerales.indicaciones_cliente,
+      descripcion_mo: DetallesGenerales.descripcion_mo,
+      imagenes_evidencia: ImagenesEvidencia.value,
+      carro: ImagenesCanvas.value.carro_img ?? null,
+      firma: ImagenesCanvas.value.firma_img ?? null,
+      condiciones_exteriores: CondicionesExteriores.value,
+      condiciones_interiores: CondicionesInteriores.value,
+      pintura: Pintura.value,
+      inventario: Inventario.value
+    }
+    const response= await CreateorUpdate(Form);
+    if(response.status){
+      MyBasicToast.success(response.data.message??'Orden De Servicio Creada/Actualizada Con Exito')
+      updateVisibility();
+    }else if(response.code === 422){
+      ValidationErrors.value=response.validationErrors ?? {};
+    }else{
+      MyBasicToast.error(response.data.message??'Error al crear/actualizar la Orden De Servicio' )
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    loading.value=false
+  }   
+  const updateVisibility = () => {
+    show.value = false;
+    if(OpenModal.value !== null){
+      OpenModal.value = null;
+    }
+  }
+  onMounted(async () => {console.log('montado')
+    optionsgasolima.value = await GetNivelesGasolina();
+    optionsequipo.value = await GetStatusPerCategory(11);
+    modulosdisponibles.value=await GetModulosDisponibles();
+  });
   watch(()=>DetallesGenerales.modulo_orden,()=>{
+    if(!resetvalues.value){return}
+    console.log('modulo orden cambio')
     DetallesGenerales.vehiculo_concepto_id=null
-  })
+  },{ flush: 'post' })
   watch(()=>DetallesGenerales.empresa,()=>{
+    if(!resetvalues.value){return}
+    console.log('empresa cambio')
     DetallesGenerales.cliente=null
   })
   const OpenOtherModal= (val:1)=>{
@@ -170,20 +203,23 @@
       ImagenesCanvas.value={}
     }
   })
-  const OpenEdit = (newId: number) => {
-    DetallesGenerales.orden_opcional = `OS-${newId.toString().padStart(6, '0')}`;
-    if (newId) {
+  const Open = (Id: number | null) => {
+    if (Id) {
+      Read(Id);
     } else {
       Object.assign(DetallesGenerales, DetallesGeneralesBase);
       CondicionesInteriores.value = CondicionesInterioresBase;
       CondicionesExteriores.value = CondicionesExterioresBase;
       Pintura.value = PinturaBase;
       Inventario.value = InventarioBase;
-      Imagenes.value = [];
+      ImagenesEvidencia.value = [];
     }
+    nextTick(() => {
+      show.value = true;
+    });
   };
   defineExpose({
-    OpenEdit,
+    Open
   })
 </script>
 <template>
@@ -195,7 +231,7 @@
   />
   <BaseModal modaltitle="Nueva Orden De Servicio" 
   :position="'center'"
-  :show="props.show && OpenModal === null" 
+  :show="show && OpenModal === null" 
   @close="updateVisibility" 
   :buttonconfirm="buttonconfirm"
   :loading="loading"
@@ -235,6 +271,7 @@
         :DeleteErrors="()=>{delete ValidationErrors?.['ubicacion']}" 
       />
       <Select 
+        v-if="!DetallesGenerales.id"
         label="Tipo De Presupuesto"  
         v-model="DetallesGenerales.tipo_id" 
         id="presupuestotipo"  
@@ -287,7 +324,7 @@
     </div>
     <Subtitle>Datos Vehiculo</Subtitle>
      <VehiculoForm
-        :GetImage="(id)=>{GetImageTipoVehiculo({Canvas:ImageVehiculoEntrada, Tipo:id})}"
+        :GetImage="(id)=>{if(!DetallesGenerales.id){GetImageTipoVehiculo({Canvas:ImageVehiculoEntrada, Tipo:id})}}"
         :Close="()=>emit('close')"
         v-model="DetallesGenerales.vehiculo"
         :errors="ValidationErrors?.['vehiculo']"
@@ -337,6 +374,7 @@
         <ZDCanvas 
           class="md:w-[70%]" 
           strokecolor="red"
+          :image="Archivos.carro?.url"
           ref="ImageVehiculoEntrada" 
           title="Detalles Del Vehiculo" 
           :errors="ValidationErrors?.['carro']" 
@@ -347,6 +385,7 @@
           classnamedivcanvas="w-full h-[10rem]" 
           ref="ImageFirmaEntrada" 
           title="Firma"
+          :image="Archivos.firma?.url"
           :errors="ValidationErrors?.['firma']" 
           :DeleteErrors="()=>{delete ValidationErrors?.['firma']}"
         />
@@ -407,20 +446,6 @@
         :errors="ValidationErrors?.['descripcion_mo']" 
         :DeleteErrors="()=>{delete ValidationErrors?.['descripcion_mo']}"
       />
-      <Textarea id="observaciones" label="Garantia" 
-        v-model="DetallesGenerales.garantia" 
-        placeholder="Escribe las observaciones aqui..." 
-        classname="h-24"
-        :errors="ValidationErrors?.['garantia']" 
-        :DeleteErrors="()=>{delete ValidationErrors?.['garantia']}"
-      />
-      <Textarea id="descripcionmo" label="Tiempo de Entrega" 
-        v-model="DetallesGenerales.observaciones" 
-        placeholder="Escribe la descripcion de la mano de obra aqui..." 
-        classname="h-24"
-        :errors="ValidationErrors?.['observaciones']" 
-        :DeleteErrors="()=>{delete ValidationErrors?.['observaciones']}"
-      />
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
       <InventarioTemplate v-model="Inventario"/>
@@ -436,10 +461,12 @@
       :DeleteErrorss="(key:string)=>{delete ValidationErrors?.[key]}" 
       :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('condiciones_exteriores')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
     <ImagenesEvidencias 
-      v-model:Imagenes="Imagenes" 
+      v-if="DetallesGenerales.update_fotos"
+      v-model:Imagenes="ImagenesEvidencia" 
       :CanEditImages="CanEditImages"
       :DeleteErrorss="(key:string)=>{delete ValidationErrors?.[key]}" 
-      :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('imagenes_evidencia')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
+      :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('imagenes_evidencia')).map((item)=>{return{Key:item[0],errors:item[1]}})"
+    />
   </template>
  
   </BaseModal>

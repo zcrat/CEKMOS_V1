@@ -10,15 +10,15 @@ class ExterioresOrdenServicio extends Model
     protected $fillable = [
         'orden_servicio_id',
         'antena_radio',
-        'antena_telefono',
-        'antena_cb',
         'estribos',
-        'espejos_laterales',
+        'antena_telefono',
         'guardafangos',
+        'antena_cb',
         'parabrisas',
         'sistema_alarma',
         'limpia_parabrisas',
         'luces_exteriores',
+        'espejos_laterales',
     ];
 
     // Relaciones

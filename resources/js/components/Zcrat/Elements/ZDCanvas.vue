@@ -3,22 +3,29 @@ import { ref, onMounted, watch } from "vue"
 import Button from "../Inputs/Button.vue"
 import ZDListErrors from "./ZDListErrors.vue"
 import ZDIconError from "./ZDIconError.vue"
-
 interface Point {
   x: number
   y: number
+}
+export type ImageDraw = Blob | null | string
+export interface StrokesArray {
+  Strokes: Point[][]
+  StrokesDelete: Point[][]
+  currentStroke: Point[]
+  ImageDraw: ImageDraw
 }
 export interface StrokesArray {
   Strokes: Point[][]
   StrokesDelete: Point[][]
   currentStroke: Point[]
-  ImageDraw: Blob | null
+  ImageDraw: ImageDraw
 }
 
 const props = withDefaults(defineProps<{
   classnamedivcanvas?: string
   disabled?: boolean
   title?: string
+  image?: string
   strokecolor?: 'red' | 'black'
   errors?: string[]
   DeleteErrors?: ()=>void
@@ -31,16 +38,9 @@ const props = withDefaults(defineProps<{
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 let ctx: CanvasRenderingContext2D | null = null
 let drawing = false
-
-export interface StrokesArray {
-  Strokes: Point[][]
-  StrokesDelete: Point[][]
-  currentStroke: Point[]
-  ImageDraw: Blob | null
-}
 const Strokes = ref<Point[][]>([])
 const StrokesDelete = ref<Point[][]>([])
-const ImageDraw = ref<Blob | null>(null)
+const ImageDraw = ref<ImageDraw>(null)
 const currentStroke = ref<Point[]>([])
 
 watch(
@@ -49,77 +49,72 @@ watch(
     props.DeleteErrors?.();
   }
 );
-
 onMounted(() => {
   const canvas = canvasRef.value
   if (!canvas) return
-
   ctx = canvas.getContext("2d")
-
-  const rect = canvas.getBoundingClientRect()
-  canvas.width = rect.width
-  canvas.height = rect.height
-
-  // 🔴 CLAVE para mobile
+  sizeCanvas()
   canvas.style.touchAction = "none"
-
   canvas.addEventListener("pointerdown", (e) => {
     if (props.disabled) return
-
     drawing = true
-
     const { x, y } = getCoords(e)
-
     currentStroke.value = [{ x, y }]
 
+    const { realx, realy } = RealCoords(x, y)
     ctx?.beginPath()
-    ctx?.moveTo(x, y)
+    ctx?.moveTo(realx, realy)
   })
-
   window.addEventListener("pointerup", () => {
     if (drawing && currentStroke.value.length > 0) {
       Strokes.value.push([...currentStroke.value])
       StrokesDelete.value = [] // limpia redo al dibujar nuevo
     }
-
     drawing = false
     ctx?.beginPath()
   })
-
   canvas.addEventListener("pointermove", draw)
+  const observer = new ResizeObserver(() => {
+    sizeCanvas()
+    redraw()
+  })
+  observer.observe(canvas.parentElement!)
 })
 
 function getCoords(e: PointerEvent) {
   const rect = canvasRef.value!.getBoundingClientRect()
   return {
-    x: e.clientX - rect.left,
-    y: e.clientY - rect.top
+    x: (e.clientX - rect.left) / rect.width,
+    y: (e.clientY - rect.top) / rect.height
   }
 }
 
+function RealCoords(x: number, y: number) {
+  const rect = canvasRef.value!.getBoundingClientRect()
+  return {
+    realx: x * rect.width,
+    realy: y * rect.height
+  }
+}
 function draw(e: PointerEvent) {
   if (!drawing || !ctx || props.disabled) return
-
-  const { x, y } = getCoords(e)
-
   ctx.lineWidth = 2
   ctx.strokeStyle = props.strokecolor
   ctx.lineCap = "round"
 
+  const { x, y } = getCoords(e)
   currentStroke.value.push({ x, y })
-
-  ctx.lineTo(x, y)
+  const { realx, realy } = RealCoords(x, y)
+  ctx.lineTo(realx, realy)
   ctx.stroke()
-
   ctx.beginPath()
-  ctx.moveTo(x, y)
+  ctx.moveTo(realx, realy)
 }
+const dibujarImagen = async (data: ImageDraw) => {
 
-const dibujarImagen = async (blob: Blob | null) => {
-  ImageDraw.value = blob
+  ImageDraw.value = data
   redraw()
 }
-
 const DrawImage = async () => {
   const canvas = canvasRef.value
   if (!canvas || !ImageDraw.value) return
@@ -127,21 +122,19 @@ const DrawImage = async () => {
   const ctx = canvas.getContext("2d")
   if (!ctx) return
 
-  const url = URL.createObjectURL(ImageDraw.value)
+  const url = typeof ImageDraw.value === 'string' ? ImageDraw.value : URL.createObjectURL(ImageDraw.value)
   const img = new Image()
 
   await new Promise<void>((resolve, reject) => {
     img.onload = () => {
       const imgWidth = img.width
       const imgHeight = img.height
-      const canvasWidth = canvas.width
-      const canvasHeight = canvas.height
-
+      const rect = canvas.getBoundingClientRect()
+      const canvasWidth = rect.width
+      const canvasHeight = rect.height
       const imgAspectRatio = imgWidth / imgHeight
       const canvasAspectRatio = canvasWidth / canvasHeight
-
       let renderWidth, renderHeight
-
       if (imgAspectRatio > canvasAspectRatio) {
         renderWidth = canvasWidth
         renderHeight = canvasWidth / imgAspectRatio
@@ -149,17 +142,24 @@ const DrawImage = async () => {
         renderHeight = canvasHeight
         renderWidth = canvasHeight * imgAspectRatio
       }
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
       ctx.drawImage(img, 0, 0, renderWidth, renderHeight)
-
       URL.revokeObjectURL(url)
       resolve()
     }
-
     img.onerror = reject
     img.src = url
   })
+}
+function sizeCanvas() {
+  const canvas = canvasRef.value
+  if (!canvas || !ctx) return
+  const rect = canvas.getBoundingClientRect()
+  const ratio = window.devicePixelRatio || 1
+  canvas.width = rect.width * ratio
+  canvas.height = rect.height * ratio
+
+  ctx.resetTransform()
+  ctx.scale(ratio, ratio)
 }
 
 async function getCanvasBlob(): Promise<Blob | null> {
@@ -195,7 +195,7 @@ function clearCanvas() {
 async function redraw() {
   const canvas = canvasRef.value
   if (!canvas || !ctx) return
-
+  
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   await DrawImage()
@@ -208,8 +208,12 @@ async function redraw() {
     ctx?.beginPath()
 
     stroke.forEach((point, i) => {
-      if (i === 0) ctx?.moveTo(point.x, point.y)
-      else ctx?.lineTo(point.x, point.y)
+      const { realx, realy } = RealCoords(point.x, point.y)
+      if (i === 0){ 
+        ctx?.moveTo(realx, realy)
+      } else {
+        ctx?.lineTo(realx, realy)
+      }
     })
 
     ctx?.stroke()
@@ -246,14 +250,16 @@ defineExpose({
      <ZDIconError :errors="props.errors" hidden-absolute/> {{ title }}
     </h2>
 
+
     <div :class="[classnamedivcanvas]">
+      <img :src="image" alt="" v-if="image" class="bg-gray-200 border border-gray-400 p-2 rounded">
       <canvas
         ref="canvasRef"
         :class="['border-4 rounded border-[--micolor] w-full h-full touch-none',props.errors && props.errors.length > 0 ? 'inputerror':'']"
       ></canvas>
     </div>
 
-    <div class="flex w-fit max-w-full gap-2 mt-2">
+    <div class="flex w-fit max-w-full gap-2 mt-2" v-if="!image">
       <Button text="Limpiar" :disabled="Strokes.length <= 0" @click="clearCanvas" type="delete"/>
       <Button icon="fa-solid fa-angle-left" :disabled="Strokes.length <= 0" @click="undo" type="secondary"/>
       <Button icon="fa-solid fa-angle-right" :disabled="StrokesDelete.length <= 0" @click="redo" type="secondary"/>

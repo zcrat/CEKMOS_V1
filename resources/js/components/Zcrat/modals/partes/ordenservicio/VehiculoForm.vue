@@ -20,24 +20,6 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
     const Vehiculo = reactive<EconomicoForm>(EconomicoBase)
     const VehiculoId=defineModel<option|null>()
     const ValidationErrors = ref<ArrayAsociativo>()
-    watch(()=>Vehiculo.tipo_id,(val)=>{
-        if(val){props.GetImage?.(val)}
-    })
-    watch(VehiculoId,()=>{
-        if(VehiculoId.value){
-            Read(VehiculoId.value.value);
-        }else{
-            Vehiculo.placas='';
-            Vehiculo.economico='';
-            Vehiculo.vin='';
-            Vehiculo.anio='';
-            Vehiculo.tipo_id=null;
-            Vehiculo.color='';
-            Vehiculo.modelo='';
-            Vehiculo.marca='';
-            Vehiculo.id=undefined;
-        }
-    })
     const Read = async (id:string|number) => {
         try {
         const response = await axios.get(route('Vehiculo.Find'),{params:{id} })
@@ -56,6 +38,25 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
             props.Close?.()
         }
     }
+    watch(()=>Vehiculo.tipo_id,(val)=>{
+        if(val){props.GetImage?.(val)}
+    })
+    watch(VehiculoId,()=>{
+        if(VehiculoId.value){
+            Read(VehiculoId.value.value);
+        }else{
+            Vehiculo.placas='';
+            Vehiculo.economico='';
+            Vehiculo.vin='';
+            Vehiculo.anio='';
+            Vehiculo.tipo_id=null;
+            Vehiculo.color='';
+            Vehiculo.modelo='';
+            Vehiculo.marca='';
+            Vehiculo.id=undefined;
+        }
+    },{immediate:true})
+   
     
 </script>
 <template >

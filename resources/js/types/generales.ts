@@ -1,5 +1,4 @@
 import { Ref } from "vue";
-import { CondicionesExterioresForm, CondicionesInterioresForm, FilesForm, InventarioForm, PinturaForm } from "./OrdenServicio";
 export interface modulosorden{
   id:number;
   descripcion:string;

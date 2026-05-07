@@ -2,10 +2,13 @@ import axios from 'axios';
 import { responseBasic } from '@/types/generales';
 import { OrdenServicioForm } from '@/types/OrdenServicio';
 
-export const Create = async (data: OrdenServicioForm): Promise<responseBasic> => {
+export const CreateorUpdate = async (data: OrdenServicioForm): Promise<responseBasic> => {
   try {
     const formData = new FormData();
     // 🔹 simples
+    if (data.id) {
+      formData.append('id', String(data.id)); // Laravel espera esto para reconocerlo como PUT
+    }
     formData.append('orden_seguimiento', data.orden_seguimiento);
     formData.append('orden_opcional', data.orden_opcional);
     formData.append('ubicacion', data.ubicacion);
@@ -25,16 +28,14 @@ export const Create = async (data: OrdenServicioForm): Promise<responseBasic> =>
     formData.append('tecnico', data.tecnico);
     formData.append('indicaciones_cliente', data.indicaciones_cliente);
     formData.append('descripcion_mo', data.descripcion_mo);
-    formData.append('garantia', data.garantia);
-    formData.append('observaciones', data.observaciones);
 
     // 🔹 objetos (Laravel los entiende así)
     Object.entries(data.inventario).forEach(([k, v]) => {
-      if (v != null) formData.append(`inventario[${k}]`, String(v));
+      if (v != null) formData.append(`inventario[${k}]`, v === true ? '1' : '0');
     });
 
     Object.entries(data.pintura).forEach(([k, v]) => {
-      if (v != null) formData.append(`pintura[${k}]`, String(v));
+      if (v != null) formData.append(`pintura[${k}]`, v === true ? '1' : '0');
     });
 
     Object.entries(data.condiciones_interiores).forEach(([k, v]) => {
@@ -45,7 +46,6 @@ export const Create = async (data: OrdenServicioForm): Promise<responseBasic> =>
       if (v != null) formData.append(`condiciones_exteriores[${k}]`, String(v));
     });
 
-    // 🔥 archivos múltiples (SIEMPRE [] sin índice)
     data.imagenes_evidencia.forEach((file, index) => {
       formData.append(
         'imagenes_evidencia[]',

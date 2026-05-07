@@ -28,7 +28,6 @@ class OrdenesServicio extends Model
     ];
     protected $casts = [
         'update_fotos' => 'boolean',
-        'diagnostico' => 'datetime',
     ];
 
     public function archivos(){

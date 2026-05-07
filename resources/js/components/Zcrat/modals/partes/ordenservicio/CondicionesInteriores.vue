@@ -1,21 +1,18 @@
 <script setup lang="ts">
   import OptionsCondicionesEquipo from '@/components/Zcrat/Elements/OptionsCondicionesEquipo.vue';
-  import OptionsCondicionesEquipo2 from '@/components/Zcrat/Elements/OptionsCondicionesEquipo2.vue';
   import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
   import { option } from '@/types/generales';
   import { CondicionesInterioresForm } from '@/types/OrdenServicio';
   import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory';
-  import { CondicionesInterioresBase, CondicionesInterioresInputs } from '@/utils/variables/ordenservicio';
-  import { onMounted, reactive, ref, watch } from 'vue';
+  import { CondicionesInterioresInputs } from '@/utils/variables/ordenservicio';
+  import { onMounted, ref, watch } from 'vue';
 
 
-  const props = defineProps<{
+  defineProps<{
     errors?: {Key:string,errors:string[]}[]
     DeleteErrors?: (val:string)=>void
   }>()
-  const ModelValue=defineModel<CondicionesInterioresForm>()
-  const CondicionesInteriores=reactive<CondicionesInterioresForm>(
-    {...CondicionesInterioresBase})
+  const CondicionesInteriores=defineModel<CondicionesInterioresForm>({ required:true })
 
   const optionsequipo=ref<option[]>([])
   const CondicionesInterioresAll1=ref<string|null>(null);
@@ -32,17 +29,17 @@
     keys.forEach(k => {
       if(CondicionesInterioresAll1.value !== null){
         console.log(CondicionesInterioresAll1.value)
-        CondicionesInteriores[k] = CondicionesInterioresAll1.value ?? '';
+        CondicionesInteriores.value[k] = CondicionesInterioresAll1.value ?? '';
       }
     });
-  })
+  },)
   watch(
     () => {
       const keys = Object.keys(
         CondicionesInterioresInputs['PANALES DE PUERTA']
       ) as Array<keyof typeof CondicionesInterioresInputs['PANALES DE PUERTA']>;
 
-      return keys.map(k => CondicionesInteriores[k]);
+      return keys.map(k => CondicionesInteriores.value[k]);
     },
     (values) => {
       if (values.length === 0) return;
@@ -54,7 +51,9 @@
         console.log('se puso null')
         CondicionesInterioresAll1.value = null;
       }
-    }
+    }, {
+    immediate:true
+  }
   );
   watch(CondicionesInterioresAll2,()=>{
     const keys = Object.keys(
@@ -63,7 +62,7 @@
 
     keys.forEach(k => {
       if(CondicionesInterioresAll2.value !== null){
-        CondicionesInteriores[k] = CondicionesInterioresAll2.value ?? '';
+        CondicionesInteriores.value[k] = CondicionesInterioresAll2.value ?? '';
       }
     });
   })
@@ -72,7 +71,7 @@
       const keys = Object.keys(
         CondicionesInterioresInputs['ASIENTOS']
       ) as Array<keyof typeof CondicionesInterioresInputs['ASIENTOS']>;
-      return keys.map(k => CondicionesInteriores[k]);
+      return keys.map(k => CondicionesInteriores.value[k]);
     },
     (values) => {
       if (values.length === 0) return;
@@ -84,7 +83,9 @@
         console.log('se puso null')
         CondicionesInterioresAll2.value = null;
       }
-    }
+    }, {
+    immediate:true
+  }
   );
   watch(CondicionesInterioresAll3,()=>{
     const keys = Object.keys(
@@ -93,7 +94,7 @@
 
     keys.forEach(k => {
       if(CondicionesInterioresAll3.value !== null){
-        CondicionesInteriores[k] = CondicionesInterioresAll3.value ?? '';
+        CondicionesInteriores.value[k] = CondicionesInterioresAll3.value ?? '';
       }
     });
   })
@@ -102,7 +103,7 @@
       const keys = Object.keys(
         CondicionesInterioresInputs['OTROS']
       ) as Array<keyof typeof CondicionesInterioresInputs['OTROS']>;
-      return keys.map(k => CondicionesInteriores[k]);
+      return keys.map(k => CondicionesInteriores.value[k]);
     },
     (values) => {
       if (values.length === 0) return;
@@ -114,16 +115,12 @@
         console.log('se puso null')
         CondicionesInterioresAll3.value = null;
       }
+    }, {
+      immediate:true
     }
   );
-  watch(CondicionesInteriores,(val) => {
-    ModelValue.value = { ...val }
-  },{ deep: true })
 
-  watch(() => ModelValue.value,(val) => {
-    console.log
-    Object.assign(CondicionesInteriores, val)
-  },{ deep: true })
+  
 </script>
 <template>
     <div class="border-2 rounded-md p-2">

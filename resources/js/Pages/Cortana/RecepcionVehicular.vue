@@ -23,7 +23,7 @@ const estatus = ref<string[]>([]);
 const modulos = ref<string[]>([]);
 const loading = ref<boolean>(false);
 const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
-const ShowNuevo = ref<boolean>(false)
+
 const orderBy=ref<null|OrderKeyProp>(null)
 const ModalOrdenServicio = ref<InstanceType<typeof OrdenServicio> | null>(null);
 
@@ -38,7 +38,7 @@ const params = computed(() => ({
 <template>
     <AppLayout title="Recepciones Vehiculares" :loading="loading">
         <template #header>
-                <Button text="Nueva" @click="ShowNuevo=true"  />
+                <Button text="Nueva" @click="ModalOrdenServicio?.Open(null)"  />
         </template>
         <template #filtering>
             <div class="flex gap-2  flex-row">
@@ -103,13 +103,7 @@ const params = computed(() => ({
                                     element: Button,
                                     props: {
                                         text:'Editar Recepcion', 
-                                        onClick:()=>{
-                                            ShowNuevo=true
-                                            if(ModalOrdenServicio){
-                                                
-                                                ModalOrdenServicio.OpenEdit(row.id)
-                                            }
-                                        },
+                                        onClick:()=>{ModalOrdenServicio?.Open(row.id)},
                                         hiddenclases:true,
                                         classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
                                     },
@@ -135,5 +129,5 @@ const params = computed(() => ({
             </div>
         </template>
     </AppLayout>
-    <OrdenServicio v-model:show="ShowNuevo"  @close="()=>ShowNuevo=false" ref="ModalOrdenServicio" />
+    <OrdenServicio ref="ModalOrdenServicio"/>
 </template>

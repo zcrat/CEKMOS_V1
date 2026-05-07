@@ -3,8 +3,10 @@
     import { ref,onMounted} from 'vue' ;
     import {type option} from '@/types/generales';
     import axios from 'axios' 
-import Label from '@/components/ui/label/Label.vue';
 
+    defineProps<{
+        disabled?:boolean
+    }>()
     const tiposvehiculos=ref<option[]>([]);
     const SelectValue=defineModel<number | null>();
 
@@ -22,5 +24,5 @@ import Label from '@/components/ui/label/Label.vue';
 
 </script>
 <template>
-     <Select label="Tipo De Vehiculo" id="tipovehiculo" :options="tiposvehiculos" v-model="SelectValue"></Select>
+     <Select label="Tipo De Vehiculo" id="tipovehiculo" :options="tiposvehiculos" v-model="SelectValue" :disabled="disabled"></Select>
 </template>

@@ -4,23 +4,16 @@ import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
 import { option } from '@/types/generales';
 import { CondicionesExterioresForm } from '@/types/OrdenServicio';
 import GetStatusPerCategory from '@/utils/functions/select/StatusPerCategory';
-import { CondicionesExterioresBase, CondicionesExterioresInputs } from '@/utils/variables/ordenservicio';
-import { onMounted, reactive, ref, watch } from 'vue';
+import {CondicionesExterioresInputs } from '@/utils/variables/ordenservicio';
+import { onMounted, ref, watch } from 'vue';
 
-const ModelValue = defineModel<CondicionesExterioresForm>()
-
-const props = defineProps<{
+defineProps<{
   errors?: {Key:string,errors:string[]}[]
   DeleteErrors?: (val:string)=>void
 }>()
-const CondicionesExteriores=reactive<CondicionesExterioresForm>({...CondicionesExterioresBase})
-watch(CondicionesExteriores,(val) => {
-  ModelValue.value = { ...val }
-},{ deep: true })
+const CondicionesExteriores=defineModel<CondicionesExterioresForm>({ required:true })
 
-watch(() => ModelValue.value,(val) => {
-  Object.assign(CondicionesExteriores, val)
-},{ deep: true })
+
 const optionsequipo=ref<option[]>([])
 const CondicionesExterioresAll=ref<string|null>(null);
 
@@ -35,7 +28,7 @@ watch(CondicionesExterioresAll,()=>{
 
   keys.forEach(k => {
     if(CondicionesExterioresAll.value !== null){
-      CondicionesExteriores[k] = CondicionesExterioresAll.value ?? '';
+      CondicionesExteriores.value[k] = CondicionesExterioresAll.value ?? '';
     }
   });
 })
@@ -44,7 +37,7 @@ watch(
     const keys = Object.keys(
       CondicionesExterioresInputs
     ) as Array<keyof typeof CondicionesExterioresInputs>;
-    return keys.map(k => CondicionesExteriores[k]);
+    return keys.map(k => CondicionesExteriores.value[k]);
   },
   (values) => {
     if (values.length === 0) return;
@@ -53,9 +46,10 @@ watch(
     if (allEqual) {
       CondicionesExterioresAll.value = first ?? '';
     }else{
-      console.log('se puso null')
       CondicionesExterioresAll.value = null;
     }
+  }, {
+    immediate:true
   }
 );
 </script>
