@@ -374,6 +374,7 @@
         <ZDCanvas 
           class="md:w-[70%]" 
           strokecolor="red"
+          ImageRequired
           :image="Archivos.carro?.url"
           ref="ImageVehiculoEntrada" 
           title="Detalles Del Vehiculo" 
@@ -382,7 +383,8 @@
           />
         <ZDCanvas 
           class="md:w-[30%]" 
-          classnamedivcanvas="w-full h-[10rem]" 
+          classnamedivcanvas="w-full"
+          height="h-[10rem]" 
           ref="ImageFirmaEntrada" 
           title="Firma"
           :image="Archivos.firma?.url"
