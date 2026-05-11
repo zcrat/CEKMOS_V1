@@ -119,7 +119,7 @@ export const GetDataVehiculoPlacas=(Economico:EconomicoForm)=>{
     }
   }
 export const ImageCanvas = async({Canvas,FileName}:{Canvas:InstanceType<typeof ZDCanvas> | null,FileName:string})=>{
-    const Image =await Canvas?.getCanvasBlob();
+    const Image =await Canvas?.getCanvasBlobZise();
     if(Image != null){
       return new File([Image], FileName, {
         type: Image.type,

@@ -203,8 +203,7 @@ class CortanaController extends Controller
         }
 
         if ($pathfirma && $firma) {
-            $urls['firma'] = ['id' => $firma->id, 'url' => Storage::disk($pathfirma->disk)
-                ->url($pathfirma->folder . '/' . $firma->nombre)];
+            $urls['firma'] = ['id' => $firma->id, 'url' => Storage::disk($pathfirma->disk)->url($pathfirma->folder . '/' . $firma->nombre)];
         } else {
             $urls['firma'] = null;
         }
@@ -346,8 +345,8 @@ class CortanaController extends Controller
             'condiciones_exteriores'=>['required','array'],
             'imagenes_evidencia'=>['required','array','min:6'],
             'imagenes_evidencia.*'=>['required','file','image','max:20048'],
-            'carro'=>['required','file','image','max:20048'],
-            'firma'=>['required','file','image','max:20048'],
+            'carro'=>['required','file','image','max:2048'],
+            'firma'=>['required','file','image','max:2048'],
             ...$rulesExtra,
         ]);
        

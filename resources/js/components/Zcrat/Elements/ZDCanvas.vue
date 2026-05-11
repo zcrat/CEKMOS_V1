@@ -253,8 +253,16 @@ const DrawImage = async () => {
         width: renderWidth,
         height: renderHeight
       }
-
+      
       ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      ctx.fillStyle = "#ffffff"
+      ctx.fillRect(
+        offsetX,
+        offsetY,
+        renderWidth,
+        renderHeight
+      )
 
       ctx.drawImage(
         img,
@@ -295,6 +303,8 @@ async function redraw() {
   const canvas = canvasRef.value
 
   if (!canvas || !ctx) return
+
+
 
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -361,6 +371,43 @@ async function getCanvasBlob(): Promise<Blob | null> {
     canvas.toBlob(blob => resolve(blob), "image/png")
   })
 }
+async function getCanvasBlobZise(
+  width = 720,
+): Promise<Blob | null> {
+
+  const sourceCanvas = canvasRef.value
+  
+  if (!sourceCanvas) return null
+  console.log(sourceCanvas.height)
+  console.log(sourceCanvas.width)
+  const ratio = sourceCanvas.height / sourceCanvas.width
+  const height=width * ratio;
+  const exportCanvas = document.createElement("canvas")
+  exportCanvas.width = width
+  exportCanvas.height = height
+
+  const exportCtx = exportCanvas.getContext("2d")
+
+  if (!exportCtx) return null
+  exportCtx.fillStyle = "#ffffff"
+  exportCtx.fillRect(0, 0, width, height)
+  
+  exportCtx.drawImage(
+    sourceCanvas,
+    0,
+    0,
+    width,
+    height
+  )
+
+  return new Promise(resolve => {
+    exportCanvas.toBlob(
+      blob => resolve(blob),
+      "image/jpeg",
+      0.8
+    )
+  })
+}
 
 function GetStrokes(): StrokesArray {
   return {
@@ -383,6 +430,7 @@ function SetStrokes(val: StrokesArray) {
 defineExpose({
   dibujarImagen,
   getCanvasBlob,
+  getCanvasBlobZise,
   GetStrokes,
   SetStrokes
 })
@@ -411,7 +459,8 @@ defineExpose({
           'border-4 rounded border-[--micolor] w-full h-full touch-none ',
           props.errors && props.errors.length > 0
             ? 'inputerror'
-            : ''
+            : '',
+          ImageRequired ? 'bg-gray-200':''
         ]"
       ></canvas>
     </div>

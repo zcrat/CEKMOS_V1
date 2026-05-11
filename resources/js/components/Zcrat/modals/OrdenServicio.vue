@@ -79,9 +79,9 @@
         !DetallesGenerales.tecnico ||
         !DetallesGenerales.indicaciones_cliente ||
         !DetallesGenerales.descripcion_mo ||
-        (DetallesGenerales.id && ImagenesEvidencia.value.length < 6) ||
-        Object.entries(CondicionesInteriores.value).some(([value]) => value === '') ||
-        Object.entries(CondicionesExteriores.value).some(([value]) => value === '')
+        (!DetallesGenerales.id && ImagenesEvidencia.value.length < 6) ||
+        Object.entries(CondicionesInteriores.value).some(([key,value]) => value == '') ||
+        Object.entries(CondicionesExteriores.value).some(([key,value]) => value == '')
       )
     }
   }) 
@@ -115,8 +115,8 @@
   const Save = async() =>{
     ImagenesCanvas.value.carro=ImageVehiculoEntrada.value?.GetStrokes();
     ImagenesCanvas.value.firma=ImageFirmaEntrada.value?.GetStrokes();
-    ImagenesCanvas.value.carro_img = await ImageCanvas({Canvas:ImageVehiculoEntrada.value,FileName:'carro.png'});
-    ImagenesCanvas.value.firma_img = await ImageCanvas({Canvas:ImageFirmaEntrada.value,FileName:'firma.png'});
+    ImagenesCanvas.value.carro_img = await ImageCanvas({Canvas:ImageVehiculoEntrada.value,FileName:'carro.jpeg'});
+    ImagenesCanvas.value.firma_img = await ImageCanvas({Canvas:ImageFirmaEntrada.value,FileName:'firma.jpeg'});
     const confirm=await ZdAlert({});
     if(!confirm){return}
     loading.value=true
@@ -246,6 +246,7 @@
       <InputBasic 
         id="ordenseguimiento" 
         label="Orden De Seguimiento" 
+        classname="uppercase"
         type="text" 
         v-model="DetallesGenerales.orden_seguimiento" 
         placeholder="Automatico o Ingresar" 
@@ -263,7 +264,8 @@
       />
       <Combobox 
         id="ubicacion" 
-        label="Ubicacion" 
+        label="Ubicacion"
+        classInput="uppercase" 
         v-model="DetallesGenerales.ubicacion" 
         endpoint="Combobox.ubicaciones" 
         placeholder="Buscar o Crear" 

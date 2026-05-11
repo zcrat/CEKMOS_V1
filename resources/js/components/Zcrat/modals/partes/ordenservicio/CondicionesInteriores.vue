@@ -139,7 +139,7 @@
           >
           </OptionsCondicionesEquipo>
         </div></Subtitle>
-          <div class=" justify-center items-center grid lg:grid-cols-2 zd1800:grid-cols-4 gap-2">
+          <div class=" justify-center items-center grid lg:grid-cols-2 zd2150:grid-cols-4 gap-2">
             
             <OptionsCondicionesEquipo v-for="(item,key) in CondicionesInterioresInputs['PANALES DE PUERTA']" 
             :label="item" 
@@ -163,7 +163,7 @@
           >
           </OptionsCondicionesEquipo>
         </div></Subtitle>
-          <div class="flex flex-col items-center lg:grid lg:grid-cols-2 zd1800:grid-cols-4 gap-2">
+          <div class="flex flex-col items-center lg:grid lg:grid-cols-2 zd2150:grid-cols-4 gap-2">
             <OptionsCondicionesEquipo v-for="(item,key) in CondicionesInterioresInputs['ASIENTOS']" 
             :label="item" 
             :key="'condiciones_interiores.'+key" 

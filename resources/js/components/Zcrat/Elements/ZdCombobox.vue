@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<{
   id: string
   endpoint: string
   placeholder?: string
-  classnamaInput?: string
+  classInput?: string
   label?: string
   timeout?: number
   OnBlur?: () => void
@@ -125,7 +125,7 @@ const onInputChange=(event: Event)=> {
             @input="onInputChange"
             :placeholder="placeholder"
             :class="['w-full border rounded px-2 py-2',
-            props.errors && props.errors.length > 0 ? 'inputerror ps-[2rem]' : '', props.classnamaInput]"
+            props.errors && props.errors.length > 0 ? 'inputerror ps-[2rem]' : '', props.classInput]"
             @focus="onFocus"
             />
           </div>

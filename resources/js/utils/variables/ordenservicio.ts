@@ -139,7 +139,7 @@ export const CondicionesInterioresBase: CondicionesInterioresForm ={
     tapetes:"",
 }
 export const CondicionesExterioresBase: CondicionesExterioresForm ={
-    antena_radio:"16",
+    antena_radio:"",
     estribos:"",
     antena_telefono:"",
     guardafangos:"",
