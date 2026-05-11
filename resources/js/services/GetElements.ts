@@ -40,6 +40,7 @@ interface ApiResponse {
       console.error('Error desconocido:', error)
     }
   } finally {
+    console.log('se cambio el valor')
     loading.value = false
   }
 }

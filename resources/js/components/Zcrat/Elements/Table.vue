@@ -86,7 +86,7 @@ const titlesComputed = computed(() => {
 
 
 <template>
-  <div class="rounded w-content w-full p-2">
+  <div class="rounded max-w-full p-2 overflow-x-auto">
     <table :class="['w-auto sm:w-full', classname]">
       <thead>
         <tr>

@@ -67,7 +67,7 @@ onMounted(() => {
               <slot name="header"/>
             </div>
             <div class="flex-1 flex flex-col items-start justify-start">
-              <div class="flex flex-col sm:flex-row justify-start w-full mt-2 gap-2" v-if="$slots.filtering">
+              <div class="flex flex-col justify-start w-full mt-2 gap-2" v-if="$slots.filtering">
                 <slot name="filtering"/>
               </div>
               <div class="w-full flex-1 flex flex-col">

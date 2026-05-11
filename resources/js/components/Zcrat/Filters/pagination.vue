@@ -9,7 +9,7 @@
     const currentPage = defineModel<number>('currentPage', { default: 1 })
     const itemsPerPage = defineModel<number>('itemsPerPage', { default: 10 })
     const totalItems = defineModel<number>('totalItems', { default: 0 })
-    const loading = defineModel<boolean>('loading',{default:false})
+    const loading = defineModel<boolean>('loading',{required:true})
 
     const items = defineModel<any[]>('items',{default:[]})
     const countpages = computed(() =>
