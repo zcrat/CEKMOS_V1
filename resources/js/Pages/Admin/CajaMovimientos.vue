@@ -1,11 +1,11 @@
 <!-- Vista que usa ModalExample.vue -->
 <script setup lang="ts">
-import AppLayout from '@/Layouts/AppLayout.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
 import Search from '@/components/Zcrat/Inputs/Search.vue'
 import ButtonComponent from '@/components/Zcrat/Inputs/Button.vue'
 import Table from '@/components/Zcrat/Elements/Table.vue'
-import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
-import {ref,watch,reactive} from 'vue'
+import Dropdown from '@/components/Zcrat/Elements/Dropdown.vue'
+import {ref,reactive} from 'vue'
 import { CajaMovimientosTable} from '@/types/admin';
 import Button  from "@/components/Zcrat/Inputs/Button.vue";
 
@@ -60,24 +60,21 @@ const params = reactive({ search: debouncedSearch });
                         {element:row.fecha+'', classname:'uppercase'},
                         {element: Dropdown,
                             props: {
-                                father: {
-                                    element: Button,
-                                    props: {text:'Opciones'},
-                                },
-                                children: [
+                                triggerText: 'Opciones',
+                                options: [
                                     {
-                                    element: Button,
-                                    props: {text:'Editar', onClick:()=>{iduser = row.id; ModalEditModuls = true},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
+                                    label: 'Editar',
+                                    onClick:()=>{iduser = row.id; ModalEditModuls = true},
                                     },
                                     {
-                                    element: Button,
-                                    props: {text:'Eliminar', onClick:()=>{iduser = row.id; openconfirmation = true},hiddenclases:true, classname:'w-full text-center p-2 '}
+                                    label: 'Eliminar',
+                                    onClick:()=>{iduser = row.id; openconfirmation = true},
                                     },
                                 ]
-                                ,contentClasses:['bg-gray-200']
+                                ,contentClasses:{bg:'bg-gray-200'}
                             }
                         }
-                                            ]
+                    ]
                 }})" 
                 
         classname="tabla"></Table>

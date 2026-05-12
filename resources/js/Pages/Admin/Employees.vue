@@ -1,6 +1,6 @@
 <!-- Vista que usa ModalExample.vue -->
 <script setup lang="ts">
-import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
+import Dropdown from '@/components/Zcrat/Elements/Dropdown.vue'
 import {DataColumn} from '@/types/tablecomponent'
 import {ref,} from 'vue'
 import { Employee} from '@/types/users';

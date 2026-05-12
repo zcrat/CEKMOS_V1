@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import {computed, reactive, ref, watch} from 'vue'
+import {computed,ref, watch} from 'vue'
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
 import Dropdown from '@/components/Zcrat/Elements/Dropdown.vue'

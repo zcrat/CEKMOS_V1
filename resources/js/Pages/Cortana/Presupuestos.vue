@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import {ref} from 'vue'
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
-import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
+import Dropdown from '@/components/Zcrat/Elements/Dropdown.vue'
 import Button from '@/components/Zcrat/Inputs/Button.vue';
 import MultiOptionFilter from '@/components/Zcrat/Filters/MultiOptionFilter.vue';
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
@@ -77,17 +77,14 @@ const orderBy=ref<null|OrderKeyProp>(null)
                         {element:row.estatus+'', classname:'uppercase'},
                         {element: Dropdown,
                             props: {
-                                father: {
-                                    element: Button,
-                                    props: {text:'Opciones'},
-                                },
-                                children: [
+                                triggerText: 'Opciones',
+                                options: [
                                     {
-                                    element: Button,
-                                    props: {text:'Editar Roles Y Permisos', onClick:()=>{console.log(row.id)},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
-                                    },
+                                    label: 'Editar Roles Y Permisos',
+                                    onClick:()=>{console.log(row.id)}
+                                   },
                                 ]
-                                ,contentClasses:['bg-gray-200']
+                                ,contentClasses:{bg:'bg-gray-200'}
                             }
                         }
                     ]

@@ -2,7 +2,7 @@
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
-import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
+import Dropdown from '@/components/Zcrat/Elements/Dropdown.vue'
 import axios from 'axios'
 import {onMounted, ref, watch} from 'vue'
 import { UsersTable} from '@/types/users';
@@ -134,34 +134,30 @@ onMounted(()=>{
                         {element:row.email, classname:'lowercase'},
                         {element:row.verified ? 'Verificado':'Sin Verificar',classname:'uppercase'},
                         {element:row.date+'', classname:'uppercase'},
-                        {classname:'flex justify-center', element: Dropdown,
-                        props: {
-                            father: {
-                                element: Button,
-                                props: {text:'Opciones'},
-                            },
-                            children: [
-                                {
-                                element: Button,
-                                props: {text:'Editar Roles Y Permisos', onClick:()=>{iduser = row.id; modalshow = 2},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
-                                },
-                                {
-                                element: Button,
-                                props: {text:'Editar Modulos Visibles', onClick:()=>{iduser = row.id; modalshow = 3},hiddenclases:true,classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
-                                },
-                                {
-                                element: Button,
-                                props: {text:'Editar Datos', onClick:()=>{iduser = row.id; modalshow = 1},hiddenclases:true, classname:'w-full text-center p-2 '}
-                                },
-                                {
-                                element: Button,
-                                props: {text:(row.deleted_at != undefined && row.deleted_at != null)  ? 'Restaurar':'Eliminar', onClick:()=>{iduser = row.id; modalshow = row.deleted_at ? 4: 5},hiddenclases:true, classname:'w-full text-center p-2 '}
-                                },
-                            ]
-                            ,contentClasses:['bg-gray-200']
+                        {classname:'flex justify-center', 
+                        element: Dropdown,
+                            props: {
+                                triggerText:'Opciones',
+                                options: [
+                                    {
+                                        label:'Editar Roles Y Permisos', 
+                                        onClick:()=>{iduser = row.id; modalshow = 2},
+                                    },
+                                    {
+                                        label:'Editar Modulos Visibles',
+                                        onClick:()=>{iduser = row.id; modalshow = 3},
+                                    },
+                                    {   label:'Editar Datos',
+                                        onClick:()=>{iduser = row.id; modalshow = 1},
+                                    },
+                                    {   label:(row.deleted_at != undefined && row.deleted_at != null)  ? 'Restaurar':'Eliminar',
+                                        onClick:()=>{iduser = row.id; modalshow = row.deleted_at ? 4: 5},
+                                    },
+                                ]
+                                ,contentClasses:{bg:'bg-gray-200'}
+                            }
                         }
-                        }
-                                            ]
+                    ]
                 }})" 
                 
                 classname="tabla"/>
