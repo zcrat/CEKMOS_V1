@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import {computed, reactive, ref, watch} from 'vue'
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue'
-import Dropdown from '@/components/Zcrat/Elements/DropdownWraper.vue'
+import Dropdown from '@/components/Zcrat/Elements/Dropdown.vue'
 import Button from '@/components/Zcrat/Inputs/Button.vue';
 import MultiOptionFilter from '@/components/Zcrat/Filters/MultiOptionFilter.vue';
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
@@ -101,29 +101,24 @@ watch((loading),()=>{
                         {element:row.estatus, classname:'uppercase'},
                         {element: Dropdown,
                             props: {
-                                father: {
-                                    element: Button,
-                                    props: {text:'Opciones'},
-                                },
-                                children: [
+                                triggerText:'Opciones',
+                                options: [
                                     {
-                                    element: Button,
-                                    props: {
-                                        text:'Editar Recepcion', 
+                                        label:'Editar Recepcion', 
                                         onClick:()=>{ModalOrdenServicio?.Open(row.id)},
-                                        hiddenclases:true,
-                                        classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
+                                        classname:['hover:text-gray-800']
                                     },
                                     {
-                                    element: Button,
-                                    props: {
-                                        text:'Descargar PDF', 
+                                        label:'Descargar PDF', 
                                         onClick:()=>{console.log(row.id)},
-                                        hiddenclases:true,
-                                        classname:'w-full text-center p-2 hover:text-gray-500 text=black text-md'}
-                                    },
+                                        classname:['hover:text-gray-800']
+                                    }
+                                    ,
                                 ]
-                                ,contentClasses:['bg-gray-200']
+                                ,
+                                contentClasses:{
+                                    bg:'bg-gray-300'
+                                }
                             }
                         }
                     ]

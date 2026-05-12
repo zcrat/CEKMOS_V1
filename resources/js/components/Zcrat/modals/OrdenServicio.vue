@@ -213,6 +213,9 @@
       Pintura.value = PinturaBase;
       Inventario.value = InventarioBase;
       ImagenesEvidencia.value = [];
+      Archivos.carro = null;
+      Archivos.firma = null;
+      Archivos.evidencias = [];
     }
     nextTick(() => {
       show.value = true;
