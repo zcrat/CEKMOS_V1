@@ -58,12 +58,11 @@
   const Archivos = reactive<{carro:filedb|null,firma:filedb|null,evidencias:filedb[]}>({carro:null,firma:null,evidencias:[]})
   const buttonconfirm=computed<buttonconfirmed>(()=>{ 
     return {
-      text:'Crear Orden De Servicio',
+      text: DetallesGenerales.id ? 'Guardar Cambios' :'Crear Orden De Servicio',
       classname:'bg-blue-600 text-white',
       onClick:Save,
       disabled:(
         !DetallesGenerales.ubicacion ||
-        !DetallesGenerales.tipo_id ||
         !DetallesGenerales.modulo_orden ||
         !DetallesGenerales.vehiculo ||
         !DetallesGenerales.vehiculo_concepto_id ||
@@ -79,7 +78,7 @@
         !DetallesGenerales.tecnico ||
         !DetallesGenerales.indicaciones_cliente ||
         !DetallesGenerales.descripcion_mo ||
-        (!DetallesGenerales.id && ImagenesEvidencia.value.length < 6) ||
+        (!DetallesGenerales.id && (ImagenesEvidencia.value.length < 6  || !DetallesGenerales.tipo_id)) ||
         Object.entries(CondicionesInteriores.value).some(([key,value]) => value == '') ||
         Object.entries(CondicionesExteriores.value).some(([key,value]) => value == '')
       )

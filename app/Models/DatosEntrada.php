@@ -12,7 +12,7 @@ class DatosEntrada extends Model
     protected $fillable = [
         'fecha',
         'estimacion',
-        'kilomentraje',
+        'kilometraje',
         'gasolina',
         'orden_servicio_id',
     ];
@@ -20,7 +20,7 @@ class DatosEntrada extends Model
     protected $casts = [
         'fecha' => 'datetime',
         'estimacion' => 'datetime',
-        'kilomentraje' => 'decimal:10,2',
+        'kilometraje' => 'decimal:2',
     ];
 
     public function nivel_combustible()
