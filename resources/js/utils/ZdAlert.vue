@@ -31,7 +31,7 @@ function handleClose(result: boolean) {
 
   <BaseModal
     :show="open"
-    :modaltitle="'Atencion'"
+    :modaltitle="options.title ??'Atencion'" 
     :z="'z-[999]'"
     @close="handleClose(false)"
     :buttonconfirm="{
@@ -39,7 +39,7 @@ function handleClose(result: boolean) {
       onClick: () => handleClose(true)
     }"
   >
-  <div class="p-6">
+  <div class="p-2 text-wrap text-center max-w-[25rem]">
     {{ options.text || '¿Deseas continuar?' }}
   </div>
   </BaseModal>

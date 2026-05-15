@@ -18,7 +18,7 @@
   import {optionstipos} from '@/utils/variables/options'
   import {DetallesGeneralesBase,CondicionesInterioresBase,CondicionesExterioresBase,PinturaBase,InventarioBase} from '@/utils/variables/ordenservicio'
   import {GetImageTipoVehiculo, ImageCanvas } from '@/utils/functions/ordenservicio';
-  import ImagenesEvidencias from '@/components/Zcrat/modals/partes/ordenservicio/ImagenesEvidencias.vue';
+  import ImagenesEvidencias,{type ImagenUpload} from '@/components/Zcrat/modals/partes/ordenservicio/ImagenesEvidencias.vue';
   import CondicionesInterioresTemplate from './partes/ordenservicio/CondicionesInteriores.vue';
   import CondicionesExterioresTemplate from './partes/ordenservicio/CondicionesExteriores.vue';
   import ValuesCondicionesEquipo from './partes/ordenservicio/ValuesCondicionesEquipo.vue';
@@ -40,7 +40,6 @@
   const OpenModal = ref<null|1>(null);
   const resetvalues = ref<boolean>(true);
   const show = ref<boolean>(false);
-  const CanEditImages = ref<boolean>(true)
   const ValidationErrors = ref<ArrayAsociativo>()
   const ImagenesEvidencia = ref<File[]>([])
   const loading = ref<boolean>(false)
@@ -51,11 +50,8 @@
   const Inventario=ref<InventarioForm>(InventarioBase)
   const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
-  type filedb = {
-    id: number,
-    url: string
-  }
-  const Archivos = reactive<{carro:filedb|null,firma:filedb|null,evidencias:filedb[]}>({carro:null,firma:null,evidencias:[]})
+
+  const Archivos = reactive<{carro:ImagenUpload|null,firma:ImagenUpload|null,evidencias:ImagenUpload[]}>({carro:null,firma:null,evidencias:[]})
   const buttonconfirm=computed<buttonconfirmed>(()=>{ 
     return {
       text: DetallesGenerales.id ? 'Guardar Cambios' :'Crear Orden De Servicio',
@@ -98,7 +94,7 @@
       loading.value=false;
       Archivos.carro = urls.carro;
       Archivos.firma = urls.firma;
-      Archivos.evidencias = urls.evidencias;
+      Archivos.evidencias = urls.evidencia;
       await nextTick();
       resetvalues.value=true;
     }catch(error:any){
@@ -467,9 +463,9 @@
       :DeleteErrorss="(key:string)=>{delete ValidationErrors?.[key]}" 
       :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('condiciones_exteriores')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
     <ImagenesEvidencias 
-      v-if="DetallesGenerales.update_fotos"
       v-model:Imagenes="ImagenesEvidencia" 
-      :CanEditImages="CanEditImages"
+      v-model:ImagenesUpload="Archivos.evidencias" 
+      :CanEditImages="DetallesGenerales.update_fotos"
       :DeleteErrorss="(key:string)=>{delete ValidationErrors?.[key]}" 
       :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('imagenes_evidencia')).map((item)=>{return{Key:item[0],errors:item[1]}})"
     />

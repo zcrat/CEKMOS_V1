@@ -41,6 +41,7 @@ export interface RecepcionesVehiculares{
   folios:string[];
   creacion:string;
   estatus:string;
+  upload_files:boolean;
 }
 
 export interface paginationprops {

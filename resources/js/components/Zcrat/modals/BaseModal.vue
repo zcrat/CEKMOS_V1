@@ -57,7 +57,7 @@ const classtitleposition = computed(() => ({
           <div v-if="modaltitle" class="flex justify-between items-center pt-4 pb-2 sticky top-0 z-10 bg-white">
           <DialogTitle
           
-            :class="['text-xl font-semibold', classtitleposition]"
+            :class="['text-xl font-semibold px-2', classtitleposition]"
           >
             {{ modaltitle }}
           </DialogTitle>

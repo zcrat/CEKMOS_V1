@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArchivosController;
 use App\Http\Controllers\CajaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -54,12 +55,16 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
       Route::post('/Create/User',[UsersController::class,"CreateUser"])->name('user.create');
       Route::post('/Update/User',[UsersController::class,"UpdateUser"])->name('user.update');
     });
+    Route::delete('Imagenes/delete',[ArchivosController::class,'Delete'])->name('Cortana.Imagenes.Delete');
+
+    
     Route::middleware(['permission:ver_presupuestos'])->group(function () {
       Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
       Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('Cortana.Presupuesto.Items');
       Route::get('cortana/get/orden-servicio',[CortanaController::class,'GetOrdenServicio'])->name('Cortana.OrdenServicio.Read');
       Route::get('cortana/get/ordenes-servicio',[CortanaController::class,'GetOrdenesServicio'])->name('Cortana.OrdenServicio.Items');
       Route::post('cortana/orden/servicio/create',[CortanaController::class,'CreateOrdenServico'])->name('Cortana.OrdenServicio.Create');
+      Route::put('cortana/orden/toggle/files_upload',[CortanaController::class,'ToggleFilesRecepcionVehicular'])->name('Cortana.Orden.Toggle.Upload.Files');
       Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('Presupuesto.Get.Data_Orden');
       Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('Presupuesto.Create');
     });

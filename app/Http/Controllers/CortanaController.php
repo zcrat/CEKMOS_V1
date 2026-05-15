@@ -252,6 +252,7 @@ class CortanaController extends Controller
                 )
                 :'Revisando' ) 
                 :'No Aplica',
+            'upload_files'=>$item->update_fotos
         ]);
 
         $totalPages=ceil($totalItems/$itemsPerPage);
@@ -555,7 +556,7 @@ class CortanaController extends Controller
         }
         
     }
-    public function GetClave(string $modulo_orden_id){
+    private function GetClave(string $modulo_orden_id){
         $anteriores=0;
         $clave=ModuloOrdenesServicio::find($modulo_orden_id);
         $num=OrdenesServicio::withTrashed()->where('modulo_orden_id',$modulo_orden_id)->count() + 1;
@@ -566,12 +567,21 @@ class CortanaController extends Controller
         }while(OrdenesServicio::where('orden_servicio',$orden)->exists());
         return $orden;
     }
-    public function GetFolio(string $ordenservicio_id,$clave,$tipo){
+    private function GetFolio(string $ordenservicio_id,$clave,$tipo){
 
         $tipos=[5=>'C',6=>'P',7=>''];
         $num=Presupuestos::withTrashed()->where('orden_servicio_id',$ordenservicio_id)->count()  + 1;
         $numeroConCeros = str_pad($num, 2, "0", STR_PAD_LEFT);
         $folio= $clave.'-'.$numeroConCeros.$tipos[$tipo];
         return $folio;
+    }
+    public function ToggleFilesRecepcionVehicular(Request $request){
+        $request->validate([
+            'id'=>['required','exists:ordenes_servicio,id']
+        ]);
+        $ordenservicio=OrdenesServicio::find($request->id);
+        $ordenservicio->update_fotos=!$ordenservicio->update_fotos;
+        $ordenservicio->save();
+        return response()->json(['message' => 'Actualizado Correctamente']);
     }
 }

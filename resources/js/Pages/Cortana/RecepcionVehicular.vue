@@ -12,6 +12,7 @@ import {RecepcionesVehiculares} from '@/types/generales';
 import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import OrdenServicio from '@/components/Zcrat/modals/OrdenServicio.vue';
 import { OrderKeyProp } from '@/types/tablecomponent';
+import { ToggleUploadFiles } from '@/utils/functions/ordenservicio';
 
 const currentPage=ref<number>(1)
 const itemsPerPage=ref<number>(10)
@@ -112,8 +113,12 @@ watch((loading),()=>{
                                         label:'Descargar PDF', 
                                         onClick:()=>{console.log(row.id)},
                                         classname:['hover:text-gray-800']
-                                    }
-                                    ,
+                                    },
+                                    {
+                                        label:((row.upload_files ? 'Desactivar ' : 'Activar ') + 'Cambios en los Archivos'), 
+                                        onClick:()=>{ToggleUploadFiles({id:row.id,estatus:row.upload_files})},
+                                        classname:['hover:text-gray-800']
+                                    },
                                 ]
                                 ,
                                 contentClasses:{

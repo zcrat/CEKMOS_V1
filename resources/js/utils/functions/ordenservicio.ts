@@ -3,6 +3,8 @@ import MyBasicToast from "@/utils/ToastNotificationBasic";
 import ZDCanvas from '@/components/Zcrat/Elements/ZDCanvas.vue';
 import { EconomicoForm} from '@/types/OrdenServicio';
 import { Ref } from 'vue';
+import { ZdAlert } from '../ZdAlert';
+import { ImagenUpload } from '@/components/Zcrat/modals/partes/ordenservicio/ImagenesEvidencias.vue';
   
 export const GetImageTipoVehiculo = async ({Canvas,Tipo}:{Canvas:InstanceType<typeof ZDCanvas> | null,Tipo:number}) => {
     try {
@@ -49,6 +51,23 @@ export const DeleteImage=({index,Imagenes,DeleteErrors}:{index:number,Imagenes:F
       DeleteErrors?.('imagenes_evidencia.'+(index+1))
     }
   }
+export const DeleteImageDB=async ({index,ImagenesUpload}:{index:number,ImagenesUpload:ImagenUpload[]})=>{
+  const confirm=await ZdAlert({ title: '¿Eliminar Archivo?',
+  text: 'Se Eliminara El Archivo Y No Se Podra Recuperar'
+});
+    if(!confirm){return}
+    const registro=ImagenesUpload[index];
+    if(!registro){return}
+    axios.delete(route('Cortana.Imagenes.Delete'), {params:{'id':registro.id,origen:'ordenservicio'}})
+    .then(response => {
+      const data = response.data.message;
+       MyBasicToast.success(data);
+       ImagenesUpload.splice(index, 1);
+      })
+    .catch(error => {
+       MyBasicToast.error(error.response.data.message ?? 'Error No Especificado');
+      });
+}
 export const DeleteImagesNew=(Imagenes:File[],DeleteErrors?:(val:string)=>void )=>{
     if (Imagenes.length > 0) {
       for (let i = Imagenes.length - 1; i >= 0; i--) {
@@ -127,5 +146,18 @@ export const ImageCanvas = async({Canvas,FileName}:{Canvas:InstanceType<typeof Z
     } else {
       return null;
     }
+    
+  }
+export const ToggleUploadFiles = async({id,estatus}:{id:number,estatus:boolean})=>{
+    const confirm=await ZdAlert({ title:'Actualizacion de Archivos', text:estatus?'Cancelar que los usuarios cambien, eliminen y agregen archivos a la Orden De Servicio' : 'Permitir que los usuarios cambien, eliminen y agregen archivos a la Orden De Servicio'});
+    if(!confirm){return}
+    axios.put(route('Cortana.Orden.Toggle.Upload.Files'), {'id':id})
+    .then(response => {
+      const data = response.data.message;
+       MyBasicToast.success(data);
+      })
+    .catch(error => {
+       MyBasicToast.error(error.response.data.message ?? 'Error No Especificado');
+    });
     
   }
