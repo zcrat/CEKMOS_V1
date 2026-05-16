@@ -5,29 +5,10 @@ import { CovertBlobToURL, DeleteImage, DeleteImageDB, DeleteImagesNew, SaveImage
 import { ref } from 'vue';
 export type ImagenUpload={id:number, url:string}
 const Imagenes = defineModel<File[]>('Imagenes', { required: true })
-const ImagenesUpload = defineModel<ImagenUpload[]>('ImagenesUpload', { required: true })
+const ImagenesUpload = defineModel<ImagenUpload[]>('ImagenesUpload', { default: [] })
 const LoadImages = ref<HTMLInputElement | null>(null)
 const imagepreview=ref<string>('')
 defineProps<{CanEditImages:boolean}>()
-const deleteid= async (index:number)=>{
-  const registro=ImagenesUpload.value[index];
-    if(!registro){return}
- const response= await  DeleteImageDB(registro.id);
- console.log(response)
- if(response){
-  console.log('se debe de borrar')
-  console.log('se debe de borrar2')
-  console.log(ImagenesUpload.value)
-  const copia = [...ImagenesUpload.value];
-  console.log(ImagenesUpload.value)
-  console.log(copia)
-  copia.splice(index,1);
-  console.log(copia)
-  ImagenesUpload.value = copia;
-  console.log(ImagenesUpload.value)
-  console.log('se debe de haber  borrar')
- }
-}
 </script>
 <template>
     <div class="pb-2 border-2 p-2 rounded  mt-2" v-if="CanEditImages">
@@ -51,11 +32,11 @@ const deleteid= async (index:number)=>{
       <Subtitle>Imagenes Cargadas</Subtitle >
         <div class="flex flex-col sm:flex-row gap-2 w-full">
           <div :class="'overflow-x-auto flex gap-2 flex-row'">
-            <div :key="'imagen-cargada-'+value.id" v-for="(value,index) in ImagenesUpload" class="border-2 rounded-md border-gray-700 p-2 w-fit flex flex-col gap-2">
+            <div :key="index" v-for="(value,index) in ImagenesUpload" class="border-2 rounded-md border-gray-700 p-2 w-fit flex flex-col gap-2">
               <div class="w-fit flex-1 flex items-end" @click="imagepreview=value.url">
                 <img :src="value.url" class="max-w-[200px] max-h-[200px] "  />
               </div>
-              <Button text="Eliminar"  type="delete" @click="deleteid(index)" v-if="CanEditImages"/>
+              <Button text="Eliminar"  type="delete" @click="DeleteImageDB({index,ImagenesUpload})" v-if="CanEditImages"/>
             </div>
         </div>
       </div>
