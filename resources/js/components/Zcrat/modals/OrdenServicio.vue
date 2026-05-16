@@ -50,8 +50,8 @@
   const Inventario=ref<InventarioForm>(InventarioBase)
   const ImageVehiculoEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
-
-  const Archivos = reactive<{carro:ImagenUpload|null,firma:ImagenUpload|null,evidencias:ImagenUpload[]}>({carro:null,firma:null,evidencias:[]})
+  const ImagenesCargadas=ref<ImagenUpload[]>([])
+  const Archivos = reactive<{carro:ImagenUpload|null,firma:ImagenUpload|null}>({carro:null,firma:null})
   const buttonconfirm=computed<buttonconfirmed>(()=>{ 
     return {
       text: DetallesGenerales.id ? 'Guardar Cambios' :'Crear Orden De Servicio',
@@ -75,11 +75,15 @@
         !DetallesGenerales.indicaciones_cliente ||
         !DetallesGenerales.descripcion_mo ||
         (!DetallesGenerales.id && (ImagenesEvidencia.value.length < 6  || !DetallesGenerales.tipo_id)) ||
+        (DetallesGenerales.id && DetallesGenerales.cambiar_archivos && ((ImagenesEvidencia.value.length + ImagenesCargadas.value.length) < 6))  ||
         Object.entries(CondicionesInteriores.value).some(([key,value]) => value == '') ||
         Object.entries(CondicionesExteriores.value).some(([key,value]) => value == '')
       )
     }
   }) 
+  watch(()=>ImagenesCargadas.value, ()=>{
+    console.log(ImagenesCargadas.value)
+  })
   const Read= async (id:number) =>{
     loading.value=true;
     try{
@@ -94,7 +98,7 @@
       loading.value=false;
       Archivos.carro = urls.carro;
       Archivos.firma = urls.firma;
-      Archivos.evidencias = urls.evidencia;
+      ImagenesCargadas.value = urls.evidencia;
       await nextTick();
       resetvalues.value=true;
     }catch(error:any){
@@ -141,7 +145,8 @@
       condiciones_exteriores: CondicionesExteriores.value,
       condiciones_interiores: CondicionesInteriores.value,
       pintura: Pintura.value,
-      inventario: Inventario.value
+      inventario: Inventario.value,
+      cambiar_archivos:DetallesGenerales.cambiar_archivos
     }
     const response= await CreateorUpdate(Form);
     if(response.status){
@@ -210,7 +215,7 @@
       ImagenesEvidencia.value = [];
       Archivos.carro = null;
       Archivos.firma = null;
-      Archivos.evidencias = [];
+      ImagenesCargadas.value = [];
     }
     nextTick(() => {
       show.value = true;
@@ -464,8 +469,8 @@
       :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('condiciones_exteriores')).map((item)=>{return{Key:item[0],errors:item[1]}})"/>
     <ImagenesEvidencias 
       v-model:Imagenes="ImagenesEvidencia" 
-      v-model:ImagenesUpload="Archivos.evidencias" 
-      :CanEditImages="DetallesGenerales.update_fotos"
+      v-model:ImagenesUpload="ImagenesCargadas" 
+      :CanEditImages="DetallesGenerales.cambiar_archivos"
       :DeleteErrorss="(key:string)=>{delete ValidationErrors?.[key]}" 
       :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('imagenes_evidencia')).map((item)=>{return{Key:item[0],errors:item[1]}})"
     />

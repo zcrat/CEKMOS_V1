@@ -45,7 +45,9 @@ export const CreateorUpdate = async (data: OrdenServicioForm): Promise<responseB
     Object.entries(data.condiciones_exteriores).forEach(([k, v]) => {
       if (v != null) formData.append(`condiciones_exteriores[${k}]`, String(v));
     });
-
+    if (data.id === undefined || (data.id != undefined && data.cambiar_archivos)) {
+      formData.append('id', String(data.id)); // Laravel espera esto para reconocerlo como PUT
+    }
     data.imagenes_evidencia.forEach((file, index) => {
       formData.append(
         'imagenes_evidencia[]',

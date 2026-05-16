@@ -71,7 +71,7 @@ export interface DatosOrdenServicio {
   user_id: number | null,
   empresa_id: number | null,
   cliente_id: number | null,
-  update_fotos: boolean | null,
+  cambiar_archivos: boolean | null,
   diagnostico: Date | null,
   indicaciones_cliente: string,
   notas_mecanico: string,

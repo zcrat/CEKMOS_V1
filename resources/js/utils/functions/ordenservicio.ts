@@ -51,22 +51,23 @@ export const DeleteImage=({index,Imagenes,DeleteErrors}:{index:number,Imagenes:F
       DeleteErrors?.('imagenes_evidencia.'+(index+1))
     }
   }
-export const DeleteImageDB=async ({index,ImagenesUpload}:{index:number,ImagenesUpload:ImagenUpload[]})=>{
+export const DeleteImageDB=async (id:number)=>{
   const confirm=await ZdAlert({ title: '¿Eliminar Archivo?',
-  text: 'Se Eliminara El Archivo Y No Se Podra Recuperar'
-});
-    if(!confirm){return}
-    const registro=ImagenesUpload[index];
-    if(!registro){return}
-    axios.delete(route('Cortana.Imagenes.Delete'), {params:{'id':registro.id,origen:'ordenservicio'}})
-    .then(response => {
-      const data = response.data.message;
-       MyBasicToast.success(data);
-       ImagenesUpload.splice(index, 1);
-      })
-    .catch(error => {
+    text: 'Se Eliminara El Archivo Y No Se Podra Recuperar'
+  });
+    if(!confirm){return false}
+     try {
+      const response = await axios.delete(route('Cortana.Imagenes.Delete'), {params:{'id':id,origen:'ordenservicio'}});
+      MyBasicToast.success(response.data.message);
+       return true;
+    } catch (error:any) {
+      if (error.response) { 
        MyBasicToast.error(error.response.data.message ?? 'Error No Especificado');
-      });
+      } else {
+        MyBasicToast.error('Error al conectar con el servidor');
+      }
+      return false;
+    }
 }
 export const DeleteImagesNew=(Imagenes:File[],DeleteErrors?:(val:string)=>void )=>{
     if (Imagenes.length > 0) {

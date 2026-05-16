@@ -89,7 +89,7 @@ export const DetallesGeneralesBase: DetallesGeneralesBaseProps ={
     tecnico: '',
     descripcion_mo: '',
     indicaciones_cliente: '',
-    update_fotos: true,
+    cambiar_archivos: true,
 }
 export const InventarioBase: InventarioForm ={
     llanta:false,

@@ -21,11 +21,12 @@ class asignarrolesypermisos extends Seeder
             'ver_empleados',
             'ver_presupuestos',
             'ver_ordenes_servicio',
-            'administrar_caja'
+            'administrar_caja',
+            'crear_ordenes_servicio'
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         $roles = [
@@ -34,12 +35,12 @@ class asignarrolesypermisos extends Seeder
         ];
 
         $rolePermissions = [
-            'Super Admin' => $permissions,
+            'Super Admin' => [],
             'Administrador 1' => $permissions,
         ];
 
         foreach ($roles as $roleName) {
-            $role = Role::create(['name' => $roleName]);
+            $role = Role::firstOrCreate(['name' => $roleName]);
 
             if (isset($rolePermissions[$roleName])) {
                 $role->givePermissionTo($rolePermissions[$roleName]);

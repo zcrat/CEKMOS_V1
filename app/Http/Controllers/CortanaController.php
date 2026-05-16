@@ -119,7 +119,7 @@ class CortanaController extends Controller
             'tecnico'=>optional($responsables->tecnico)->nombre ?? null,
             'descripcion_mo'=>$ordenservicio->notas_mecanico,
             'indicaciones_cliente'=>$ordenservicio->indicaciones_cliente,
-            'update_fotos'=>$ordenservicio->update_fotos,
+            'cambiar_archivos'=>$ordenservicio->cambiar_archivos,
         ];
 
 
@@ -192,7 +192,7 @@ class CortanaController extends Controller
         Log::info($archivos);
         $carro     = $archivos->where('tipo_id', 26)->where('estatus_id', 21)->first();
         $firma     = $archivos->where('tipo_id', 25)->where('estatus_id', 21)->first();
-        $evidencia = $archivos->where('tipo_id', 63)->where('estatus_id', 21);
+        $evidencia = $archivos->where('tipo_id', 63)->where('estatus_id', 21)->values();
 
         $urls = [];
 
@@ -252,7 +252,7 @@ class CortanaController extends Controller
                 )
                 :'Revisando' ) 
                 :'No Aplica',
-            'upload_files'=>$item->update_fotos
+            'upload_files'=>$item->cambiar_archivos
         ]);
 
         $totalPages=ceil($totalItems/$itemsPerPage);
@@ -383,7 +383,7 @@ class CortanaController extends Controller
                 'user_id'=>$request->user()->id,
                 'empresa_id'=>$request->empresa_id,
                 'cliente_id'=>$request->cliente_id,
-                'update_fotos'=>false,
+                'cambiar_archivos'=>false,
                 'diagnostico'=>null,
                 'indicaciones_cliente'=>$request->indicaciones_cliente ?? '',
                 'notas_mecanico'=>$request->descripcion_mo ?? '',
@@ -580,7 +580,7 @@ class CortanaController extends Controller
             'id'=>['required','exists:ordenes_servicio,id']
         ]);
         $ordenservicio=OrdenesServicio::find($request->id);
-        $ordenservicio->update_fotos=!$ordenservicio->update_fotos;
+        $ordenservicio->cambiar_archivos=!$ordenservicio->cambiar_archivos;
         $ordenservicio->save();
         return response()->json(['message' => 'Actualizado Correctamente']);
     }

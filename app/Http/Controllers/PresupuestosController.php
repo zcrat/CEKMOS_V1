@@ -175,7 +175,7 @@ class PresupuestosController extends Controller
             $ordenservicio->user_id=$user->id;
             $ordenservicio->empresa_id=$request->empresa_id;
             $ordenservicio->cliente_id=$request->cliente_id;
-            $ordenservicio->update_fotos=false;
+            $ordenservicio->cambiar_archivos=false;
             $ordenservicio->diagnostico=null;
             $ordenservicio->indicaciones_cliente=$request->indicaciones_cliente;
             $ordenservicio->notas_mecanico=$request->descripcion_mo;

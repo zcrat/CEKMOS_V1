@@ -18,7 +18,7 @@ class OrdenesServicio extends Model
         'user_id',
         'empresa_id',
         'cliente_id',
-        'update_fotos',
+        'cambiar_archivos',
         'estatus_id',
         'indicaciones_cliente',
         'notas_mecanico',
@@ -27,7 +27,7 @@ class OrdenesServicio extends Model
         'ubicacion_id',
     ];
     protected $casts = [
-        'update_fotos' => 'boolean',
+        'cambiar_archivos' => 'boolean',
     ];
 
     public function archivos(){

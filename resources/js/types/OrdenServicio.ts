@@ -39,6 +39,7 @@ import { color } from './generales';
     imagenes_evidencia:File[],
     carro:File|null,
     firma:File|null,
+    cambiar_archivos: boolean,
   }
   export interface DetallesGeneralesBaseProps {
     id?:number
@@ -61,7 +62,7 @@ import { color } from './generales';
     tecnico: string,
     indicaciones_cliente: string,
     descripcion_mo: string,
-    update_fotos: boolean,
+    cambiar_archivos: boolean,
   }
   export interface FilesForm {
     file:File,
