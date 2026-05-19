@@ -28,7 +28,6 @@
 
     keys.forEach(k => {
       if(CondicionesInterioresAll1.value !== null){
-        console.log(CondicionesInterioresAll1.value)
         CondicionesInteriores.value[k] = CondicionesInterioresAll1.value ?? '';
       }
     });
@@ -48,7 +47,6 @@
       if (allEqual) {
         CondicionesInterioresAll1.value = first ?? '';
       }else{
-        console.log('se puso null')
         CondicionesInterioresAll1.value = null;
       }
     }, {
@@ -80,7 +78,6 @@
       if (allEqual) {
         CondicionesInterioresAll2.value = first ?? '';
       }else{
-        console.log('se puso null')
         CondicionesInterioresAll2.value = null;
       }
     }, {
@@ -112,7 +109,6 @@
       if (allEqual) {
         CondicionesInterioresAll3.value = first ?? '';
       }else{
-        console.log('se puso null')
         CondicionesInterioresAll3.value = null;
       }
     }, {

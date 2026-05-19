@@ -8,7 +8,7 @@ const Imagenes = defineModel<File[]>('Imagenes', { required: true })
 const ImagenesUpload = defineModel<ImagenUpload[]>('ImagenesUpload', { default: [] })
 const LoadImages = ref<HTMLInputElement | null>(null)
 const imagepreview=ref<string>('')
-defineProps<{CanEditImages:boolean}>()
+defineProps<{CanEditImages:boolean,errors?: {Key:string,errors:string[]}[],DeleteErrors?: (val:string)=>void}>()
 </script>
 <template>
     <div class="pb-2 border-2 p-2 rounded  mt-2" v-if="CanEditImages">

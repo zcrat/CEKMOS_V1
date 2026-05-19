@@ -9,6 +9,8 @@ use App\Models\Modelos;
 use Illuminate\Http\Request;
 use App\Models\Vehiculos;
 use App\Rules\TipoCategoriaRule;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 use function Pest\Laravel\json;
@@ -25,6 +27,21 @@ class VehiculoController extends Controller
         
     return response()->json(['datos'=>$vehiculo]);
     }
+    public function GetImage(Request $request) {
+        $request->validate([
+            'id'=>['required','exists:vehiculos,id']
+        ]);
+        $vehiculo=Vehiculos::find($request->id);
+        $realtype=$vehiculo->tipo_id-7;
+        $path='VehiculosRecepcionVehicular/Vehiculo'.$realtype.'.png';
+        $file = Storage::disk('local')->path($path);
+        if (!file_exists($file)) {
+            return response()->json(['message'=>'No existe la Imagen Del Tipo '.$realtype],404);
+        }
+        return Response::file($file, [
+            'Content-Type' => mime_content_type($file)
+        ]);
+  }
     public function FindDatos(Request $request){
         $request->validate([
             'id'=>['required','exists:vehiculos,id']

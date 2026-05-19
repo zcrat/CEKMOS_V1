@@ -81,15 +81,18 @@
       )
     }
   }) 
-  watch(()=>ImagenesCargadas.value, ()=>{
-    console.log(ImagenesCargadas.value)
-  })
+
+
   const Read= async (id:number) =>{
     loading.value=true;
     try{
       const response=await axios.get(route('Cortana.OrdenServicio.Read'),{params:{id}});
       resetvalues.value=false;
-      Object.assign(DetallesGenerales,response.data.generales);
+      const generales = response.data.generales;
+      if (generales.estimacion) {
+        generales.estimacion = new Date(generales.estimacion);
+      }
+      Object.assign(DetallesGenerales,generales);
       CondicionesInteriores.value=response.data.interiores;
       CondicionesExteriores.value=response.data.exteriores;
       Pintura.value=response.data.pintura;
@@ -119,7 +122,9 @@
     const confirm=await ZdAlert({});
     if(!confirm){return}
     loading.value=true
+
     const Form:OrdenServicioForm={
+      id:DetallesGenerales.id,
       orden_seguimiento: DetallesGenerales.orden_seguimiento,
       orden_opcional: DetallesGenerales.orden_opcional,
       ubicacion: DetallesGenerales.ubicacion,
@@ -139,15 +144,22 @@
       tecnico: DetallesGenerales.tecnico,
       indicaciones_cliente: DetallesGenerales.indicaciones_cliente,
       descripcion_mo: DetallesGenerales.descripcion_mo,
-      imagenes_evidencia: ImagenesEvidencia.value,
-      carro: ImagenesCanvas.value.carro_img ?? null,
-      firma: ImagenesCanvas.value.firma_img ?? null,
+      carro: null,
+      firma: null,
+      imagenes_evidencia: [],
       condiciones_exteriores: CondicionesExteriores.value,
       condiciones_interiores: CondicionesInteriores.value,
       pintura: Pintura.value,
       inventario: Inventario.value,
       cambiar_archivos:DetallesGenerales.cambiar_archivos
     }
+
+    if(DetallesGenerales.cambiar_archivos){
+      Form.carro= ImagenesCanvas.value.carro_img ?? null;
+      Form.firma= ImagenesCanvas.value.firma_img ?? null;
+      Form.imagenes_evidencia= ImagenesEvidencia.value;
+    }
+
     const response= await CreateorUpdate(Form);
     if(response.status){
       MyBasicToast.success(response.data.message??'Orden De Servicio Creada/Actualizada Con Exito')
@@ -166,29 +178,35 @@
       OpenModal.value = null;
     }
   }
-  onMounted(async () => {console.log('montado')
+  onMounted(async () => {
     optionsgasolima.value = await GetNivelesGasolina();
     optionsequipo.value = await GetStatusPerCategory(11);
     modulosdisponibles.value=await GetModulosDisponibles();
   });
   watch(()=>DetallesGenerales.modulo_orden,()=>{
     if(!resetvalues.value){return}
-    console.log('modulo orden cambio')
     DetallesGenerales.vehiculo_concepto_id=null
-  },{ flush: 'post' })
-  watch(()=>DetallesGenerales.empresa,()=>{
-    if(!resetvalues.value){return}
-    console.log('empresa cambio')
-    DetallesGenerales.cliente=null
   })
+  watch(()=>DetallesGenerales.modulo_orden,()=>{
+    if(!resetvalues.value){return}
+    DetallesGenerales.vehiculo_concepto_id=null
+  })
+  watch(()=>DetallesGenerales.vehiculo,()=>{
+    if(!resetvalues.value){return}
+    PrintImageTipoVehiculo();
+    
+  })
+
   const OpenOtherModal= (val:1)=>{
     ImagenesCanvas.value.carro=ImageVehiculoEntrada.value?.GetStrokes();
     ImagenesCanvas.value.firma=ImageFirmaEntrada.value?.GetStrokes();
     OpenModal.value = val;
   }
+
   const CloseOtherModal= ()=>{
     OpenModal.value = null;
   }
+
   watch([OpenModal,loading],async ()=>{
     if(OpenModal.value === null && loading.value=== false){
       const firmablob=ImagenesCanvas.value.firma;
@@ -203,6 +221,14 @@
       ImagenesCanvas.value={}
     }
   })
+  const PrintImageTipoVehiculo=()=>{
+    if(DetallesGenerales.vehiculo){
+      GetImageTipoVehiculo({Canvas:ImageVehiculoEntrada.value, id:Number(DetallesGenerales.vehiculo.value)})
+    }else{
+      ImageVehiculoEntrada.value?.dibujarImagen(null);
+    }
+    
+  }
   const Open = (Id: number | null) => {
     if (Id) {
       Read(Id);
@@ -275,33 +301,34 @@
         :errors="ValidationErrors?.['ubicacion']" 
         :DeleteErrors="()=>{delete ValidationErrors?.['ubicacion']}" 
       />
-      <Select 
-        v-if="!DetallesGenerales.id"
-        label="Tipo De Presupuesto"  
-        v-model="DetallesGenerales.tipo_id" 
-        id="presupuestotipo"  
-        :options="optionstipos"
-        :errors="ValidationErrors?.['tipo_id']" 
-        :DeleteErrors="()=>{delete ValidationErrors?.['tipo_id']}" 
+      <template v-if="!DetallesGenerales.id">
+        <Select 
+          label="Tipo De Presupuesto"  
+          v-model="DetallesGenerales.tipo_id" 
+          id="presupuestotipo"  
+          :options="optionstipos"
+          :errors="ValidationErrors?.['tipo_id']" 
+          :DeleteErrors="()=>{delete ValidationErrors?.['tipo_id']}" 
         />
-      <Select label="Modulo Orden" 
-        v-model="DetallesGenerales.modulo_orden" 
-        id="modulooreden"
-        :canempty="true" 
-        :options="modulosdisponibles"
-        :errors="ValidationErrors?.['modulo_orden']" 
-        :DeleteErrors="()=>{delete ValidationErrors?.['modulo_orden']}" 
-      />
-      <Select2
-        :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
-        label="Vehiculo De Los Conceptos" 
-        endpoint="Select2.Vehiculos.Conceptos.Modulos" 
-        v-model="DetallesGenerales.vehiculo_concepto_id" 
-        :empty_message="DetallesGenerales.modulo_orden? 'Sin Resultados':'Selecciona Un Modulo'" 
-        placeholder="Buscar Vehiculo" 
-        :errors="ValidationErrors?.['vehiculo_concepto_id']" 
-        :DeleteErrors="()=>{delete ValidationErrors?.['vehiculo_concepto_id']}" 
+        <Select label="Modulo Orden" 
+          v-model="DetallesGenerales.modulo_orden" 
+          id="modulooreden"
+          :canempty="true" 
+          :options="modulosdisponibles"
+          :errors="ValidationErrors?.['modulo_orden']" 
+          :DeleteErrors="()=>{delete ValidationErrors?.['modulo_orden']}" 
         />
+        <Select2
+          :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
+          label="Vehiculo De Los Conceptos" 
+          endpoint="Select2.Vehiculos.Conceptos.Modulos" 
+          v-model="DetallesGenerales.vehiculo_concepto_id" 
+          :empty_message="DetallesGenerales.modulo_orden? 'Sin Resultados':'Selecciona Un Modulo'" 
+          placeholder="Buscar Vehiculo" 
+          :errors="ValidationErrors?.['vehiculo_concepto_id']" 
+          :DeleteErrors="()=>{delete ValidationErrors?.['vehiculo_concepto_id']}" 
+        />
+      </template>
     </div>
     <Subtitle>Datos Cliente</Subtitle>
     <div class="grid sm:grid-cols-2 gap-2">
@@ -329,13 +356,14 @@
     </div>
     <Subtitle>Datos Vehiculo</Subtitle>
      <VehiculoForm
-        :GetImage="(id)=>{if(!DetallesGenerales.id){GetImageTipoVehiculo({Canvas:ImageVehiculoEntrada, Tipo:id})}}"
         :Close="()=>emit('close')"
         v-model="DetallesGenerales.vehiculo"
         :errors="ValidationErrors?.['vehiculo']"
         :DeleteErrors="()=>{delete ValidationErrors?.['vehiculo']}"
         :OpenModal="()=>OpenOtherModal(1)" 
       />
+
+
     <Subtitle>Datos De Ingreso</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-2" >
       <InputBasic 
@@ -375,29 +403,40 @@
         :errors="ValidationErrors?.['gasolina']" 
         :DeleteErrors="()=>{delete ValidationErrors?.['gasolina']}"
       />
-      <div class="md:col-span-4 sm:col-span-2 flex flex-col md:flex-row gap-2" >
-        <ZDCanvas 
-          class="md:w-[70%]" 
-          strokecolor="red"
-          ImageRequired
-          :image="Archivos.carro?.url"
-          ref="ImageVehiculoEntrada" 
-          title="Detalles Del Vehiculo" 
-          :errors="ValidationErrors?.['carro']" 
-          :DeleteErrorss="()=>{delete ValidationErrors?.['carro']}" 
-          />
-        <ZDCanvas 
-          class="md:w-[30%]" 
-          classnamedivcanvas="w-full"
-          height="h-[10rem]" 
-          ref="ImageFirmaEntrada" 
-          title="Firma"
-          :image="Archivos.firma?.url"
-          :errors="ValidationErrors?.['firma']" 
-          :DeleteErrors="()=>{delete ValidationErrors?.['firma']}"
-        />
-      </div>
     </div>
+    <div class="md:col-span-4 sm:col-span-2 flex flex-col md:flex-row gap-2" >
+      <ZDCanvas 
+        class="md:w-[70%]" 
+        strokecolor="red"
+        ImageRequired
+        :CanEdit="DetallesGenerales.cambiar_archivos"
+        :image="Archivos.carro?.url"
+        ref="ImageVehiculoEntrada" 
+        title="Detalles Del Vehiculo" 
+        :DeleteImage="()=>{
+          Archivos.carro=null
+          PrintImageTipoVehiculo()
+        }"
+        :errors="ValidationErrors?.['carro']" 
+        :DeleteErrorss="()=>{delete ValidationErrors?.['carro']}" 
+        />
+      <ZDCanvas 
+        class="md:w-[30%]" 
+        classnamedivcanvas="w-full"
+        height="h-[10rem]"
+        ref="ImageFirmaEntrada" 
+        title="Firma"
+        :CanEdit="DetallesGenerales.cambiar_archivos" 
+        :image="Archivos.firma?.url"
+        :DeleteImage="()=>{
+          Archivos.firma=null
+          ImageFirmaEntrada?.dibujarImagen(null);
+        }"
+        :errors="ValidationErrors?.['firma']" 
+        :DeleteErrors="()=>{delete ValidationErrors?.['firma']}"
+      />
+    </div>
+    
     <Subtitle>Empleados Encargados</Subtitle>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2" >
       <Combobox 
@@ -471,7 +510,7 @@
       v-model:Imagenes="ImagenesEvidencia" 
       v-model:ImagenesUpload="ImagenesCargadas" 
       :CanEditImages="DetallesGenerales.cambiar_archivos"
-      :DeleteErrorss="(key:string)=>{delete ValidationErrors?.[key]}" 
+      :DeleteErrors="(key:string)=>{delete ValidationErrors?.[key]}" 
       :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('imagenes_evidencia')).map((item)=>{return{Key:item[0],errors:item[1]}})"
     />
   </template>

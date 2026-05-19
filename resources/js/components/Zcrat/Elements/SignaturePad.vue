@@ -17,7 +17,6 @@ function clear(){
 
 function save(){
   const data = signaturePad.toDataURL()
-  console.log(data)
 }
 </script>
 

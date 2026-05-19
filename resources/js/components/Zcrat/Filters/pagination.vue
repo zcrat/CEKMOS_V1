@@ -37,7 +37,6 @@
     }
     watch([currentPage], () => {
         search();
-        console.log('cambio desde la page')
     }, { immediate: true });
 
 
@@ -50,7 +49,6 @@
         if (currentPage.value !== 1) {
             currentPage.value = 1
         } else {
-            console.log('cambio desde los item')
             search()
         }
     })

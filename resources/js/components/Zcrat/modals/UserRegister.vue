@@ -31,12 +31,7 @@ watch(() => props.userid, (val) => {
 }, { immediate: true })
 
 watchEffect(()=>{
-  console.log(UserForm.id)
-  console.log(props.show)
-  console.log('ubocambio')
   if(UserForm.id && props.show){
-    console.log('soli')
-
     Read()
   }else{
     UserForm.name='';
@@ -90,7 +85,7 @@ const Read = async () => {
       emit('close')
       const status = error.response?.status ?? 0;
       const data = error.response?.data ?? {'message':"Error inesperado"};
-      console.log(error)
+      console.error(error)
       if (status === 422) {
         if( data.errors){
           const formattedErrors: Record<string, string[]> = {};

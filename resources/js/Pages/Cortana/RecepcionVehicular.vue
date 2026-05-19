@@ -35,11 +35,7 @@ const params = computed(() => ({
   modulos: modulos.value
 }))
 
-watch((loading),()=>{
-    console.log(loading.value)
-},{
-    immediate:true
-})
+
 </script>
 
 <template>
@@ -59,7 +55,8 @@ watch((loading),()=>{
                     <Datapicker />
                 </div>
             </div>
-            <Pagination api="Cortana.OrdenServicio.Items" 
+            <Pagination 
+                api="Cortana.OrdenServicio.Items" 
                 :params="params" 
                 v-model:currentPage="currentPage" 
                 v-model:itemsPerPage="itemsPerPage" 

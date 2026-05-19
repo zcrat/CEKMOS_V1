@@ -63,13 +63,15 @@ const localContent = computed(() => ({
 
   <DropdownMenuRoot>
     <DropdownMenuTrigger :class="Object.values(localTrigger)">{{triggerText}}</DropdownMenuTrigger>
-    <DropdownMenuPortal :class="[width]">
-      <DropdownMenuContent :class="Object.values(localContent)">
-        <template v-for="(child, index) in props.options" :key="index+'_'+now">
-          <DropdownMenuItem :class="['text-center','py-1','text-black','text-md','hover:cursor-pointer',...child.classname]" @select="child.onClick">{{ child.label }}</DropdownMenuItem>
-          <DropdownMenuSeparator />
-        </template>
-      </DropdownMenuContent>
+    <DropdownMenuPortal >
+      <div :class="[width]">
+        <DropdownMenuContent :class="Object.values(localContent)">
+          <template v-for="(child, index) in props.options" :key="index+'_'+now">
+            <DropdownMenuItem :class="['text-center','py-1','text-black','text-md','hover:cursor-pointer',...child.classname]" @select="child.onClick">{{ child.label }}</DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </template>
+        </DropdownMenuContent>
+      </div>
     </DropdownMenuPortal>
   </DropdownMenuRoot>
 </template>

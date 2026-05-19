@@ -24,8 +24,6 @@ useEcho(
   `Data.User.${props.IdUser}`,
   '.DataUserEvent',
   (data: DataEvent) => {
-    console.log('Evento recibido:', data.message, data.tipo)
-
     if (data.tipo === 58) {
       MyBasicToast.success('Se Te Ha Revocado El Acceso')
       window.location.reload()

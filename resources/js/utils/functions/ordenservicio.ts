@@ -6,9 +6,9 @@ import { Ref } from 'vue';
 import { ZdAlert } from '../ZdAlert';
 import { ImagenUpload } from '@/components/Zcrat/modals/partes/ordenservicio/ImagenesEvidencias.vue';
   
-export const GetImageTipoVehiculo = async ({Canvas,Tipo}:{Canvas:InstanceType<typeof ZDCanvas> | null,Tipo:number}) => {
+export const GetImageTipoVehiculo = async ({Canvas,id}:{Canvas:InstanceType<typeof ZDCanvas> | null,id:number}) => {
     try {
-      const response = await axios.get(route('image.tipo.vehiculo', { type: Tipo }), {
+      const response = await axios.get(route('Vehiculo.Get.Image', { id: id }), {
         responseType: 'blob'
       });
       Canvas?.dibujarImagen(response.data);
@@ -109,7 +109,6 @@ export const GetDataVehiculoEconomico=(Economico:EconomicoForm)=>{
   }
 export const GetDataVehiculoPlacas=(Economico:EconomicoForm)=>{
     if(Economico.placas){
-      console.log(Economico.placas)
       if(Economico.placas.length < 6){
         MyBasicToast.error('Longitud mínima de N# placas es de 6 caracteres');
         return;

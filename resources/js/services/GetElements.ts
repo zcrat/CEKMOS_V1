@@ -19,7 +19,6 @@ interface ApiResponse {
     const response = await axios.get<ApiResponse>(route(api),{
       params: params ?? {}
     });
-    console.log(response.data.items)
     items.value = response.data.items ?? []
     totalItems.value = response.data.totalItems ?? 0
   } catch (error: any) {
@@ -40,7 +39,6 @@ interface ApiResponse {
       console.error('Error desconocido:', error)
     }
   } finally {
-    console.log('se cambio el valor')
     loading.value = false
   }
 }

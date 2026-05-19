@@ -13,7 +13,7 @@ export const getVehiculoDatos = async (
     return { status: true, data: response.data };
   } catch (error: any) {
     if (axios.isCancel(error)) {
-      console.log('Cancelado');
+      console.log('Solicitud cancelada');
     } else {
       console.error('Error al obtener datos del vehículo:', error);
     }

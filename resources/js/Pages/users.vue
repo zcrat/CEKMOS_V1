@@ -89,7 +89,6 @@ const ToggleActiveUser=async ()=>{
     }
 }
 watch([OrderKey,() => filters.value.search,pagination.itemsPerPage], () => {
-    console.log('cambio')
     if(pagination.currentPage.value != 1){
         pagination.currentPage.value = 1
     }else{
@@ -97,7 +96,6 @@ watch([OrderKey,() => filters.value.search,pagination.itemsPerPage], () => {
     }
 })
 watch([pagination.currentPage], () => {
-    console.log(pagination.currentPage.value)
     debouncedGetElements()
 })
 onMounted(()=>{

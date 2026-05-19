@@ -32,20 +32,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session')])->group(func
 });
 Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])->group(function () {
     
-  Route::get('/Image/Tipo/Vehiculo/General/{type}', function ($type) {
-      if(!in_array($type,[8,9,10,11,12,13])){
-        return response()->json(['message'=>'Tipo Invalido'],404);
-      }
-      $realtype=$type-7;
-      $path='VehiculosRecepcionVehicular/Vehiculo'.$realtype.'.png';
-      $file = Storage::disk('local')->path($path);
-      if (!file_exists($file)) {
-        return response()->json(['message'=>'No existe la Imagen Del Tipo '.$realtype],404);
-      }
-      return Response::file($file, [
-          'Content-Type' => mime_content_type($file)
-      ]);
-  })->where('path', '.*')->name('image.tipo.vehiculo');
+  
 
     Route::middleware(['permission:ver_usuarios_sitema'])->group(function () {
       Route::get('/users', function () {return Inertia::render('users');})->name('users');
@@ -64,6 +51,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
       Route::get('cortana/get/orden-servicio',[CortanaController::class,'GetOrdenServicio'])->name('Cortana.OrdenServicio.Read');
       Route::get('cortana/get/ordenes-servicio',[CortanaController::class,'GetOrdenesServicio'])->name('Cortana.OrdenServicio.Items');
       Route::post('cortana/orden/servicio/create',[CortanaController::class,'CreateOrdenServico'])->name('Cortana.OrdenServicio.Create');
+      Route::post('cortana/orden/servicio/update',[CortanaController::class,'UpdateOrdenServico'])->name('Cortana.OrdenServicio.Update');
       Route::put('cortana/orden/toggle/files_upload',[CortanaController::class,'ToggleFilesRecepcionVehicular'])->name('Cortana.Orden.Toggle.Upload.Files');
       Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('Presupuesto.Get.Data_Orden');
       Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('Presupuesto.Create');
@@ -108,6 +96,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('ComboBox/ubicaciones',[ComboboxController::class,'GetUbicaciones'])->name('Combobox.ubicaciones');
 
     Route::get('vehiculo/get/datos',[VehiculoController::class,'GetDatos'])->name('Vehiculo.Get.Datos');
+    Route::get('vehiculo/get/image',[VehiculoController::class,'GetImage'])->name('Vehiculo.Get.Image');
     Route::get('vehiculo/find/datos',[VehiculoController::class,'FindDatos'])->name('Vehiculo.Find');
     Route::post('vehiculo/Create/update',[VehiculoController::class,'CreateOrUpdate'])->name('Vehiculo.CreateOrUpdate');
     Route::get('Admin/Caja',[CajaController::class,'View'])->name('Admin.Caja');

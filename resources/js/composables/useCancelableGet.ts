@@ -16,7 +16,7 @@ export const useCancelableGet = () => {
       return { status: true, data: response.data };
     } catch (error: any) {
       if (axios.isCancel(error)) {
-        console.log('Solicitud cancelada');
+        console.error('Solicitud cancelada');
       } else {
         console.error('Error en solicitud:', error);
       }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Traits\Timestamp;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 class OrdenesServicio extends Model
@@ -19,6 +20,7 @@ class OrdenesServicio extends Model
         'empresa_id',
         'cliente_id',
         'cambiar_archivos',
+        'estimacion',
         'estatus_id',
         'indicaciones_cliente',
         'notas_mecanico',
@@ -28,6 +30,7 @@ class OrdenesServicio extends Model
     ];
     protected $casts = [
         'cambiar_archivos' => 'boolean',
+        'estimacion' => 'datetime'
     ];
 
     public function archivos(){

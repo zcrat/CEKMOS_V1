@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch, nextTick } from "vue"
 import Button from "../Inputs/Button.vue"
 import ZDListErrors from "./ZDListErrors.vue"
 import ZDIconError from "./ZDIconError.vue"
@@ -22,12 +22,14 @@ const props = withDefaults(defineProps<{
   classnamedivcanvas?: string
   height?:string
   disabled?: boolean
+  CanEdit: boolean
   title?: string
   image?: string
   strokecolor?: 'red' | 'black'
   errors?: string[]
   ImageRequired?: boolean
   DeleteErrors?: ()=>void
+  DeleteImage?: ()=>void
 }>(), {
   disabled: false,
   strokecolor: 'black',
@@ -59,14 +61,6 @@ watch(
   }
 )
 
-watch(
-  () => ImageDraw.value,
-  () => {
-    if (props.ImageRequired) {
-      clearCanvas()
-    }
-  }
-)
 
 onMounted(() => {
   const canvas = canvasRef.value
@@ -101,7 +95,6 @@ onMounted(() => {
       Strokes.value.push([...currentStroke.value])
       StrokesDelete.value = []
     }
-
     drawing = false
     ctx?.beginPath()
   })
@@ -109,7 +102,6 @@ onMounted(() => {
   canvas.addEventListener("pointermove", draw)
 
   const observer = new ResizeObserver(() => {
-    sizeCanvas()
     redraw()
   })
 
@@ -200,8 +192,12 @@ function draw(e: PointerEvent) {
   ctx.moveTo(realx, realy)
 }
 
-const dibujarImagen = async (data: ImageDraw) => {
+const dibujarImagen = async (data: ImageDraw,reset: boolean=true) => {
   ImageDraw.value = data
+  if(reset){
+    Strokes.value = []
+    StrokesDelete.value = []
+  }
   redraw()
 }
 
@@ -300,33 +296,25 @@ function sizeCanvas() {
 }
 
 async function redraw() {
+  sizeCanvas()
   const canvas = canvasRef.value
-
   if (!canvas || !ctx) return
-
-
-
+  
   ctx.clearRect(0, 0, canvas.width, canvas.height)
-
   await DrawImage()
-
   ctx.lineWidth = 2
   ctx.strokeStyle = props.strokecolor
   ctx.lineCap = "round"
-
   Strokes.value.forEach(stroke => {
     ctx?.beginPath()
-
     stroke.forEach((point, i) => {
       const { realx, realy } = RealCoords(point.x, point.y)
-
       if (i === 0) {
         ctx?.moveTo(realx, realy)
       } else {
         ctx?.lineTo(realx, realy)
       }
     })
-
     ctx?.stroke()
   })
 }
@@ -334,7 +322,6 @@ async function redraw() {
 function clearCanvas() {
   StrokesDelete.value = [...Strokes.value]
   Strokes.value = []
-
   redraw()
 }
 
@@ -378,8 +365,6 @@ async function getCanvasBlobZise(
   const sourceCanvas = canvasRef.value
   
   if (!sourceCanvas) return null
-  console.log(sourceCanvas.height)
-  console.log(sourceCanvas.width)
   const ratio = sourceCanvas.height / sourceCanvas.width
   const height=width * ratio;
   const exportCanvas = document.createElement("canvas")
@@ -423,9 +408,16 @@ function SetStrokes(val: StrokesArray) {
   StrokesDelete.value = val.StrokesDelete
   ImageDraw.value = val.ImageDraw
   currentStroke.value = val.currentStroke
-
   redraw()
 }
+watch([props.CanEdit,props.image],async ()=>{
+  if(props.image && props.CanEdit){
+    await nextTick();
+    dibujarImagen(props.image,false)
+  }else{
+
+  }
+},{immediate:true})
 
 defineExpose({
   dibujarImagen,
@@ -449,8 +441,8 @@ defineExpose({
       {{ title }}
     </h2>
 
-    <div :class="[classnamedivcanvas , image ? '' : height]">
-      <img :src="image" alt="" v-if="image" class="bg-gray-200 border border-gray-400 p-2 rounded max-h-full">
+    <div :class="[classnamedivcanvas , (image && !CanEdit) ? '' : height]">
+      <img :src="image" alt="" v-if="image && !CanEdit" class="bg-gray-200 border border-gray-400 p-2 rounded max-h-full">
 
       <canvas
       v-else
@@ -467,11 +459,17 @@ defineExpose({
 
     <div
       class="flex w-fit max-w-full gap-2 mt-2"
-      v-if="!image"
-    >
+        v-if="!image || CanEdit"
+      >
+      <Button
+        text="Rehacer"
+        @click="props.DeleteImage?.();"
+        type="save"
+         v-if="image"
+      />
       <Button
         text="Limpiar"
-        :disabled="Strokes.length <= 0"
+        :disabled="Strokes.length <= 0 "
         @click="clearCanvas"
         type="delete"
       />

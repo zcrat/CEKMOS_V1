@@ -63,8 +63,6 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
       <InputBasic id="paterno" label="Paterno" type="text" v-model="Employee.paterno" />
       <InputBasic id="materno" label="Materno" type="text" v-model="Employee.materno" />
       <InputBasic id="curp" label="CURP" type="text" v-model="Employee.curp" :OnBlur="()=>{
-        console.log(Employee.rfc)
-        console.log(Employee.curp)
         if(!Employee.rfc  && Employee.curp !== ''){
           Employee.rfc=Employee.curp.substring(0,10);
         }

@@ -89,7 +89,6 @@ const onSelect = () => {
     }
 }
 const onFocus = () => {
-  console.log('focus')
   isOpen.value = true
   if(!props.cacheoptions){
     GetOptions()
@@ -180,7 +179,6 @@ onBeforeUnmount(() => {
             @focus="onFocus"
             :value="isOpen ? query : optionselect?.label ?? ''"
             @mousedown="onMouseDown"
-            @blur="()=>{console.log('blurr')}"
           />
           </div>
         </div>

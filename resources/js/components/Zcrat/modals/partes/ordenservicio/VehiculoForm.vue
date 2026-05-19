@@ -10,7 +10,6 @@
     import Select2 from '@/components/Zcrat/Elements/Select2.vue';
 import Button from '@/components/Zcrat/Inputs/Button.vue';
     const props = defineProps<{
-        GetImage?: (val:number)=>void
         Close?: ()=>void
         errors?: string[]
         DeleteErrors?: ()=>void
@@ -38,9 +37,6 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
             props.Close?.()
         }
     }
-    watch(()=>Vehiculo.tipo_id,(val)=>{
-        if(val){props.GetImage?.(val)}
-    })
     watch(VehiculoId,()=>{
         if(VehiculoId.value){
             Read(VehiculoId.value.value);
