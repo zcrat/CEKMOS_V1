@@ -13,6 +13,7 @@ import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import OrdenServicio from '@/components/Zcrat/modals/OrdenServicio.vue';
 import { OrderKeyProp } from '@/types/tablecomponent';
 import { ToggleUploadFiles } from '@/utils/functions/ordenservicio';
+import { useEcho } from '@laravel/echo-vue';
 
 const currentPage=ref<number>(1)
 const itemsPerPage=ref<number>(10)
@@ -27,13 +28,33 @@ const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
 
 const orderBy=ref<null|OrderKeyProp>(null)
 const ModalOrdenServicio = ref<InstanceType<typeof OrdenServicio> | null>(null);
-
+interface DaTaUpdateWebSocket extends Record<string,any> {
+    id:number
+}
 const params = computed(() => ({
   search: search.value,
   estatus: estatus.value,
   empresa: empresa.value,
   modulos: modulos.value
 }))
+
+
+useEcho(
+  `ordenes_servicio`, '.update', (data:DaTaUpdateWebSocket) => {
+    console.log(data)
+    items.value = items.value.map((item)=>{
+        if(item.id === data.id){
+            return {...item,...data}
+        }
+        return item
+    })
+  }
+)
+useEcho(
+  `ordenes_servicio`, '.delete', (data:{id:number}) => {
+    items.value = items.value.filter((item)=>item.id !== data.id)
+  }
+)
 
 
 </script>
@@ -112,8 +133,8 @@ const params = computed(() => ({
                                         classname:['hover:text-gray-800']
                                     },
                                     {
-                                        label:((row.upload_files ? 'Desactivar ' : 'Activar ') + 'Cambios en los Archivos'), 
-                                        onClick:()=>{ToggleUploadFiles({id:row.id,estatus:row.upload_files})},
+                                        label:((row.cambiar_archivos ? 'Desactivar ' : 'Activar ') + 'Cambios en los Archivos'), 
+                                        onClick:()=>{ToggleUploadFiles({id:row.id,estatus:row.cambiar_archivos})},
                                         classname:['hover:text-gray-800']
                                     },
                                 ]

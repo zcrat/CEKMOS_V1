@@ -96,4 +96,7 @@ protected $dateFormat = 'Y-m-d H:i:s.v'; // Formato compatible con SQL Server
     public function caja_movimientos(){
         return $this->hasMany(CajaMovimientos::class,'user_id');
     }
+    public function bitacora(){
+        return $this->hasMany(BitacoraAccionesUsers::class,'user_id');
+    }
 }

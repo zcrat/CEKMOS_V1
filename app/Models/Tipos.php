@@ -44,5 +44,8 @@ class Tipos extends Model
     }
     public function hojas_conceptos(){
         return $this->hasMany(HojaConceptos::class,'tipo_id');
+        }
+    public function bitacora(){
+        return $this->hasMany(BitacoraAccionesUsers::class,'tipo_id');
     }
 }

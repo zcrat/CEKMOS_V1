@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OrdenServicioEvents;
 use App\Http\Controllers\Controller;
 use App\Models\Archivos;
 use App\Models\CondicionesPinturaOrdenServicio;
@@ -252,7 +253,7 @@ class CortanaController extends Controller
                 )
                 :'Revisando' ) 
                 :'No Aplica',
-            'upload_files'=>$item->cambiar_archivos
+            'cambiar_archivos'=>$item->cambiar_archivos
         ]);
 
         $totalPages=ceil($totalItems/$itemsPerPage);
@@ -582,6 +583,9 @@ class CortanaController extends Controller
         $ordenservicio=OrdenesServicio::find($request->id);
         $ordenservicio->cambiar_archivos=!$ordenservicio->cambiar_archivos;
         $ordenservicio->save();
+        event(new OrdenServicioEvents($ordenservicio->id,'update',[
+            'cambiar_archivos'=>$ordenservicio->cambiar_archivos
+        ]));
         return response()->json(['message' => 'Actualizado Correctamente']);
     }
 
@@ -689,7 +693,7 @@ class CortanaController extends Controller
             $ubicacion=Ubicaciones::FirstOrCreate(['nombre'=>
                 strtolower(trim($request->ubicacion))
             ]);
-            $ordenservicio=OrdenesServicio::find($request->id);
+            $ordenservicio=OrdenesServicio::findOrFail($request->id);
 
             $ordenservicio->update([
                 'orden_seguimiento'=>$request->orden_seguimiento,
@@ -842,6 +846,19 @@ class CortanaController extends Controller
                 }
             }
             DB::commit();
+            $ordenservicio->refresh()->load(['vehiculo.modelo.marca','empresa','ubicacion']);
+            $dataws = [
+                'orden'       => $ordenservicio->orden_servicio,
+                'seguimiento' => $ordenservicio->orden_seguimiento,
+                'ubicacion'   => $ordenservicio->ubicacion?->nombre ?? '',
+                'empresa'     => $ordenservicio->empresa?->nombre ?? '',
+                'economico'   => $ordenservicio->vehiculo?->economico ?? '',
+                'placas'      => $ordenservicio->vehiculo?->placas  ?? '',
+                'marca'       => $ordenservicio->vehiculo?->modelo?->marca?->descripcion ?? '',
+                'modelo'      => $ordenservicio->vehiculo?->modelo?->descripcion ?? '',
+            ];
+            event(new OrdenServicioEvents($request->id,'update',$dataws));
+
             return response()->json(['message' => 'Creada Correctamente']);
         }catch(\Exception $e){
             DB::rollBack();
