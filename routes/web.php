@@ -107,13 +107,28 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
   use App\Http\Controllers\PdfController;
 
 Route::get('/pdf-demo', [PdfController::class, 'show'])->name('Pdf.Cortana.RecepcionVehicular');
-use Spatie\Browsershot\Browsershot;
 
-Route::get('/testpdf', function () {
+use Spatie\LaravelPdf\Facades\Pdf;
 
-    $consoleMessages = Browsershot::html('<h1>Hello world!!</h1>')
-        ->setOption('args', ['--no-sandbox', '--disable-setuid-sandbox'])
-        ->consoleMessages();
+Route::get('/test-browser', function () {
 
-    return $consoleMessages;
+    try {
+
+        Pdf::html('<h1>Hello world</h1>')
+            ->save(public_path('my-a3-pdf.pdf'));
+
+        return 'funciona';
+
+    } catch (\Throwable $e) {
+
+        return response()->json([
+            'message' => mb_convert_encoding(
+                $e->getMessage(),
+                'UTF-8',
+                'UTF-8'
+            ),
+        ]);
+
+    }
+
 });
