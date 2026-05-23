@@ -104,3 +104,16 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
   });
   
   Route::get('migrar/caja',[MigrateDataBaseOld::class,'migrateCaja']);
+  use App\Http\Controllers\PdfController;
+
+Route::get('/pdf-demo', [PdfController::class, 'show'])->name('Pdf.Cortana.RecepcionVehicular');
+use Spatie\Browsershot\Browsershot;
+
+Route::get('/testpdf', function () {
+
+    $consoleMessages = Browsershot::html('<h1>Hello world!!</h1>')
+        ->setOption('args', ['--no-sandbox', '--disable-setuid-sandbox'])
+        ->consoleMessages();
+
+    return $consoleMessages;
+});

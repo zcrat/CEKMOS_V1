@@ -52,6 +52,7 @@
         "laravel-vite-plugin": "^1.0",
         "lodash": "^4.17.21",
         "lucide-vue-next": "^0.468.0",
+        "puppeteer": "^24.43.1",
         "reka-ui": "^2.9.2",
         "signature_pad": "^5.1.3",
         "sweetalert2": "^11.26.24",

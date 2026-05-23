@@ -14,6 +14,7 @@ import OrdenServicio from '@/components/Zcrat/modals/OrdenServicio.vue';
 import { OrderKeyProp } from '@/types/tablecomponent';
 import { ToggleUploadFiles } from '@/utils/functions/ordenservicio';
 import { useEcho } from '@laravel/echo-vue';
+import PDFDemo from '@/components/Zcrat/modals/PDFDemo.vue';
 
 const currentPage=ref<number>(1)
 const itemsPerPage=ref<number>(10)
@@ -28,6 +29,7 @@ const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
 
 const orderBy=ref<null|OrderKeyProp>(null)
 const ModalOrdenServicio = ref<InstanceType<typeof OrdenServicio> | null>(null);
+const pdf = ref<InstanceType<typeof PDFDemo> | null>(null);
 interface DaTaUpdateWebSocket extends Record<string,any> {
     id:number
 }
@@ -129,7 +131,7 @@ useEcho(
                                     },
                                     {
                                         label:'Descargar PDF', 
-                                        onClick:()=>{console.log(row.id)},
+                                        onClick:()=>{pdf?.Open(row.id)},
                                         classname:['hover:text-gray-800']
                                     },
                                     {
@@ -155,4 +157,5 @@ useEcho(
         </template>
     </AppLayout>
     <OrdenServicio ref="ModalOrdenServicio"/>
+    <PDFDemo ref="pdf"/>
 </template>
