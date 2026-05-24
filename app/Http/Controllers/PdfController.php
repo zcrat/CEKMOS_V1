@@ -9,7 +9,14 @@ class PdfController extends Controller
 {
     public function show()
     {
-        Pdf::html('<h1>Hello world</h1>')->save('my-a3-pdf.pdf');
-        return 'funciona';
+       return Pdf::view('pdf.RecepcionVehicular',[
+            'orden' => 'prueba',
+            'usuario' => 'Ivan',
+            'items' => [
+                ['nombre' => 'Aceite', 'estado' => 'OK'],
+                ['nombre' => 'Frenos', 'estado' => 'Pendiente'],
+                ['nombre' => 'Llantas', 'estado' => 'OK'],
+            ]
+        ])->format('A4');
     }
 }

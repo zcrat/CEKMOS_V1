@@ -2,51 +2,49 @@
 
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-
-    <style>
-        body{
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            font-size: 14px;
-        }
-
-        .header{
-            border-bottom: 2px solid #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-        }
-
-        .title{
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .card{
-            border: 1px solid #999;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        table{
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td{
-            border: 1px solid #ccc;
-            padding: 8px;
-        }
-
-        th{
-            background: #f0f0f0;
-        }
-    </style>
+<head ca>
+    <link rel="stylesheet" href="{{ public_path('css/pdf.css') }}">
 </head>
-<body>
-<h1>Hola</h1>
+<body class="a4">
+    <div class="flex flex-col gap-2 w-full h-full">
+
+        <div class="flex justify-between gap-2 h-30">
+            <div class="w-80 gap-1 flex-col flex">
+                <div class="contenedor_title"><h1>REPORTE DE RECEPCION DE VEHICULO</h1></div>
+                <div class="contedor_bordes h-80">
+
+                </div>
+                <div class="contedor_bordes flex-1 gap-1 flex">
+                    <span>D (Danada)</span>
+                    <span>O = Operacional</span>
+                    <span>F = Falta objeto</span>
+                    <span>J = Sin Dalo</span>
+                    <span>R = Ocupa Reparacion</span>
+                    <span>NA = No Aplica</span>
+                </div>
+            </div>
+            <div>
+
+            </div>
+            <div class="flex-1 h-full flex flex-col">
+                <div class="contenedor_orden"><h1>No. <span class="textfolio">{{$orden}}</span></h1></div>
+                <div class="contedor_bordes flex-1"> </div>
+            </div>
+        </div>
+        <div class="h-15 flex gap-1">
+            <div class="contedor_bordes w-full"></div>
+            <div class="contedor_bordes w-full"></div>
+        </div>
+        <div class="h-15 flex gap-1">
+            <div class="contedor_bordes w-full"></div>
+            <div class="contedor_bordes w-full"></div>
+        </div>
+        <div class="h-17 contedor_bordes">
+        </div>
+        <div class="flex-1 flex contedor_bordes">
+
+        </div>
+    </div>
 
 </body>
-</html>6
+</html>
