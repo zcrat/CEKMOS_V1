@@ -25,7 +25,7 @@
   font-weight: 600;
   font-size: 1.25rem;
   background-color:#c2d7f7;
-  border-radius: 3px;
+  border-radius: 0.5rem;
   width: 90%;
   text-align: center;
   margin: auto;
@@ -41,6 +41,9 @@
   margin: auto;
 }
 
+.renglon{
+  border-bottom: 1px solid navy;
+}
 
 .textfolio{
   color: red;
@@ -99,7 +102,7 @@
 }
 
 .items-center{
-  justify-items: center;
+  align-items: center;
 }
 .gap-2{
   gap: 8px;
@@ -148,14 +151,29 @@
 .h-25{
   height: 25%;
 }
+.h-24{
+  height: 24%;
+}
+.h-21{
+  height: 21%;
+}
 .h-20{
   height: 20%;
+}
+.h-17{
+  height: 17%;
+}
+.h-16{
+  height: 16%;
 }
 .h-15{
   height: 15%;
 }
-.h-17{
-  height: 17%;
+.h-10{
+  height: 10%;
+}
+.h-8{
+  height: 8%;
 }
 
 .text-08{
