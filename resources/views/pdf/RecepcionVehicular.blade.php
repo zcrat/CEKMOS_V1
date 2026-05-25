@@ -14,8 +14,8 @@
                 <div class="contedor_bordes h-80">
 
                 </div>
-                <div class="contedor_bordes flex-1 gap-1 flex">
-                    <span>D (Danada)</span>
+                <div class="contedor_bordes flex-1 gap-1 flex text-08 justify-around items-center">
+                    <span>D = Danada</span>
                     <span>O = Operacional</span>
                     <span>F = Falta objeto</span>
                     <span>J = Sin Dalo</span>
