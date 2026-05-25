@@ -35,7 +35,14 @@
                     </div>
                 </div>
                 <div class="flex-1 h-full flex flex-col">
-                    <div class="contedor_bordes flex-1"> </div>
+                    <div class="contedor_bordes flex-1"> 
+                        <div class="renglon h-10"> </div>
+                        <div class="renglon h-20"> </div>
+                        <div class="renglon h-15"> </div>
+                        <div class="renglon h-15"> </div>
+                        <div class="renglon h-15"> </div>
+                        <div class="h-8"> </div>
+                    </div>
                 </div>
             </div>
         </div>
