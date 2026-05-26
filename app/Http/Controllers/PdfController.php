@@ -9,6 +9,7 @@ class PdfController extends Controller
 {
     public function show()
     {
+        return view('pdf.RecepcionVehicular');
        return Pdf::view('pdf.RecepcionVehicular',[
             'orden' => 'prueba',
             'usuario' => 'Ivan',
