@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 </head>
-<body class="a4 contedor_bordes">
+<body class="a4 contedor_bordes flex overflow">
     <div class="flex flex-col gap-2 w-full h-full">
 
         <div class="flex flex-col gap-2 h-30">
@@ -21,7 +21,6 @@
                             <h3 class="celda w-45"><span>Nombre: </span>prechadssd s dd</h3>
                             <h3 class="celda w-35"><span>Cliente/Zona/Usuario: </span> </h3>
                             <h3 class="celda flex-1"><span>Ord. Servicio: </span>MOR70000</h3>
-                            
                         </div>
                         <div class="renglon h-12"> 
                             <h3 class="celda"><span>Direccion: </span> </h3>
@@ -75,53 +74,91 @@
                 </div>
             </div>
         </div>
-        <div class="h-15 flex gap-1">
-            <div class="contedor_bordes w-full flex flex-col">
-                <div class="contenedor_title"><h2>Condiciones De Interiores Y Equipo</h2></div>
-                <div class="condiciones">
-                    <div class="row">
-                        <div class="col w-25"><h3>Puerta IF.</h3><span class="respuesta"> D </span></div>
-                        <div class="col w-25"><h3>Puerta DF.</h3><span class="respuesta">D</span></div>
-                        <div class="col w-25"><h3>Puerta IT.</h3><span class="respuesta">D</span></div>
-                        <div class="col w-25"><h3>Puerta DT.</h3><span class="respuesta">D</span></div>
-                    </div>
-                    <div class="row">
-                        <div class="col w-25"><h3>Asiento IF.</h3><span class="respuesta">NA</span></div>
-                        <div class="col w-25"><h3>Asiento DF.</h3><span class="respuesta">D</span></div>
-                        <div class="col w-25"><h3>Asiento IT.</h3><span class="respuesta">D</span></div>
-                        <div class="col w-25"><h3>Asiento DT.</h3><span class="respuesta">D</span></div>
-                    </div>
-                    <div class="h-8"></div>
-                    <div class="row">
-                        <div class="col w-33"><h3>Consola</h3><span class="respuesta">D</span></div>
-                        <div class="col w-33"><h3>Claxon</h3><span class="respuesta">D</span></div>
-                        <div class="col w-33"><h3>Tablero</h3><span class="respuesta">D</span></div>
-                    </div>
-                    <div class="row">
-                        <div class="col w-33"><h3>Quemacocos</h3><span class="respuesta">D</span></div>
-                        <div class="col w-33"><h3>Toldo</h3><span class="respuesta">D</span></div>
-                        <div class="col w-33"><h3>Elevadores Elec.</h3><span class="respuesta">D</span></div>
-                    </div>
-                    <div  class="row">
-                        <div class="col w-33"><h3>Luces Int.</h3><span class="respuesta">D</span></div>
-                        <div class="col w-33"><h3>Seguros Elec.</h3><span class="respuesta">D</span></div>
-                        <div class="col w-33"><h3>Tapetes</h3><span class="respuesta">D</span></div>
-                    </div>
-                    <div  class="row">
-                        <div class="col w-33"><h3>Radio</h3><span class="respuesta">D</span></div>
-                        <div class="col w-33"><h3>Retrovisor</h3><span class="respuesta">D</span></div>
-                        <div class="col w-33"><h3>Climatizador</h3><span class="respuesta">D</span></div>
-                    </div>
+        <div class="h-15 flex gap-1 ">
+            <div class="contedor_bordes w-60 flex flex-col">
+                <div class="contenedor_title"><h2>Condiciones Interiores Y Equipo</h2></div>
+                <div class="condiciones grid-4">
+                        <div class="col"><h3>Puerta IF.</h3><span class="respuesta"> D </span></div>
+                        <div class="col"><h3>Puerta DF.</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Puerta IT.</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Puerta DT.</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Asiento IF.</h3><span class="respuesta">NA</span></div>
+                        <div class="col"><h3>Asiento DF.</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Asiento IT.</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Asiento DT.</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Consola</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Claxon</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Tablero</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Quemacocos</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Toldo</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Tapetes</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Radio</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Retrovisor</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Luces Interior</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Seguros Electricos</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Elevadores Electricos.</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Climatizador A.C</h3><span class="respuesta">D</span></div>
                     
 
                 </div>
 
             </div>
-            <div class="contedor_bordes w-full"></div>
+            <div class="contedor_bordes w-40">
+                <div class="contenedor_title"><h2>Condiciones Exteriores Y Equipo</h2></div>
+                <div class="condiciones grid-2">
+                    
+                        <div class="col"><h3>Antena/Radio</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Estribos</h3><span class="respuesta">D</span></div>
+
+                        <div class="col"><h3>Antena Telefono</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Guardafangos</h3><span class="respuesta">D</span></div>
+
+                        <div class="col"><h3>Antena/C.B.</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Parabrisas</h3><span class="respuesta">D</span></div>
+
+                        <div class="col"><h3>Sistema Alarma</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Limpiaparabrisas</h3><span class="respuesta">D</span></div>
+
+                        <div class="col"><h3>Luces Exterior</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Espejos Laterales</h3><span class="respuesta">D</span></div>
+
+                </div>
+            </div>
         </div>
         <div class="h-15 flex gap-1">
-            <div class="contedor_bordes w-full"></div>
-            <div class="contedor_bordes w-full"></div>
+            <div class="contedor_bordes w-60 flex flex-col">
+                <div class="contenedor_title"><h2>Varios Equipos - INVENTARIO</h2></div>
+                <div class="condiciones grid-2 px-4">
+                    <div class="w-full flex justify-around col-span-2">
+                        <div class="check"><i class="fa-regular fa-square"></i><h3>Gato</h3></div>
+                        <div class="check"><i class="fa-regular fa-square-check"></i><h3>Extinguidor</h3></div>
+                        <div class="check"><i class="fa-regular fa-square-check"></i><h3>Plcas</h3></div>
+                    </div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>LLantas Refaccion</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Cubreruedas</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Candado de Ruedas</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Llave Tuercas de Rueda</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Triángulo de Seguridad</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Cables para Corriente</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Estuche de Herramientas</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Tarjeta de Circulación</h3></div>
+                 </div>
+            </div>
+           <div class="contedor_bordes w-40 flex flex-col">
+                <div class="contenedor_title"><h2>Condiciones Pintura</h2></div>
+                 <div class="condiciones grid-2">
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Decolorada</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Exceso Rociado</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Color No Igualado</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Logos Buen Estado</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Exceso Rayones</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>LLuvia Acida</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Daños Por Granizo</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Pequeñas Grietas</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Carroceria Con Golpes </h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Emplemas Completos</h3></div>
+                 </div>
+            </div>
         </div>
         <div class="h-17 contedor_bordes">
         </div>

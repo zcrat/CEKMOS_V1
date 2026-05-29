@@ -88,6 +88,9 @@
   text-transform: uppercase;
 }
 
+.w-85{
+  width: 85%;
+}
 .w-80{
   width: 80%;
 }
@@ -96,6 +99,12 @@
 }
 .w-60{
   width: 60%;
+}
+.w-55{
+  width: 55%;
+}
+.w-50{
+  width: 50%;
 }
 .w-45{
   width: 45%;
@@ -153,6 +162,9 @@
  text-transform: uppercase;
 }
 .p-4{
+  padding: 16px;
+}
+.px-4{
   padding: 16px;
 }
 .flex{
@@ -228,7 +240,9 @@
 .h-50px{
   height: 50px;
 }
-
+.flex-wrap{
+  flex-wrap: wrap;
+}
 .flex-col{
   flex-direction: column;
 }
@@ -369,8 +383,30 @@
 .condiciones{
   display: flex;
   flex-direction: column;
-  padding: 0.25rem 0.5rem;
+  padding: 0rem 0.5rem 0.5rem 0.5rem;
+  box-sizing: border-box;
   height:85%;
+}
+.grid-2{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 8px;
+}
+.grid-3{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.grid-4-5{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  
+}
+.grid-4{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
+  row-gap: 10px;
 }
 .condiciones .row{
   display: flex;
@@ -385,14 +421,26 @@
   justify-content: space-between;
   height: 100%;
 }
-.condiciones h3{
+.condiciones .check{
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  justify-content:space-evenly;
+  height: 100%;
+}
+.condiciones  h3{
   font-weight: 500;
   font-size: 0.7rem;
   padding: 0;
   margin: 0;
-  text-align: end;
   width: 75%;
+  text-transform: uppercase;
+}
+.chexk i{
   align-self: flex-end;
+}
+.col h3{
+  text-align: end;
 }
 .condiciones .respuesta{
   font-size: 0.75rem;
@@ -402,4 +450,11 @@
   color:navy;
   font-weight: 600;
   border-bottom: 1px solid navy;
+}
+.overflow{
+  overflow: auto;
+}
+
+.col-span-2{
+  grid-column:span 2 / span 2
 }
