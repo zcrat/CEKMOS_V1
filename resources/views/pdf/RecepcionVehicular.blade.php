@@ -119,7 +119,7 @@
                         <div class="col"><h3>Sistema Alarma</h3><span class="respuesta">D</span></div>
                         <div class="col"><h3>Limpiaparabrisas</h3><span class="respuesta">D</span></div>
 
-                        <div class="col"><h3>Luces Exterior</h3><span class="respuesta">D</span></div>
+                        <div class="col"><h3>Luces Exteriores</h3><span class="respuesta">D</span></div>
                         <div class="col"><h3>Espejos Laterales</h3><span class="respuesta">D</span></div>
 
                 </div>
@@ -132,12 +132,12 @@
                     <div class="w-full flex justify-around col-span-2">
                         <div class="check"><i class="fa-regular fa-square"></i><h3>Gato</h3></div>
                         <div class="check"><i class="fa-regular fa-square-check"></i><h3>Extinguidor</h3></div>
-                        <div class="check"><i class="fa-regular fa-square-check"></i><h3>Plcas</h3></div>
+                        <div class="check"><i class="fa-regular fa-square-check"></i><h3>Placas</h3></div>
                     </div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>LLantas Refaccion</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Cubreruedas</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Candado de Ruedas</h3></div>
-                    <div class="check"><i class="fa-regular fa-square"></i><h3>Llave Tuercas de Rueda</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Llave para Tuercas de Rueda</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Triángulo de Seguridad</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Cables para Corriente</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Estuche de Herramientas</h3></div>
@@ -146,23 +146,71 @@
             </div>
            <div class="contedor_bordes w-40 flex flex-col">
                 <div class="contenedor_title"><h2>Condiciones Pintura</h2></div>
-                 <div class="condiciones grid-2">
+                 <div class="condiciones grid-2 grip-gap-1">
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Decolorada</h3></div>
-                    <div class="check"><i class="fa-regular fa-square"></i><h3>Exceso Rociado</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3 class="font-6">Exceso De Rociado</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Color No Igualado</h3></div>
-                    <div class="check"><i class="fa-regular fa-square"></i><h3>Logos Buen Estado</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Logos En Buen Estado</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Exceso Rayones</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>LLuvia Acida</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Daños Por Granizo</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Pequeñas Grietas</h3></div>
                     <div class="check"><i class="fa-regular fa-square"></i><h3>Carroceria Con Golpes </h3></div>
-                    <div class="check"><i class="fa-regular fa-square"></i><h3>Emplemas Completos</h3></div>
+                    <div class="check"><i class="fa-regular fa-square"></i><h3>Emblemas Completos</h3></div>
                  </div>
             </div>
         </div>
-        <div class="h-17 contedor_bordes">
+        <div class="h-17 flex gap-2">
+            <div class="contedor_bordes w-70">
+                <img src="{{ asset('carro.jpeg')}}" alt="" class="img_contenida">
+            </div>
+            <div class="flex-1 flex flex-col justify-end">
+                <div class="flex h-70 items-end">
+                    <img src="{{ asset('firma.jpeg')}}" alt="" class="img_contenida">
+                </div>
+                <h3 class="descripcion_firma">Firma Supervisor</h3>
+            </div>
         </div>
-        <div class="flex-1 flex contedor_bordes">
+        <div class="flex-1 flex  flex-col  gap-2">
+            <div class="descripciones_contenedor">
+                <div class="contedor_bordes w-50 p-1">
+                    <h3 class="texto-descripcion"><span class="encabezado-descripcion">Notas: </span>prechadssd s dd</h3>
+                </div>
+                <div class="contedor_bordes w-50 p-1">
+                    <h3 class="texto-descripcion"><span class="encabezado-descripcion">Indicaciones:</span>REVISION DE FRENOS GENERALES ddddddssss csaf x  dsa vf fssdfsv fgsvsdv fsvs sd ddddd ddddddddddddddd REVISION DEL SENSOR DE OXIGENO REVISION DE FRENOS GENERALES REVISION DEL SENSOR DE OXIGENO REVISION DE FRENOS GENERALES REVISION DEL SENSOR DE OXIGENO</h3>
+                </div>
+            </div>
+            <div class="flex flex-row flex-1 items-center">
+                <div class="contedor_bordes w-60 h-100 flex flex-col">
+                    <h5 class="descripcion"> Hemos registrado los daños en su vehículo que no están relacionados con las reparaciones
+                        autorizadas.
+                        El que usted y nuestro representante hayan revisado estas áreas conjuntamente,
+                        ambos podemos tener la seguridad del mejor servicio posible. Hemos indicado cada área de daño o
+                        defecto,
+                        junto con otros artículos diversos, por favor no dude en ayudarnos mientras llenamos este formato.</h5>
+                    <div class="flex justify-around flex-1">
+                        <div class="w-40">
+                            <div class="flex h-70">
+                                <img src="{{ asset('firma.jpeg')}}" alt="" class="img_contenida">
+                            </div>
+                            <h3 class="descripcion_firma">Firma de Recibido</h3>
+                        </div>
+                         <div class="w-40">
+                            <div class="flex h-70">
+                            </div>
+                            <h3 class="descripcion_firma">Firma del Cliente</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col w-40 items-end">
+                    <div class="h-50 flex items-center">
+                        <img src="{{ asset('logo_akumas.png')}}" alt="" class="img_contenida">
+                    </div>
+                    <h4 class="h-50  direccion-empresa">
+                        ECO IMPULSA, S.A. DE .C.V. PUERTO DE ACAPULCO #328, RINCON DEL ANGEL. C.P. 58337, MORELIA, MICH, TEL (433) 2532182
+                    </h4>
+                </div>
+            </div>
 
         </div>
     </div>

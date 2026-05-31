@@ -395,7 +395,7 @@ class CortanaController extends Controller
             DatosEntrada::create([
                 'fecha'=>Carbon::now(),
                 'estimacion'=>$request->estimacion,
-                'kilomentraje'=>$request->kilometraje,
+                'kilometraje'=>$request->kilometraje,
                 'gasolina'=>$request->gasolina,
                 'orden_servicio_id'=>$ordenservicio->id,
             ]);
