@@ -107,8 +107,6 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
   });
   
   Route::get('migrar/caja',[MigrateDataBaseOld::class,'migrateCaja']);
-  use App\Http\Controllers\PdfController;
-
 
 use Spatie\LaravelPdf\Facades\Pdf;
 

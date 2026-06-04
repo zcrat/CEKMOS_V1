@@ -61,8 +61,8 @@
                             <h3 class="celda"><span>Placas: </span>{{$vehiculo['placas']}}</h3>
                         </div>
                         <div class="renglon h-12  last"> 
-                            <h3 class="celda w-26"><span>Km Entrada: </span>{{$entrada['gasolina']}}</h3>
-                            <h3 class="celda w-25"><span>Km Salida: </span>{{$salida['gasolina']}}</h3>
+                            <h3 class="celda w-26"><span>Km Entrada: </span>{{$entrada['kilometraje']}}</h3>
+                            <h3 class="celda w-25"><span>Km Salida: </span>{{$salida['kilometraje']}}</h3>
                             <h3 class="celda"><span>Vin: </span>{{$vehiculo['vin']}}</h3>
                         </div>
                     </div>
@@ -93,25 +93,25 @@
                 <div class="contenedor_title"><h2>Condiciones Interiores Y Equipo</h2></div>
                 <div class="condiciones grid-4">
                         <div class="col"><h3>Puerta IF.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Puerta DF.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Puerta IT.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Puerta DT.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Asiento IF.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Asiento DF.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Asiento IT.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Asiento DT.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Consola</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Claxon</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Tablero</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Quemacocos</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Toldo</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Tapetes</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Radio</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Retrovisor</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Luces Interior</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Seguros Electricos</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Elevadores Electricos.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
-                        <div class="col"><h3>Climatizador A.C</h3><span class="respuesta">{!!condicionesEquipo($interiores['pif'])!!}</span></div>
+                        <div class="col"><h3>Puerta DF.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pdf'])!!}</span></div>
+                        <div class="col"><h3>Puerta IT.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pit'])!!}</span></div>
+                        <div class="col"><h3>Puerta DT.</h3><span class="respuesta">{!!condicionesEquipo($interiores['pdt'])!!}</span></div>
+                        <div class="col"><h3>Asiento IF.</h3><span class="respuesta">{!!condicionesEquipo($interiores['aif'])!!}</span></div>
+                        <div class="col"><h3>Asiento DF.</h3><span class="respuesta">{!!condicionesEquipo($interiores['adf'])!!}</span></div>
+                        <div class="col"><h3>Asiento IT.</h3><span class="respuesta">{!!condicionesEquipo($interiores['ait'])!!}</span></div>
+                        <div class="col"><h3>Asiento DT.</h3><span class="respuesta">{!!condicionesEquipo($interiores['adt'])!!}</span></div>
+                        <div class="col"><h3>Consola</h3><span class="respuesta">{!!condicionesEquipo($interiores['consola'])!!}</span></div>
+                        <div class="col"><h3>Claxon</h3><span class="respuesta">{!!condicionesEquipo($interiores['claxon'])!!}</span></div>
+                        <div class="col"><h3>Tablero</h3><span class="respuesta">{!!condicionesEquipo($interiores['tablero'])!!}</span></div>
+                        <div class="col"><h3>Quemacocos</h3><span class="respuesta">{!!condicionesEquipo($interiores['quemacocos'])!!}</span></div>
+                        <div class="col"><h3>Toldo</h3><span class="respuesta">{!!condicionesEquipo($interiores['toldo'])!!}</span></div>
+                        <div class="col"><h3>Tapetes</h3><span class="respuesta">{!!condicionesEquipo($interiores['tapetes'])!!}</span></div>
+                        <div class="col"><h3>Radio</h3><span class="respuesta">{!!condicionesEquipo($interiores['radio'])!!}</span></div>
+                        <div class="col"><h3>Retrovisor</h3><span class="respuesta">{!!condicionesEquipo($interiores['retrovisor'])!!}</span></div>
+                        <div class="col"><h3>Luces Interior</h3><span class="respuesta">{!!condicionesEquipo($interiores['luces_interior'])!!}</span></div>
+                        <div class="col"><h3>Seguros Electricos</h3><span class="respuesta">{!!condicionesEquipo($interiores['seguros_electricos'])!!}</span></div>
+                        <div class="col"><h3>Elevadores Electricos.</h3><span class="respuesta">{!!condicionesEquipo($interiores['elevadores_electricos'])!!}</span></div>
+                        <div class="col"><h3>Climatizador A.C</h3><span class="respuesta">{!!condicionesEquipo($interiores['climatizador'])!!}</span></div>
                 </div>
 
             </div>
@@ -119,20 +119,20 @@
                 <div class="contenedor_title"><h2>Condiciones Exteriores Y Equipo</h2></div>
                 <div class="condiciones grid-2">
                     
-                        <div class="col"><h3>Antena/Radio</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena'])!!}</span></div>
-                        <div class="col"><h3>Estribos</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena'])!!}</span></div>
+                        <div class="col"><h3>Antena/Radio</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena_radio'])!!}</span></div>
+                        <div class="col"><h3>Estribos</h3><span class="respuesta">{!!condicionesEquipo($exteriores['estribos'])!!}</span></div>
 
-                        <div class="col"><h3>Antena Telefono</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena'])!!}</span></div>
-                        <div class="col"><h3>Guardafangos</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena'])!!}</span></div>
+                        <div class="col"><h3>Antena Telefono</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena_telefono'])!!}</span></div>
+                        <div class="col"><h3>Guardafangos</h3><span class="respuesta">{!!condicionesEquipo($exteriores['guardafangos'])!!}</span></div>
 
-                        <div class="col"><h3>Antena/C.B.</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena'])!!}</span></div>
-                        <div class="col"><h3>Parabrisas</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena'])!!}</span></div>
+                        <div class="col"><h3>Antena/C.B.</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena_cb'])!!}</span></div>
+                        <div class="col"><h3>Parabrisas</h3><span class="respuesta">{!!condicionesEquipo($exteriores['parabrisas'])!!}</span></div>
 
-                        <div class="col"><h3>Sistema Alarma</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena'])!!}</span></div>
-                        <div class="col"><h3>Limpiaparabrisas</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena'])!!}</span></div>
+                        <div class="col"><h3>Sistema Alarma</h3><span class="respuesta">{!!condicionesEquipo($exteriores['sistema_alarma'])!!}</span></div>
+                        <div class="col"><h3>Limpiaparabrisas</h3><span class="respuesta">{!!condicionesEquipo($exteriores['limpiaparabrisas'])!!}</span></div>
 
-                        <div class="col"><h3>Luces Exteriores</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena'])!!}</span></div>
-                        <div class="col"><h3>Espejos Laterales</h3><span class="respuesta">{!!condicionesEquipo($exteriores['antena'])!!}</span></div>
+                        <div class="col"><h3>Luces Exteriores</h3><span class="respuesta">{!!condicionesEquipo($exteriores['luces_exteriores'])!!}</span></div>
+                        <div class="col"><h3>Espejos Laterales</h3><span class="respuesta">{!!condicionesEquipo($exteriores['espejos_laterales'])!!}</span></div>
 
                 </div>
             </div>
@@ -143,32 +143,32 @@
                 <div class="condiciones grid-2 px-4">
                     <div class="w-full flex justify-around col-span-2">
                         <div class="check">{!!check($inventario['gato'])!!}<h3>Gato</h3></div>
-                        <div class="check">{!!check($inventario['gato'])!!}<h3>Extinguidor</h3></div>
-                        <div class="check">{!!check($inventario['gato'])!!}<h3>Placas</h3></div>
+                        <div class="check">{!!check($inventario['extinguidor'])!!}<h3>Extinguidor</h3></div>
+                        <div class="check">{!!check($inventario['placas'])!!}<h3>Placas</h3></div>
                     </div>
-                    <div class="check">{!!check($inventario['gato'])!!}<h3>LLantas Refaccion</h3></div>
-                    <div class="check">{!!check($inventario['gato'])!!}<h3>Cubreruedas</h3></div>
-                    <div class="check">{!!check($inventario['gato'])!!}<h3>Candado de Ruedas</h3></div>
-                    <div class="check">{!!check($inventario['gato'])!!}<h3>Llave para Tuercas de Rueda</h3></div>
-                    <div class="check">{!!check($inventario['gato'])!!}<h3>Triángulo de Seguridad</h3></div>
-                    <div class="check">{!!check($inventario['gato'])!!}<h3>Cables para Corriente</h3></div>
-                    <div class="check">{!!check($inventario['gato'])!!}<h3>Estuche de Herramientas</h3></div>
-                    <div class="check">{!!check($inventario['gato'])!!}<h3>Tarjeta de Circulación</h3></div>
+                    <div class="check">{!!check($inventario['llantas_refaccion'])!!}<h3>LLantas Refaccion</h3></div>
+                    <div class="check">{!!check($inventario['cubreruedas'])!!}<h3>Cubreruedas</h3></div>
+                    <div class="check">{!!check($inventario['candado_ruedas'])!!}<h3>Candado de Ruedas</h3></div>
+                    <div class="check">{!!check($inventario['llave_tuercas'])!!}<h3>Llave para Tuercas de Rueda</h3></div>
+                    <div class="check">{!!check($inventario['triangulo_seguridad'])!!}<h3>Triángulo de Seguridad</h3></div>
+                    <div class="check">{!!check($inventario['cables_corriente'])!!}<h3>Cables para Corriente</h3></div>
+                    <div class="check">{!!check($inventario['estuche_herramientas'])!!}<h3>Estuche de Herramientas</h3></div>
+                    <div class="check">{!!check($inventario['tarjeta_circulacion'])!!}<h3>Tarjeta de Circulación</h3></div>
                  </div>
             </div>
            <div class="contedor_bordes w-40 flex flex-col">
                 <div class="contenedor_title"><h2>Condiciones Pintura</h2></div>
                  <div class="condiciones grid-2 grip-gap-1">
                     <div class="check">{!!check($pintura['decolorada'])!!}<h3>Decolorada</h3></div>
-                    <div class="check">{!!check($pintura['decolorada'])!!}<h3 class="font-6">Exceso De Rociado</h3></div>
-                    <div class="check">{!!check($pintura['decolorada'])!!}<h3>Color No Igualado</h3></div>
-                    <div class="check">{!!check($pintura['decolorada'])!!}<h3>Logos En Buen Estado</h3></div>
-                    <div class="check">{!!check($pintura['decolorada'])!!}<h3>Exceso Rayones</h3></div>
-                    <div class="check">{!!check($pintura['decolorada'])!!}<h3>LLuvia Acida</h3></div>
-                    <div class="check">{!!check($pintura['decolorada'])!!}<h3>Daños Por Granizo</h3></div>
-                    <div class="check">{!!check($pintura['decolorada'])!!}<h3>Pequeñas Grietas</h3></div>
-                    <div class="check">{!!check($pintura['decolorada'])!!}<h3>Carroceria Con Golpes </h3></div>
-                    <div class="check">{!!check($pintura['decolorada'])!!}<h3>Emblemas Completos</h3></div>
+                    <div class="check">{!!check($pintura['exceso_rociado'])!!}<h3 class="font-6">Exceso De Rociado</h3></div>
+                    <div class="check">{!!check($pintura['color_no_igualado'])!!}<h3>Color No Igualado</h3></div>
+                    <div class="check">{!!check($pintura['logos_buen_estado'])!!}<h3>Logos En Buen Estado</h3></div>
+                    <div class="check">{!!check($pintura['exceso_rayones'])!!}<h3>Exceso Rayones</h3></div>
+                    <div class="check">{!!check($pintura['lluvia_acida'])!!}<h3>LLuvia Acida</h3></div>
+                    <div class="check">{!!check($pintura['danos_granizo'])!!}<h3>Daños Por Granizo</h3></div>
+                    <div class="check">{!!check($pintura['pequenas_grietas'])!!}<h3>Pequeñas Grietas</h3></div>
+                    <div class="check">{!!check($pintura['carroceria_golpes'])!!}<h3>Carroceria Con Golpes </h3></div>
+                    <div class="check">{!!check($pintura['emblemas_completos'])!!}<h3>Emblemas Completos</h3></div>
                  </div>
             </div>
         </div>
