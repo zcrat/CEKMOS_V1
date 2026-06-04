@@ -12,6 +12,7 @@ use App\Http\Controllers\select2controller;
 use App\Http\Controllers\selectcontroller;
 use App\Http\Controllers\ComboboxController;
 use App\Http\Controllers\MigrateDataBaseOld;
+use App\Http\Controllers\PdfController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\presupuestosController;
 use App\Http\Controllers\PruebasController;
@@ -58,6 +59,8 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     });
 
     Route::get('cortana/recepciones/vehiculares',[CortanaController::class,'RecepcionVehicularVista'])->name('Cortana.OrdenesServicio.Vista');
+    Route::get('/pdf/recepciones/vehiculares/?id={id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.Cortana.RecepcionVehicular');
+
 
     Route::get('/dashboard', function () { return Inertia::render('Dashboard');})->name('dashboard');
 
@@ -106,7 +109,6 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
   Route::get('migrar/caja',[MigrateDataBaseOld::class,'migrateCaja']);
   use App\Http\Controllers\PdfController;
 
-Route::get('/pdf-demo', [PdfController::class, 'show'])->name('Pdf.Cortana.RecepcionVehicular');
 
 use Spatie\LaravelPdf\Facades\Pdf;
 
