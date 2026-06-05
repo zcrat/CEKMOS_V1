@@ -15,6 +15,7 @@ class ModuloOrdenesServicio extends Model
         'contrato_id',
         'zona_id',
         'año',
+        'emisor_id',
     ];
     public function modulo()
     {
@@ -23,6 +24,10 @@ class ModuloOrdenesServicio extends Model
     public function zona()
     {
         return $this->belongsTo(Zonas::class, 'zona_id');
+    }
+    public function emisor()
+    {
+        return $this->belongsTo(Emisor::class, 'emisor_id');
     }
     public function contrato()
     {

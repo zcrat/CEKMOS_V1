@@ -71,19 +71,15 @@ class modulos extends Seeder
         ]);
         ModulosModel::create([
             'descripcion' => 'CFE',
-            'emisor_id' => 1,
         ]);
         ModulosModel::create([
             'descripcion' => 'CFB',
-            'emisor_id' => 2,
         ]);
         ModulosModel::create([
             'descripcion' => 'ECO',
-            'emisor_id' => 2,
         ]);
         ModulosModel::create([
             'descripcion' => 'KARWORKS',
-            'emisor_id' => 4,
         ]);
         $zonas=['ZAMORA',
                 'MORELIA',
@@ -133,32 +129,32 @@ class modulos extends Seeder
         }
         
         $asignaciones = [
-            ['modulo_id' => 1, 'zona_id' => 5,  'contrato_id' => 12, 'descripcion' => '2025 CFE BAJIO DIESEL',  'clave' => 'BAJ', 'año' => 2025],    
-            ['modulo_id' => 1, 'zona_id' => 5,  'contrato_id' => 5,  'descripcion' => '2025 CFE BAJIO GASOLINA',  'clave' => 'BAJ',  'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 2,  'contrato_id' => 11, 'descripcion' => '2025 CFE MORELIA DIESEL',  'clave' => 'MOR',  'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 2,  'contrato_id' => 2,  'descripcion' => '2025 CFE MORELIA GASOLINA',  'clave' => 'MOR',   'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 6,  'contrato_id' => 7,  'descripcion' => '2025 CFE DIVISIONALES GASOLINA',  'clave' => 'DIV',  'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 4,  'contrato_id' => 4,  'descripcion' => '2025 CFE ZACAPU GASOLINA',  'clave' => 'ZAC',  'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 3,  'contrato_id' => 10, 'descripcion' => '2025 CFE JIQUILPAN DIESEL',  'clave' => 'JIQ', 'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 3,  'contrato_id' => 3,  'descripcion' => '2025 CFE JIQUILPAN GASOLINA',  'clave' => 'JIQ',  'año' => 2025],
-            ['modulo_id' => 1, 'zona_id' => 9,  'contrato_id' => 9,  'descripcion' => '2025 CFE APATZINGAN DIESEL', 'clave' => 'APAT',  'año' => 2025],
-            ['modulo_id' => 2, 'zona_id' => 13, 'contrato_id' => 8,  'descripcion' => '2025 CFB GENERALES', 'clave' => 'PG', 'año' => 2025],
-            ['modulo_id' => 2, 'zona_id' => 11, 'contrato_id' => 8,  'descripcion' => '2025 CFB LOCALES', 'clave' => 'CFB', 'año' => 2025],
-            ['modulo_id' => 2, 'zona_id' => 12, 'contrato_id' => 8,  'descripcion' => '2025 CFB FORANEOS', 'clave' => 'CFOR', 'año' => 2025],
-            ['modulo_id' => 3, 'zona_id' => 10, 'contrato_id' => 8,  'descripcion' => '2025 ECO ALTOZANO', 'clave' => 'ALT', 'año' => 2025],
-            ['modulo_id' => 3, 'zona_id' => 14, 'contrato_id' => 8,  'descripcion' => '2025 ECO EDENRED', 'clave' => 'EDEN', 'año' => 2025],
-            ['modulo_id' => 3, 'zona_id' => 11, 'contrato_id' => 8,  'descripcion' => '2025 ECO LOCALES', 'clave' => 'ECO', 'año' => 2025],
-            ['modulo_id' => 3, 'zona_id' => 12, 'contrato_id' => 8,  'descripcion' => '2025 ECO FORANEOS', 'clave' => 'EFOR', 'año' => 2025],
-            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 8,  'descripcion' => '2026 KARWORKS ALTOZANO GENERALES', 'clave' => 'ALT', 'año' => 2026],
-            ['modulo_id' => 4, 'zona_id' => 2, 'contrato_id' => 13,  'descripcion' => '2026 KARWORKS CFE MORELIA GASOLINA', 'clave' => 'MOR', 'año' => 2026],
-            ['modulo_id' => 4, 'zona_id' => 6, 'contrato_id' => 14,  'descripcion' => '2026 KARWORKS CFE DIVISIONALES GASOLINA', 'clave' => 'DIV', 'año' => 2026],
-            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 15,  'descripcion' => '2026 KARWORKS INTEGRA NADRO', 'clave' => 'ALT', 'año' => 2026],
-            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 16,  'descripcion' => '2026 KARWORKS INTEGRA DHL', 'clave' => 'ALT', 'año' => 2026],
-            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 17,  'descripcion' => '2026 KARWORKS INTEGRA FARMACOS', 'clave' => 'ALT', 'año' => 2026],
-            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 18,  'descripcion' => '2026 KARWORKS INTEGRA TRIPLE I 1800', 'clave' => 'ALT', 'año' => 2026],
-            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 19,  'descripcion' => '2026 KARWORKS INTEGRA TRIPLE I SERVICIOS', 'clave' => 'ALT', 'año' => 2026],
-            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 20,  'descripcion' => '2026 KARWORKS INTEGRA ATLAS COPCO', 'clave' => 'ALT', 'año' => 2026],
-            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 21,  'descripcion' => '2026 KARWORKS INTEGRA ASE III', 'clave' => 'ALT', 'año' => 2026],
+            ['modulo_id' => 1, 'zona_id' => 5,  'contrato_id' => 12, 'descripcion' => '2025 CFE BAJIO DIESEL',  'clave' => 'BAJ', 'año' => 2025, 'emisor_id' => 1],    
+            ['modulo_id' => 1, 'zona_id' => 5,  'contrato_id' => 5,  'descripcion' => '2025 CFE BAJIO GASOLINA',  'clave' => 'BAJ',  'año' => 2025, 'emisor_id' => 1],
+            ['modulo_id' => 1, 'zona_id' => 2,  'contrato_id' => 11, 'descripcion' => '2025 CFE MORELIA DIESEL',  'clave' => 'MOR',  'año' => 2025, 'emisor_id' => 1],
+            ['modulo_id' => 1, 'zona_id' => 2,  'contrato_id' => 2,  'descripcion' => '2025 CFE MORELIA GASOLINA',  'clave' => 'MOR',   'año' => 2025, 'emisor_id' => 1],
+            ['modulo_id' => 1, 'zona_id' => 6,  'contrato_id' => 7,  'descripcion' => '2025 CFE DIVISIONALES GASOLINA',  'clave' => 'DIV',  'año' => 2025, 'emisor_id' => 1],
+            ['modulo_id' => 1, 'zona_id' => 4,  'contrato_id' => 4,  'descripcion' => '2025 CFE ZACAPU GASOLINA',  'clave' => 'ZAC',  'año' => 2025, 'emisor_id' => 1],
+            ['modulo_id' => 1, 'zona_id' => 3,  'contrato_id' => 10, 'descripcion' => '2025 CFE JIQUILPAN DIESEL',  'clave' => 'JIQ', 'año' => 2025, 'emisor_id' => 1],
+            ['modulo_id' => 1, 'zona_id' => 3,  'contrato_id' => 3,  'descripcion' => '2025 CFE JIQUILPAN GASOLINA',  'clave' => 'JIQ',  'año' => 2025, 'emisor_id' => 1],
+            ['modulo_id' => 1, 'zona_id' => 9,  'contrato_id' => 9,  'descripcion' => '2025 CFE APATZINGAN DIESEL', 'clave' => 'APAT',  'año' => 2025, 'emisor_id' => 1],
+            ['modulo_id' => 2, 'zona_id' => 13, 'contrato_id' => 8,  'descripcion' => '2025 CFB GENERALES', 'clave' => 'PG', 'año' => 2025, 'emisor_id' => 2],
+            ['modulo_id' => 2, 'zona_id' => 11, 'contrato_id' => 8,  'descripcion' => '2025 CFB LOCALES', 'clave' => 'CFB', 'año' => 2025, 'emisor_id' => 2],
+            ['modulo_id' => 2, 'zona_id' => 12, 'contrato_id' => 8,  'descripcion' => '2025 CFB FORANEOS', 'clave' => 'CFOR', 'año' => 2025, 'emisor_id' => 2],
+            ['modulo_id' => 3, 'zona_id' => 10, 'contrato_id' => 8,  'descripcion' => '2025 ECO ALTOZANO', 'clave' => 'ALT', 'año' => 2025, 'emisor_id' => 2],
+            ['modulo_id' => 3, 'zona_id' => 14, 'contrato_id' => 8,  'descripcion' => '2025 ECO EDENRED', 'clave' => 'EDEN', 'año' => 2025, 'emisor_id' => 2],
+            ['modulo_id' => 3, 'zona_id' => 11, 'contrato_id' => 8,  'descripcion' => '2025 ECO LOCALES', 'clave' => 'ECO', 'año' => 2025, 'emisor_id' => 2],
+            ['modulo_id' => 3, 'zona_id' => 12, 'contrato_id' => 8,  'descripcion' => '2025 ECO FORANEOS', 'clave' => 'EFOR', 'año' => 2025, 'emisor_id' => 2],
+            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 8,  'descripcion' => '2026 KARWORKS ALTOZANO GENERALES', 'clave' => 'ALT', 'año' => 2026, 'emisor_id' => 4],
+            ['modulo_id' => 4, 'zona_id' => 2, 'contrato_id' => 13,  'descripcion' => '2026 KARWORKS CFE MORELIA GASOLINA', 'clave' => 'MOR', 'año' => 2026, 'emisor_id' => 4],
+            ['modulo_id' => 4, 'zona_id' => 6, 'contrato_id' => 14,  'descripcion' => '2026 KARWORKS CFE DIVISIONALES GASOLINA', 'clave' => 'DIV', 'año' => 2026, 'emisor_id' => 4],
+            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 15,  'descripcion' => '2026 KARWORKS INTEGRA NADRO', 'clave' => 'ALT', 'año' => 2026, 'emisor_id' => 4],
+            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 16,  'descripcion' => '2026 KARWORKS INTEGRA DHL', 'clave' => 'ALT', 'año' => 2026, 'emisor_id' => 4],
+            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 17,  'descripcion' => '2026 KARWORKS INTEGRA FARMACOS', 'clave' => 'ALT', 'año' => 2026, 'emisor_id' => 4],
+            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 18,  'descripcion' => '2026 KARWORKS INTEGRA TRIPLE I 1800', 'clave' => 'ALT', 'año' => 2026, 'emisor_id' => 4],
+            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 19,  'descripcion' => '2026 KARWORKS INTEGRA TRIPLE I SERVICIOS', 'clave' => 'ALT', 'año' => 2026, 'emisor_id' => 4],
+            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 20,  'descripcion' => '2026 KARWORKS INTEGRA ATLAS COPCO', 'clave' => 'ALT', 'año' => 2026, 'emisor_id' => 4],
+            ['modulo_id' => 4, 'zona_id' => 10, 'contrato_id' => 21,  'descripcion' => '2026 KARWORKS INTEGRA ASE III', 'clave' => 'ALT', 'año' => 2026, 'emisor_id' => 4],
         ];
         foreach ($asignaciones as $data) {
             ModuloOrdenesServicio::create($data);
