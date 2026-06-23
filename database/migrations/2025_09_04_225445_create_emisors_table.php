@@ -19,6 +19,13 @@ return new class extends Migration
             $table->string('clave_key');
             $table->string('rfc');
             $table->string('nombre');
+            // Dirección del emisor
+            $table->string('calle')->nullable();
+            $table->string('colonia')->nullable();
+            $table->string('ciudad')->nullable();
+            $table->string('estado')->nullable();
+            $table->string('cp', 10)->nullable();
+            $table->string('telefono', 30)->nullable();
             $table->string('logotipo');
             $table->string('regimen');
             $table->string('codigo');
@@ -34,6 +41,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('emisors');
+        Schema::dropIfExists('emisores');
     }
 };

@@ -12,15 +12,24 @@ class PdfController extends Controller
 {
     public function RecepcionVehicular($id)
     {
-        $ordenservicio=OrdenesServicio::with(['cliente','user','empresa.municipio.estado',
-        'ubicacion','responsables.tecnico','entrada.nivel_combustible','salida.nivel_combustible',
-                                                'vehiculo.color',
-                                                'vehiculo.modelo.marca',
-                                                'interiores',
-                                                'exteriores',
-                                                'inventario',
-                                                'condiciones_pintura',
-                                                'archivos'])->find($id);
+        $ordenservicio=OrdenesServicio::with([
+            'cliente',
+            'user',
+            'empresa.municipio.estado',
+            'ubicacion',
+            'responsables.tecnico',
+            'entrada.nivel_combustible',
+            'salida.nivel_combustible',
+            'vehiculo.color',
+            'vehiculo.modelo.marca',
+            'interiores',
+            'exteriores',
+            'inventario',
+            'condiciones_pintura',
+            'archivos',
+            // Emisor ahora se obtiene desde ModuloOrdenesServicio
+            'modulo_ordenes_servicio.emisor',
+        ])->find($id);
         if(!$ordenservicio){
             return  Pdf::html('<h1>Orden de servicio no encontrada</h1>')->format('A4');
         }
@@ -41,7 +50,28 @@ class PdfController extends Controller
             $ruta=$rutas_archivos->get(25);
             $firma_url=Storage::url($ruta->folder.'/'.$firma->nombre);
         }
-        
+        // Datos del emisor (empresa que emite) usando la relación Emisor
+        $emisor = optional(optional($ordenservicio->modulo_ordenes_servicio)->emisor);
+        // Construcción en una sola línea con el formato:
+        // "{NOMBRE} {CALLE}, {COLONIA}. C.P. {CP}, {CIUDAD}, {ESTADO}, TEL {TELEFONO}"
+        $direccion_emisor = '';
+        if ($emisor) {
+            $bloques = [];
+            if (!empty($emisor->calle)) { $bloques[] = $emisor->calle; }
+            // Colonia sin el prefijo "COL.", seguido de punto, y CP
+            $col_cp = '';
+            if (!empty($emisor->colonia)) { $col_cp .= $emisor->colonia . '. '; }
+            if (!empty($emisor->cp)) { $col_cp .= 'C.P. ' . $emisor->cp; }
+            $col_cp = trim($col_cp);
+            if (!empty($col_cp)) { $bloques[] = $col_cp; }
+            if (!empty($emisor->ciudad)) { $bloques[] = $emisor->ciudad; }
+            if (!empty($emisor->estado)) { $bloques[] = $emisor->estado; }
+            if (!empty($emisor->telefono)) { $bloques[] = 'TEL ' . $emisor->telefono; }
+            $direccion_detalle = implode(', ', array_filter($bloques));
+            $prefijo_nombre = !empty($emisor->nombre) ? trim($emisor->nombre) . ' ' : '';
+            $direccion_emisor = trim($prefijo_nombre . $direccion_detalle);
+        }
+
         return Pdf::view('pdf.RecepcionVehicular',[
             'datos' => [
                 'telefono'=>$ordenservicio->telefono,
@@ -144,8 +174,8 @@ class PdfController extends Controller
                 'vin'=>$ordenservicio->vehiculo->vin
             ],
             'empresa_emision'=>[
-                'logo'=>'logo_akumas.png',
-                'direccion'=>'ECO IMPULSA, S.A. DE .C.V. PUERTO DE ACAPULCO #328, RINCON DEL ANGEL. C.P. 58337, MORELIA, MICH, TEL (433) 2532182'
+                'logo' => $emisor->logotipo ?? 'desconocido.png',
+                'direccion' => $direccion_emisor ?: ($emisor->nombre ?? ''),
             ],
             'carro' => $carro_url,
             'firma' => $firma_url,

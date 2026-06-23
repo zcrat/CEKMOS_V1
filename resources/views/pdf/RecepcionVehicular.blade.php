@@ -11,8 +11,11 @@
     @php
         function condicionesEquipo($valor) {
             return match ($valor) {
-                '1' => 'D',
-                '2' => '<i class="fa-solid fa-check"></i>',
+                14 => '<i class="fa-solid fa-check"></i>',
+                15 => "O",
+                16 => "F",
+                17 => "D",
+                18 => "R",
                 default => 'NA'
             };
         }
@@ -224,7 +227,7 @@
                         <img src="{{ asset($empresa_emision['logo'])}}" alt="" class="img_contenida">
                     </div>
                     <h4 class="h-50  direccion-empresa">
-                        {{$empresa_emision['direccion']}}
+                        {!! $empresa_emision['direccion'] !!}
                     </h4>
                 </div>
             </div>

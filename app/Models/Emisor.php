@@ -15,14 +15,22 @@ class Emisor extends Model
         'clave_key',
         'rfc',
         'nombre',
+        // Dirección
+        'calle',
+        'colonia',
+        'ciudad',
+        'estado',
+        'cp',
+        'telefono',
         'logotipo',
         'regimen',
         'codigo',
         'serie_factura',
         'serie_p_factura',
     ];
-    public function modulos(){
-        return $this->hasMany(Modulos::class,'emisor_id');
+    // Relación actual: un Emisor pertenece a muchas asignaciones de módulo/orden
+    public function modulo_ordenes_servicios(){
+        return $this->hasMany(ModuloOrdenesServicio::class,'emisor_id');
     }
     public function facturas()
     {
