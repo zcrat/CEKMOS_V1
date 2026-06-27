@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('archivos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
+            $table->foreignId('recepcion_vehicular_id')->constrained('recepciones_vehiculares');
             $table->unsignedBigInteger('presupuesto_id')->nullable();
             $table->foreign('presupuesto_id')->references('id')->on('presupuestos');
             $table->foreignId('tipo_id')->constrained('tipos');

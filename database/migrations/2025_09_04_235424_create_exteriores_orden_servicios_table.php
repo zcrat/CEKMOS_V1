@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('exteriores_orden_servicios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
+            $table->foreignId('recepcion_vehicular_id')->constrained('recepciones_vehiculares');
             $table->foreignId('antena_radio')->constrained('estatus');
             $table->foreignId('antena_telefono')->constrained('estatus');
             $table->foreignId('antena_cb')->constrained('estatus');

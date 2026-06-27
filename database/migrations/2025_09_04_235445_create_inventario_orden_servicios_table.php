@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('inventario_orden_servicios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
+            $table->foreignId('recepcion_vehicular_id')->constrained('recepciones_vehiculares');
             $table->boolean('llanta')->default(false);
             $table->boolean('cubreruedas')->default(false);
             $table->boolean('cables_corriente')->default(false);

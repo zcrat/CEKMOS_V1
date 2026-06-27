@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('condiciones_pintura_orden_servicios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
+            $table->foreignId('recepcion_vehicular_id')->constrained('recepciones_vehiculares');
             $table->boolean('decolorada')->default(false);
             $table->boolean('emblemas_completos')->default(false);
             $table->boolean('color_no_igual')->default(false);
