@@ -9,7 +9,7 @@ class CondicionesPinturaOrdenServicio extends Model
     protected $table = 'condiciones_pintura_orden_servicios';
     public $timestamps=false;
     protected $fillable = [
-        'orden_servicio_id',
+        'recepcion_vehicular_id',
         'decolorada',
         'emblemas_completos',
         'color_no_igual',
@@ -36,8 +36,9 @@ class CondicionesPinturaOrdenServicio extends Model
     ];
 
     // Relación principal
-    public function orden_servicio(){
-        return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
+    public function recepcion_vehicular()
+    {
+        return $this->belongsTo(RecepcionesVehiculares::class,'recepcion_vehicular_id');
     }
 
 }

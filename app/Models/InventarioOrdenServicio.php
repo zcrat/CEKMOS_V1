@@ -8,7 +8,7 @@ class InventarioOrdenServicio extends Model
     protected $table = 'inventario_orden_servicios';
     public $timestamps=false;
     protected $fillable = [
-        'orden_servicio_id',
+        'recepcion_vehicular_id',
         'llanta',
         'cubreruedas',
         'cables_corriente',
@@ -37,9 +37,9 @@ class InventarioOrdenServicio extends Model
     ];
 
     // Relación principal
-    public function orden_servicio()
+    public function recepcion_vehicular()
     {
-        return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
+        return $this->belongsTo(RecepcionesVehiculares::class,'recepcion_vehicular_id');
     }
 
 }

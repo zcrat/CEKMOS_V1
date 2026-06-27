@@ -19,22 +19,26 @@ class OrdenesServicio extends Model
         'user_id',
         'empresa_id',
         'cliente_id',
-        'cambiar_archivos',
         'estimacion',
         'estatus_id',
-        'indicaciones_cliente',
-        'notas_mecanico',
+        'fallas_reportadas',
         'notas_retraso',
         'telefono',
         'ubicacion_id',
     ];
     protected $casts = [
-        'cambiar_archivos' => 'boolean',
         'estimacion' => 'datetime'
     ];
 
     public function archivos(){
-        return $this->hasMany(Archivos::class,'orden_servicio_id');
+        return $this->hasManyThrough(
+            Archivos::class,
+            RecepcionesVehiculares::class,
+            'orden_servicio_id',
+            'recepcion_vehicular_id',
+            'id',
+            'id'
+        );
     }
     public function modulo_ordenes_servicio()
     {
@@ -73,21 +77,53 @@ class OrdenesServicio extends Model
     {
         return $this->hasOne(ResponsablesOrdenServicio::class,'orden_servicio_id');
     }
+    public function recepcion_vehicular()
+    {
+        return $this->hasOne(RecepcionesVehiculares::class,'orden_servicio_id');
+    }
     public function interiores()
     {
-        return $this->hasOne(InterioresOrdenServicio::class,'orden_servicio_id');
+        return $this->hasOneThrough(
+            InterioresOrdenServicio::class,
+            RecepcionesVehiculares::class,
+            'orden_servicio_id',
+            'recepcion_vehicular_id',
+            'id',
+            'id'
+        );
     }
     public function exteriores()
     {
-        return $this->hasOne(ExterioresOrdenServicio::class,'orden_servicio_id');
+        return $this->hasOneThrough(
+            ExterioresOrdenServicio::class,
+            RecepcionesVehiculares::class,
+            'orden_servicio_id',
+            'recepcion_vehicular_id',
+            'id',
+            'id'
+        );
     }
     public function inventario()
     {
-        return $this->hasOne(InventarioOrdenServicio::class,'orden_servicio_id');
+        return $this->hasOneThrough(
+            InventarioOrdenServicio::class,
+            RecepcionesVehiculares::class,
+            'orden_servicio_id',
+            'recepcion_vehicular_id',
+            'id',
+            'id'
+        );
     }
     public function condiciones_pintura()
     {
-        return $this->hasOne(CondicionesPinturaOrdenServicio ::class,'orden_servicio_id');
+        return $this->hasOneThrough(
+            CondicionesPinturaOrdenServicio::class,
+            RecepcionesVehiculares::class,
+            'orden_servicio_id',
+            'recepcion_vehicular_id',
+            'id',
+            'id'
+        );
     }
     public function pedidos_almacen(){
         return $this->hasMany(PedidosOrdenesAlmacen::class,'orden_servicio_id');

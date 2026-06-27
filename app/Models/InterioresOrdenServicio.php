@@ -10,7 +10,7 @@ class InterioresOrdenServicio extends Model
     protected $table = 'interiores_orden_servicios';
     public $timestamps=false;
     protected $fillable = [
-        'orden_servicio_id',
+        'recepcion_vehicular_id',
         'puerta_interior_frontal',
         'puerta_interior_trasera',
         'puerta_delantera_frontal',
@@ -33,9 +33,9 @@ class InterioresOrdenServicio extends Model
         'espejos_retrovizor',
     ];
 
-    public function orden_servicio()
+    public function recepcion_vehicular()
     {
-        return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
+        return $this->belongsTo(RecepcionesVehiculares::class,'recepcion_vehicular_id');
     }
 
     public function estatus_puerta_interior_frontal()

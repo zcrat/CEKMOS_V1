@@ -11,13 +11,13 @@ class Archivos extends Model
 
     protected $fillable = [
         'nombre',
-        'orden_servicio_id',
+        'recepcion_vehicular_id',
         'presupuesto_id',
         'tipo_id',
         'estatus_id',
     ];
-    public function orden_servicio(){
-        return $this->belongsTo(OrdenesServicio::class, 'orden_servicio_id');
+    public function recepcion_vehicular(){
+        return $this->belongsTo(RecepcionesVehiculares::class, 'recepcion_vehicular_id');
     }
     public function presupuesto(){
         return $this->belongsTo(Presupuestos::class, 'presupuesto_id');

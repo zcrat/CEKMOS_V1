@@ -8,7 +8,7 @@ class ExterioresOrdenServicio extends Model
     protected $table = 'exteriores_orden_servicios';
     public $timestamps=false;
     protected $fillable = [
-        'orden_servicio_id',
+        'recepcion_vehicular_id',
         'antena_radio',
         'estribos',
         'antena_telefono',
@@ -21,10 +21,9 @@ class ExterioresOrdenServicio extends Model
         'espejos_laterales',
     ];
 
-    // Relaciones
-    public function orden_servicio()
+    public function recepcion_vehicular()
     {
-        return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
+        return $this->belongsTo(RecepcionesVehiculares::class,'recepcion_vehicular_id');
     }
 
     public function estatus_antena_radio()
