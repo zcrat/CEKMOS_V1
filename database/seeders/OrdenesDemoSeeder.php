@@ -22,6 +22,7 @@ use App\Models\InventarioOrdenServicio;
 use App\Models\CondicionesPinturaOrdenServicio;
 use App\Models\ResponsablesOrdenServicio;
 use App\Models\Archivos;
+use App\Models\RecepcionesVehiculares;
 
 class OrdenesDemoSeeder extends Seeder
 {
@@ -67,10 +68,8 @@ class OrdenesDemoSeeder extends Seeder
                     'user_id' => $user->id,
                     'empresa_id' => optional($empresa)->id ?? 1,
                     'cliente_id' => optional($cliente)->id ?? 1,
-                    'cambiar_archivos' => false,
                     'diagnostico' => Carbon::now()->addHours(rand(1, 8)),
-                    'indicaciones_cliente' => 'Revisión general y servicio preventivo',
-                    'notas_mecanico' => 'Sin novedades relevantes',
+                    'fallas_reportadas' => 'Sin novedades relevantes',
                     'notas_retraso' => null,
                     'telefono' => '443-000-000' . ($i % 10),
                     'ubicacion_id' => $ubicacion->id,
@@ -93,9 +92,16 @@ class OrdenesDemoSeeder extends Seeder
                     'orden_servicio_id' => $os->id,
                 ]);
 
+                $recepcionVehicular = RecepcionesVehiculares::create([
+                    'orden_servicio_id' => $os->id,
+                    'is_ficticia' => false,
+                    'cambiar_archivos' => false,
+                    'indicaciones_cliente' => 'Revision general y servicio preventivo',
+                ]);
+
                 // Interiores (2 = sin daño)
                 InterioresOrdenServicio::create([
-                    'orden_servicio_id' => $os->id,
+                    'recepcion_vehicular_id' => $recepcionVehicular->id,
                     'puerta_interior_frontal' => 2,
                     'puerta_interior_trasera' => 2,
                     'puerta_delantera_frontal' => 2,
@@ -120,7 +126,7 @@ class OrdenesDemoSeeder extends Seeder
 
                 // Exteriores (2 = sin daño)
                 ExterioresOrdenServicio::create([
-                    'orden_servicio_id' => $os->id,
+                    'recepcion_vehicular_id' => $recepcionVehicular->id,
                     'antena_radio' => 2,
                     'estribos' => 2,
                     'antena_telefono' => 2,
@@ -135,7 +141,7 @@ class OrdenesDemoSeeder extends Seeder
 
                 // Inventario
                 InventarioOrdenServicio::create([
-                    'orden_servicio_id' => $os->id,
+                    'recepcion_vehicular_id' => $recepcionVehicular->id,
                     'llanta' => true,
                     'cubreruedas' => true,
                     'cables_corriente' => false,
@@ -151,7 +157,7 @@ class OrdenesDemoSeeder extends Seeder
 
                 // Condiciones de pintura (false = no aplica/ok)
                 CondicionesPinturaOrdenServicio::create([
-                    'orden_servicio_id' => $os->id,
+                    'recepcion_vehicular_id' => $recepcionVehicular->id,
                     'decolorada' => false,
                     'emblemas_completos' => true,
                     'color_no_igual' => false,
@@ -176,21 +182,21 @@ class OrdenesDemoSeeder extends Seeder
                 // Archivos asociados usando las 3 imágenes esperadas
                 Archivos::create([
                     'nombre' => 'firma.jpeg',
-                    'orden_servicio_id' => $os->id,
+                    'recepcion_vehicular_id' => $recepcionVehicular->id,
                     'tipo_id' => 25,
                     'estatus_id' => 21,
                 ]);
 
                 Archivos::create([
                     'nombre' => 'carro.jpeg',
-                    'orden_servicio_id' => $os->id,
+                    'recepcion_vehicular_id' => $recepcionVehicular->id,
                     'tipo_id' => 26,
                     'estatus_id' => 21,
                 ]);
 
                 Archivos::create([
                     'nombre' => 'evidencia.jpeg',
-                    'orden_servicio_id' => $os->id,
+                    'recepcion_vehicular_id' => $recepcionVehicular->id,
                     'tipo_id' => 63,
                     'estatus_id' => 21,
                 ]);
@@ -198,4 +204,5 @@ class OrdenesDemoSeeder extends Seeder
         });
     }
 }
+
 
