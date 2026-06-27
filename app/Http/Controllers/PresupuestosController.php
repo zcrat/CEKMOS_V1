@@ -7,6 +7,7 @@ use App\Models\Modelos;
 use App\Models\Marcas;
 use App\Models\ModuloOrdenesServicio;
 use App\Models\OrdenesServicio;
+use App\Models\RecepcionesVehiculares;
 use App\Models\Tipos;
 use App\Models\UsuariosTaller;
 use App\Models\Vehiculos;
@@ -36,7 +37,8 @@ class PresupuestosController extends Controller
                 'vehiculo_concepto',
                 'empresa',
                 'cliente',
-                'ubicacion'
+                'ubicacion',
+                'recepcion_vehicular'
             ])->first();
             if($data){
                 if(!in_array($data->modulo_orden_id,$user->modulos_orden->pluck('modulo_orden_id')->toarray())){
@@ -57,8 +59,8 @@ class PresupuestosController extends Controller
                     'jefe'=>$data->responsables->jefe_de_proceso->nombre,
                     'trabajador'=>$data->responsables->trabajador->nombre,
                     'tecnico'=>$data->responsables->tecnico->nombre,
-                    'descripcion_mo'=> $data->notas_mecanico,
-                    'indicaciones_cliente'=> $data->indicaciones_cliente,
+                    'descripcion_mo'=> $data->fallas_reportadas,
+                    'indicaciones_cliente'=> $data->recepcion_vehicular->indicaciones_cliente ?? '',
                     'garantia'=>'LO ESTIPULADO EN EL CONTRATO',
                     'observaciones'=>'DE ACUERDO A LO DIFICIL DE LA FALLA PARA SU REPARACION',
                     'tipo_id'=>3,
@@ -175,10 +177,8 @@ class PresupuestosController extends Controller
             $ordenservicio->user_id=$user->id;
             $ordenservicio->empresa_id=$request->empresa_id;
             $ordenservicio->cliente_id=$request->cliente_id;
-            $ordenservicio->cambiar_archivos=false;
             $ordenservicio->diagnostico=null;
-            $ordenservicio->indicaciones_cliente=$request->indicaciones_cliente;
-            $ordenservicio->notas_mecanico=$request->descripcion_mo;
+            $ordenservicio->fallas_reportadas=$request->descripcion_mo;
             $ordenservicio->notas_retraso=$request->observaciones;
             $ordenservicio->telefono=$request->telefono;
             $ordenservicio->ubicacion_id=$ubicacion->id;
@@ -203,8 +203,14 @@ class PresupuestosController extends Controller
             $EquipoInventario=new \App\Models\InventarioOrdenServicio();
             $InterioresEquipo=new \App\Models\InterioresOrdenServicio();
             $CondicionesPintura=new \App\Models\CondicionesPinturaOrdenServicio();
+            $recepcionVehicular=RecepcionesVehiculares::create([
+                'orden_servicio_id'=>$ordenservicio->id,
+                'is_ficticia'=>true,
+                'cambiar_archivos'=>false,
+                'indicaciones_cliente'=>$request->indicaciones_cliente,
+            ]);
             
-            $ExterioresEquipo->orden_servicio_id= $ordenservicio->id;
+            $ExterioresEquipo->recepcion_vehicular_id= $recepcionVehicular->id;
             $ExterioresEquipo->antena_radio = 3;
             $ExterioresEquipo->antena_telefono = 3;
             $ExterioresEquipo->antena_cb = 3;
@@ -218,7 +224,7 @@ class PresupuestosController extends Controller
             $ExterioresEquipo->save();
 
 
-            $EquipoInventario->orden_servicio_id= $ordenservicio->id;
+            $EquipoInventario->recepcion_vehicular_id= $recepcionVehicular->id;
             $EquipoInventario->llanta = 0;
             $EquipoInventario->cubreruedas = 0;
             $EquipoInventario->cables_corriente = 0;
@@ -233,7 +239,7 @@ class PresupuestosController extends Controller
             $EquipoInventario->save();
 
 
-            $InterioresEquipo->orden_servicio_id= $ordenservicio->id;
+            $InterioresEquipo->recepcion_vehicular_id= $recepcionVehicular->id;
             $InterioresEquipo->puerta_interior_frontal = 3;
             $InterioresEquipo->puerta_interior_trasera = 3;
             $InterioresEquipo->puerta_delantera_frontal = 3;
@@ -256,7 +262,7 @@ class PresupuestosController extends Controller
             $InterioresEquipo->espejos_retrovizor =3;
             $InterioresEquipo->save();
 
-            $CondicionesPintura->orden_servicio_id= $ordenservicio->id;
+            $CondicionesPintura->recepcion_vehicular_id= $recepcionVehicular->id;
             $CondicionesPintura->decolorada=0;
             $CondicionesPintura->emblemas_completos=0;
             $CondicionesPintura->color_no_igual=0;

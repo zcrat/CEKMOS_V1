@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Archivos;
-use App\Models\OrdenesServicio;
 use App\Models\RutasArchivo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,13 +21,13 @@ class ArchivosController extends Controller
             if(!$file){
                 throw new \Exception('Imagen Eliminada Anteriormente');
             }
-            if(($request->origen === 'ordenservicio' && (!$file->orden_servicio_id || $file->tipo_id !== '63') ) || ($request->origen === 'presupuesto' && !$file->presupuesto_id )){
+            if(($request->origen === 'ordenservicio' && (!$file->recepcion_vehicular_id || (int)$file->tipo_id !== 63) ) || ($request->origen === 'presupuesto' && !$file->presupuesto_id )){
                 throw new \Exception('Imagen No Valida Para Eliminar por este medio ');
             }
 
             if($request->origen === 'ordenservicio'){
-                $orden=OrdenesServicio::find($file->orden_servicio_id);
-                if(!$orden || ($orden && !$orden->cambiar_archivos)){
+                $orden=$file->recepcion_vehicular?->orden_servicio;
+                if(!$orden || ($orden && !($orden->recepcion_vehicular->cambiar_archivos ?? false))){
                     throw new \Exception('Orden de Servicio No Habilitada ');
                 }
                 

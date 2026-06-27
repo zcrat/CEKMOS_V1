@@ -26,6 +26,7 @@ class PdfController extends Controller
             'exteriores',
             'inventario',
             'condiciones_pintura',
+            'recepcion_vehicular',
             'archivos',
             // Emisor ahora se obtiene desde ModuloOrdenesServicio
             'modulo_ordenes_servicio.emisor',
@@ -81,8 +82,8 @@ class PdfController extends Controller
                 'ubicacion'=>$ordenservicio->ubicacion->descripcion,
                 'usuario'=>$ordenservicio->user->name,
                 'tecnico'=>$ordenservicio->responsables->tecnico->nombre ?? '',
-                'notas'=>$ordenservicio->notas_mecanico,
-                'observaciones'=>$ordenservicio->indicaciones_cliente,
+                'notas'=>$ordenservicio->fallas_reportadas,
+                'observaciones'=>$ordenservicio->recepcion_vehicular->indicaciones_cliente ?? '',
             ],
             'interiores'=>[
                 'pif'=>$ordenservicio->interiores->puerta_interior_frontal ?? '0',

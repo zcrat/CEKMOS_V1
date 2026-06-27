@@ -16,6 +16,7 @@ use App\Models\Modulos;
 use App\Models\OrdenesServicio;
 use App\Models\Path;
 use App\Models\Presupuestos;
+use App\Models\RecepcionesVehiculares;
 use App\Models\ResponsablesOrdenServicio;
 use App\Models\RutasArchivo;
 use App\Models\Ubicaciones;
@@ -69,6 +70,7 @@ class CortanaController extends Controller
                 'exteriores', 
                 'inventario', 
                 'condiciones_pintura',
+                'recepcion_vehicular',
                 'empresa',
                 'cliente',
                 'vehiculo',
@@ -119,9 +121,9 @@ class CortanaController extends Controller
             'jefe'=>optional($responsables->jefe_de_proceso)->nombre ?? null,
             'trabajador'=>optional($responsables->trabajador)->nombre ?? null,
             'tecnico'=>optional($responsables->tecnico)->nombre ?? null,
-            'descripcion_mo'=>$ordenservicio->notas_mecanico,
-            'indicaciones_cliente'=>$ordenservicio->indicaciones_cliente,
-            'cambiar_archivos'=>$ordenservicio->cambiar_archivos,
+            'descripcion_mo'=>$ordenservicio->fallas_reportadas,
+            'indicaciones_cliente'=>$ordenservicio->recepcion_vehicular->indicaciones_cliente ?? '',
+            'cambiar_archivos'=>$ordenservicio->recepcion_vehicular->cambiar_archivos ?? false,
         ];
 
 
@@ -225,7 +227,7 @@ class CortanaController extends Controller
         $currentPage=$request->currentPage ?? 1;
         $itemsPerPage=$request->itemsPerPage ?? 10;
         
-        $query=OrdenesServicio::query()->with(['last_seguimiento','vehiculo.modelo.marca','empresa','ubicacion']);
+        $query=OrdenesServicio::query()->with(['last_seguimiento','vehiculo.modelo.marca','empresa','ubicacion','recepcion_vehicular']);
         
         if(!$user->hasRole('Super Admin')){
             $user->load('modulos_orden');
@@ -253,7 +255,7 @@ class CortanaController extends Controller
                 )
                 :'Revisando' ) 
                 :'No Aplica',
-            'cambiar_archivos'=>$item->cambiar_archivos
+            'cambiar_archivos'=>$item->recepcion_vehicular->cambiar_archivos ?? false
         ]);
 
         $totalPages=ceil($totalItems/$itemsPerPage);
@@ -384,10 +386,8 @@ class CortanaController extends Controller
                 'user_id'=>$request->user()->id,
                 'empresa_id'=>$request->empresa_id,
                 'cliente_id'=>$request->cliente_id,
-                'cambiar_archivos'=>false,
                 'diagnostico'=>null,
-                'indicaciones_cliente'=>$request->indicaciones_cliente ?? '',
-                'notas_mecanico'=>$request->descripcion_mo ?? '',
+                'fallas_reportadas'=>$request->descripcion_mo ?? '',
                 'notas_retraso'=>'',
                 'telefono'=>$request->telefono,
                 'ubicacion_id'=>$ubicacion->id,
@@ -433,8 +433,14 @@ class CortanaController extends Controller
                 'tipo_id'=>$request->tipo_presupuesto_id,
                 'estatus_id'=>1,
             ]);
-            InterioresOrdenServicio::create([
+            $recepcionVehicular=RecepcionesVehiculares::create([
                 'orden_servicio_id'=>$ordenservicio->id,
+                'is_ficticia'=>false,
+                'cambiar_archivos'=>false,
+                'indicaciones_cliente'=>$request->indicaciones_cliente ?? '',
+            ]);
+            InterioresOrdenServicio::create([
+                'recepcion_vehicular_id'=>$recepcionVehicular->id,
                 'puerta_interior_frontal'=>$request->condiciones_interiores['puerta_izq_f'],
                 'puerta_interior_trasera'=>$request->condiciones_interiores['puerta_izq_t'],
                 'puerta_delantera_frontal'=>$request->condiciones_interiores['puerta_der_f'],
@@ -457,7 +463,7 @@ class CortanaController extends Controller
                 'espejos_retrovizor'=>$request->condiciones_interiores['retrovisor'],
             ]);
             ExterioresOrdenServicio::create([
-                'orden_servicio_id'=>$ordenservicio->id,
+                'recepcion_vehicular_id'=>$recepcionVehicular->id,
                 'antena_radio'=>$request->condiciones_exteriores['antena_radio'],
                 'antena_telefono'=>$request->condiciones_exteriores['antena_telefono'],
                 'antena_cb'=>$request->condiciones_exteriores['antena_cb'],
@@ -470,7 +476,7 @@ class CortanaController extends Controller
                 'luces_exteriores'=>$request->condiciones_exteriores['luces'],
             ]);
             InventarioOrdenServicio::create([
-                'orden_servicio_id'=>$ordenservicio->id,
+                'recepcion_vehicular_id'=>$recepcionVehicular->id,
                 'llanta'=>$request->inventario['llanta'],
                 'cubreruedas'=>$request->inventario['cubreruedas'],
                 'cables_corriente'=>$request->inventario['cables'],
@@ -485,7 +491,7 @@ class CortanaController extends Controller
             ]);
 
             CondicionesPinturaOrdenServicio::create([
-                'orden_servicio_id'=>$ordenservicio->id,
+                'recepcion_vehicular_id'=>$recepcionVehicular->id,
                 'decolorada'=>$request->pintura['decolorada'],
                 'emblemas_completos'=>$request->pintura['emblemas'],
                 'color_no_igual'=>$request->pintura['color_desigual'],
@@ -540,7 +546,7 @@ class CortanaController extends Controller
             foreach ($filessaves as $image){
                 Archivos::create([
                     'nombre'=>$image['name'],
-                    'orden_servicio_id'=>$ordenservicio->id,
+                    'recepcion_vehicular_id'=>$recepcionVehicular->id,
                     'tipo_id'=>$image['tipo'],
                     'estatus_id'=>21
                 ]);
@@ -581,14 +587,16 @@ class CortanaController extends Controller
             'id'=>['required','exists:ordenes_servicio,id']
         ]);
         $ordenservicio=OrdenesServicio::find($request->id);
-        $ordenservicio->cambiar_archivos=!$ordenservicio->cambiar_archivos;
-        $ordenservicio->save();
+        $recepcionVehicular=RecepcionesVehiculares::firstOrCreate([
+            'orden_servicio_id'=>$ordenservicio->id,
+        ]);
+        $recepcionVehicular->cambiar_archivos=!$recepcionVehicular->cambiar_archivos;
+        $recepcionVehicular->save();
         event(new OrdenServicioEvents($ordenservicio->id,'update',[
-            'cambiar_archivos'=>$ordenservicio->cambiar_archivos
+            'cambiar_archivos'=>$recepcionVehicular->cambiar_archivos
         ]));
         return response()->json(['message' => 'Actualizado Correctamente']);
     }
-
     public function UpdateOrdenServico(Request $request){
         $user=Auth::user()->load('modulos_orden');
         $keysinventario=[
@@ -702,8 +710,7 @@ class CortanaController extends Controller
                 'user_id'=>$request->user()->id,
                 'empresa_id'=>$request->empresa_id,
                 'cliente_id'=>$request->cliente_id,
-                'indicaciones_cliente'=>$request->indicaciones_cliente ?? '',
-                'notas_mecanico'=>$request->descripcion_mo ?? '',
+                'fallas_reportadas'=>$request->descripcion_mo ?? '',
                 'telefono'=>$request->telefono,
                 'ubicacion_id'=>$ubicacion->id,
             ]);
@@ -730,7 +737,19 @@ class CortanaController extends Controller
                 'tecnico_id'=>$tecnico->id,
             ]);
 
-            InterioresOrdenServicio::updateOrCreate(['orden_servicio_id'=>$ordenservicio->id],[
+            $recepcionVehicular=RecepcionesVehiculares::firstOrCreate([
+                'orden_servicio_id'=>$ordenservicio->id,
+            ], [
+                'is_ficticia'=>false,
+            ]);
+            if ($recepcionVehicular->is_ficticia) {
+                $recepcionVehicular->update(['is_ficticia'=>false]);
+            }
+            $recepcionVehicular->update([
+                'indicaciones_cliente'=>$request->indicaciones_cliente ?? '',
+            ]);
+
+            InterioresOrdenServicio::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
                 'puerta_interior_frontal'=>$request->condiciones_interiores['puerta_izq_f'],
                 'puerta_interior_trasera'=>$request->condiciones_interiores['puerta_izq_t'],
                 'puerta_delantera_frontal'=>$request->condiciones_interiores['puerta_der_f'],
@@ -752,7 +771,7 @@ class CortanaController extends Controller
                 'radio'=>$request->condiciones_interiores['radio'],
                 'espejos_retrovizor'=>$request->condiciones_interiores['retrovisor'],
             ]);
-            ExterioresOrdenServicio::updateOrCreate(['orden_servicio_id'=>$ordenservicio->id],[
+            ExterioresOrdenServicio::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
                 'antena_radio'=>$request->condiciones_exteriores['antena_radio'],
                 'antena_telefono'=>$request->condiciones_exteriores['antena_telefono'],
                 'antena_cb'=>$request->condiciones_exteriores['antena_cb'],
@@ -764,7 +783,7 @@ class CortanaController extends Controller
                 'limpia_parabrisas'=>$request->condiciones_exteriores['limpiaparabrisas'],
                 'luces_exteriores'=>$request->condiciones_exteriores['luces'],
             ]);
-            InventarioOrdenServicio::updateOrCreate(['orden_servicio_id'=>$ordenservicio->id],[
+            InventarioOrdenServicio::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
                 'llanta'=>$request->inventario['llanta'],
                 'cubreruedas'=>$request->inventario['cubreruedas'],
                 'cables_corriente'=>$request->inventario['cables'],
@@ -778,7 +797,7 @@ class CortanaController extends Controller
                 'placas'=>$request->inventario['placas'],
             ]);
 
-            CondicionesPinturaOrdenServicio::updateOrCreate(['orden_servicio_id'=>$ordenservicio->id],[
+            CondicionesPinturaOrdenServicio::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
                 'decolorada'=>$request->pintura['decolorada'],
                 'emblemas_completos'=>$request->pintura['emblemas'],
                 'color_no_igual'=>$request->pintura['color_desigual'],
@@ -790,7 +809,7 @@ class CortanaController extends Controller
                 'carroceria_golpes'=>$request->pintura['golpes'],
                 'lluvia_acido'=>$request->pintura['lluvia'],
             ]);
-            if($ordenservicio->cambiar_archivos){
+            if($recepcionVehicular->cambiar_archivos){
                 $pathcarro     = RutasArchivo::where('tipo_id',26)->where('estatus_id',21)->first();
                 $pathfirma     = RutasArchivo::where('tipo_id',25)->where('estatus_id',21)->first();
                 $pathevidencia = RutasArchivo::where('tipo_id',63)->where('estatus_id',21)->first();
@@ -839,7 +858,7 @@ class CortanaController extends Controller
                 foreach ($filessaves as $image){
                     Archivos::create([
                         'nombre'=>$image['name'],
-                        'orden_servicio_id'=>$ordenservicio->id,
+                        'recepcion_vehicular_id'=>$recepcionVehicular->id,
                         'tipo_id'=>$image['tipo'],
                         'estatus_id'=>21
                     ]);
