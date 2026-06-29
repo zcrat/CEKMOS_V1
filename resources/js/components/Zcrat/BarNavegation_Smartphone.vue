@@ -35,10 +35,10 @@ const logout = () => {
                 <font-awesome-icon icon="fa-solid fa-address-book "/>
                 <span>&nbsp;Empleados</span>
             </NavLink>
-            <Dropdown :align="'left-up'" width="48" classtrigger="w-full" classcontent="w-full" v-if="canAny(['ver_presupuestos','ver_ordenes_servicio'])">
+            <Dropdown :align="'left-up'" width="48" classtrigger="w-full" classcontent="w-full" v-if="canAny(['ver_presupuestos','ver_recepciones_vehiculares'])">
                 <template #trigger>
                     <ButtonLink 
-                        :active="route().current('Cortana.Presupuesto.Vista') || route().current('Cortana.OrdenesServicio.Vista')"  
+                        :active="route().current('Cortana.Presupuesto.Vista') || route().current('RecepcionesVehiculares.Vista')"  
                         class="ms-2 gap-x-1 w-full text-white">
                         <font-awesome-icon icon="fa-solid fa-table-list" />
                         <span>&nbsp;Ordenes</span></ButtonLink>
@@ -48,7 +48,7 @@ const logout = () => {
                     <DropdownLink v-if="can('ver_presupuestos')" :href="route('Cortana.Presupuesto.Vista')">
                         Presupuestos
                     </DropdownLink>
-                    <DropdownLink v-if="can('ver_ordenes_servicio')" :href="route('Cortana.OrdenesServicio.Vista')">
+                    <DropdownLink v-if="can('ver_recepciones_vehiculares')" :href="route('RecepcionesVehiculares.Vista')">
                         Recepciones Vehiculares
                     </DropdownLink>
                 </template>

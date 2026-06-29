@@ -16,6 +16,7 @@ use App\Http\Controllers\PdfController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\presupuestosController;
 use App\Http\Controllers\PruebasController;
+use App\Http\Controllers\RecepcionVehicularController;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
@@ -33,7 +34,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session')])->group(func
 });
 Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])->group(function () {
     
-  
+    Route::get('/dashboard', function () { return Inertia::render('Dashboard');})->name('dashboard');
 
     Route::middleware(['permission:ver_usuarios_sitema'])->group(function () {
       Route::get('/users', function () {return Inertia::render('users');})->name('users');
@@ -49,20 +50,23 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::middleware(['permission:ver_presupuestos'])->group(function () {
       Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
       Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('Cortana.Presupuesto.Items');
-      Route::get('cortana/get/orden-servicio',[CortanaController::class,'GetOrdenServicio'])->name('Cortana.OrdenServicio.Read');
       Route::get('cortana/get/ordenes-servicio',[CortanaController::class,'GetOrdenesServicio'])->name('Cortana.OrdenServicio.Items');
-      Route::post('cortana/orden/servicio/create',[CortanaController::class,'CreateOrdenServico'])->name('Cortana.OrdenServicio.Create');
-      Route::post('cortana/orden/servicio/update',[CortanaController::class,'UpdateOrdenServico'])->name('Cortana.OrdenServicio.Update');
       Route::put('cortana/orden/toggle/files_upload',[CortanaController::class,'ToggleFilesRecepcionVehicular'])->name('Cortana.Orden.Toggle.Upload.Files');
       Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('Presupuesto.Get.Data_Orden');
       Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('Presupuesto.Create');
-    });
+      });
+      
+      Route::middleware(['permission:ver_recepciones_vehiculares'])->group(function () {
+        Route::get('/recepciones/vehiculares',[RecepcionVehicularController::class,'view'])->name('RecepcionesVehiculares.Vista');
+      Route::get('/recepciones/vehiculares/read',[CortanaController::class,'Read'])->name('RecepcionesVehiculares.Read');
+        Route::get('/pdf/recepciones/vehiculares/?id={id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.Cortana.RecepcionVehicular');
+      });
+      Route::middleware(['permission:recepciones_vehiculares_crear'])->group(function () {
+        Route::post('/recepciones/vehiculares/update',[RecepcionVehicularController::class,'Update'])->name('RecepcionesVehiculares.Update');
+        Route::post('/recepciones/vehiculares/create',[RecepcionVehicularController::class,'Create'])->name('RecepcionesVehiculares.Create');
+      });
 
-    Route::get('cortana/recepciones/vehiculares',[CortanaController::class,'RecepcionVehicularVista'])->name('Cortana.OrdenesServicio.Vista');
-    Route::get('/pdf/recepciones/vehiculares/?id={id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.Cortana.RecepcionVehicular');
 
-
-    Route::get('/dashboard', function () { return Inertia::render('Dashboard');})->name('dashboard');
 
     Route::get('/Get/Permisos/User',[UsersController::class,"GetPermisos"])->name('getpermisosuser');
     Route::get('/Get/Modulos/User',[UsersController::class,"GetModulos"])->name('get.modulos.user');

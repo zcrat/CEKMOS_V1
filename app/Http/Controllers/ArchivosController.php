@@ -14,18 +14,19 @@ class ArchivosController extends Controller
 {
     public function Delete(Request $request){
 
-        $request->validate(['id'=>['required','exists:archivos,id'],'origen'=>['required','in:ordenservicio,presupuesto']]);
+        $request->validate(['id'=>['required','exists:archivos,id'],'origen'=>['required','in:recepcionvehicular,presupuesto']]);
+        $origen = $request->origen;
         $file=Archivos::find($request->id);
         try{
             DB::beginTransaction();
             if(!$file){
                 throw new \Exception('Imagen Eliminada Anteriormente');
             }
-            if(($request->origen === 'ordenservicio' && (!$file->recepcion_vehicular_id || (int)$file->tipo_id !== 63) ) || ($request->origen === 'presupuesto' && !$file->presupuesto_id )){
+            if(($origen === 'recepcionvehicular' && (!$file->recepcion_vehicular_id || (int)$file->tipo_id !== 63) ) || ($origen === 'presupuesto' && !$file->presupuesto_id )){
                 throw new \Exception('Imagen No Valida Para Eliminar por este medio ');
             }
 
-            if($request->origen === 'ordenservicio'){
+            if($origen === 'recepcionvehicular'){
                 $orden=$file->recepcion_vehicular?->orden_servicio;
                 if(!$orden || ($orden && !($orden->recepcion_vehicular->cambiar_archivos ?? false))){
                     throw new \Exception('Orden de Servicio No Habilitada ');
