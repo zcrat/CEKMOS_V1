@@ -69,7 +69,7 @@ export const CreateorUpdate = async (data: OrdenServicioForm): Promise<responseB
       }
     }
     const response = await axios.post(
-      data.id? route( 'Cortana.OrdenServicio.Update'): route( 'Cortana.OrdenServicio.Create'),
+      data.id? route( 'RecepcionesVehiculares.Update'): route( 'RecepcionesVehiculares.Create'),
       formData,
       {
         headers: {

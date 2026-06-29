@@ -79,7 +79,7 @@ useEcho(
                 </div>
             </div>
             <Pagination 
-                api="Cortana.OrdenServicio.Items" 
+                api="RecepcionesVehiculares.Read" 
                 :params="params" 
                 v-model:currentPage="currentPage" 
                 v-model:itemsPerPage="itemsPerPage" 

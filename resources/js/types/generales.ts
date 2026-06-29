@@ -74,7 +74,7 @@ export interface DatosOrdenServicio {
   cambiar_archivos: boolean | null,
   diagnostico: Date | null,
   indicaciones_cliente: string,
-  notas_mecanico: string,
+  fallas_reportadas: string,
   notas_retraso: string,
   telefono: string,
   ubicacion: string,

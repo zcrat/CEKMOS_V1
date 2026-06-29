@@ -58,7 +58,7 @@ export const DeleteImageDB=async ({index,ImagenesUpload}:{index:number,ImagenesU
     if(!confirm){return}
     const registro=ImagenesUpload[index];
     if(!registro){return}
-    axios.delete(route('Cortana.Imagenes.Delete'), {params:{'id':registro.id,origen:'ordenservicio'}})
+    axios.delete(route('Cortana.Imagenes.Delete'), {params:{'id':registro.id,origen:'recepcionvehicular'}})
     .then(response => {
       const data = response.data.message;
        MyBasicToast.success(data);
