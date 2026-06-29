@@ -20,7 +20,7 @@ class asignarrolesypermisos extends Seeder
             'ver_usuarios_sitema',
             'ver_empleados',
             'ver_presupuestos',
-            'ver_ordenes_servicio',
+            'ver_recepciones_vehiculares',
             'administrar_caja',
             'crear_ordenes_servicio'
         ];

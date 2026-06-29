@@ -57,7 +57,7 @@ const logout = () => {
             <NavLink  :title="IsRow ? '' : 'Inicio'" :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
             <NavLink v-if="can('ver_usuarios_sitema')" :title="IsRow ? '' : 'Usuarios'" :href="route('users')" :active="route().current('users')"><font-awesome-icon icon="fa-solid fa-users " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
             <NavLink v-if="can('ver_empleados')" :title="IsRow ? '' : 'Empleados'" :href="route('employees')" :active="route().current('employees')"><font-awesome-icon icon="fa-solid fa-address-book " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Empleados</span></NavLink>
-            <Dropdown :align="IsRow?'right':'left-up' " width="48" v-if="canAny(['ver_presupuestos','ver_ordenes_servicio'])">
+            <Dropdown :align="IsRow?'right':'left-up' " width="48" v-if="canAny(['ver_presupuestos','ver_recepciones_vehiculares'])">
                 <template #trigger>
                     <ButtonLink :title="IsRow ? '' : 'Ordenes'"  :active="route().current('Cortana.Presupuesto.Vista')"><font-awesome-icon icon="fa-solid fa-table-list" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Ordenes</span></ButtonLink>
                 </template>
@@ -66,7 +66,7 @@ const logout = () => {
                     <DropdownLink v-if="can('ver_presupuestos')" :href="route('Cortana.Presupuesto.Vista')">
                         Presupuestos
                     </DropdownLink>
-                    <DropdownLink v-if="can('ver_ordenes_servicio')" :href="route('Cortana.OrdenesServicio.Vista')">
+                    <DropdownLink v-if="can('ver_recepciones_vehiculares')" :href="route('RecepcionesVehiculares.Vista')">
                     <font-awesome-icon icon="fa-solid fa-truck-pickup" :class="IsRow?'':'sm:text-[1.3rem]'"/> Recepciones Vehiculares
                     </DropdownLink>
                 </template>
