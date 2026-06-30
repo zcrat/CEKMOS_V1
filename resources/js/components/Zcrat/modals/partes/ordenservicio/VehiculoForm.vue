@@ -7,7 +7,7 @@
     import {EconomicoBase} from '@/utils/variables/ordenservicio'
     import {type Vehiculo as VehiculoProps} from '@/types/generales'
     import axios from 'axios';
-    import Select2 from '@/components/Zcrat/Elements/Select2.vue';
+    import ZDRemoteSelect from '@/components/Zcrat/Elements/ZDRemoteSelect.vue';
 import Button from '@/components/Zcrat/Inputs/Button.vue';
     const props = defineProps<{
         Close?: ()=>void
@@ -57,7 +57,7 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
 </script>
 <template >
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-    <Select2 
+    <ZDRemoteSelect 
         label="Vehiculo" 
         :buttonNew="OpenModal"
         id="Vehiculo" 

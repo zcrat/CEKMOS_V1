@@ -9,7 +9,7 @@
   import Combobox from '@/components/Zcrat/Elements/ZdCombobox.vue'
   import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
   import Select from '@/components/Zcrat/Elements/Select.vue';
-  import Select2 from '@/components/Zcrat/Elements/Select2.vue';
+  import ZDRemoteSelect from '@/components/Zcrat/Elements/ZDRemoteSelect.vue';
   import GetNivelesGasolina from '@/utils/functions/select/NivelesGasolina';
   import GetModulosDisponibles  from '@/utils/functions/select/ModulosCortana';
   import ZDCanvas, { StrokesArray } from '../Elements/ZDCanvas.vue'
@@ -318,7 +318,7 @@
           :errors="ValidationErrors?.['modulo_orden']" 
           :DeleteErrors="()=>{delete ValidationErrors?.['modulo_orden']}" 
         />
-        <Select2
+        <ZDRemoteSelect
           :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
           label="Vehiculo De Los Conceptos" 
           endpoint="Select2.Vehiculos.Conceptos.Modulos" 
@@ -332,7 +332,7 @@
     </div>
     <Subtitle>Datos Cliente</Subtitle>
     <div class="grid sm:grid-cols-2 gap-2">
-      <Select2 
+      <ZDRemoteSelect 
         label="Empresa" 
         id="presupuestoempresa" 
         endpoint="Select2.Empresas" 
@@ -341,7 +341,7 @@
         :errors="ValidationErrors?.['empresa']" 
         :DeleteErrors="()=>{delete ValidationErrors?.['empresa']}"
       />
-      <Select2   
+      <ZDRemoteSelect   
         label="Cliente" 
         :params="{'empresa_id':DetallesGenerales.empresa?.value}" 
         endpoint="Select2.Clientes" 

@@ -58,7 +58,7 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
       
       Route::middleware(['permission:ver_recepciones_vehiculares'])->group(function () {
         Route::get('/recepciones/vehiculares',[RecepcionVehicularController::class,'view'])->name('RecepcionesVehiculares.Vista');
-      Route::get('/recepciones/vehiculares/read',[CortanaController::class,'Read'])->name('RecepcionesVehiculares.Read');
+      Route::get('/recepciones/vehiculares/read',[RecepcionVehicularController::class,'Read'])->name('RecepcionesVehiculares.Read');
         Route::get('/pdf/recepciones/vehiculares/?id={id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.Cortana.RecepcionVehicular');
       });
       Route::middleware(['permission:recepciones_vehiculares_crear'])->group(function () {

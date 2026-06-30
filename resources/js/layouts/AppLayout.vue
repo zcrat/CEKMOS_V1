@@ -20,6 +20,7 @@ onMounted(async () => {
 const props = defineProps({
     title: String,
     description: String,
+    messageLoading:String,
     loading: Boolean
 });
 const title=computed(() => props.title);
@@ -71,7 +72,7 @@ onMounted(() => {
                 <slot name="filtering"/>
               </div>
               <div class="w-full flex-1 flex flex-col">
-                <Loading v-if="loading" text="Cargando Usuarios"/>
+                <Loading v-if="loading" :text="messageLoading ?? 'Cargando Elementos'"/>
                 <slot v-else name="content"/>
               </div>
             </div>

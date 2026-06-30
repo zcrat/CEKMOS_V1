@@ -25,7 +25,7 @@ const empresa = ref<string|null>(null);
 const estatus = ref<string[]>([]);
 const modulos = ref<string[]>([]);
 const loading = ref<boolean>(true);
-const message_empty=ref<string>('No Hay Presupuestos Para Mostrar')
+const message_empty=ref<string>('No Hay Recepciones Vehiculares Para Mostrar')
 
 const orderBy=ref<null|OrderKeyProp>(null)
 const ModalOrdenServicio = ref<InstanceType<typeof OrdenServicio> | null>(null);
@@ -62,7 +62,7 @@ useEcho(
 </script>
 
 <template>
-    <AppLayout title="Recepciones Vehiculares" :loading="loading">
+    <AppLayout title="Recepciones Vehiculares" :loading="loading" messageLoading="Cargando Recepciones Vehiculares">
         <template #header>
                 <Button text="Nueva" @click="ModalOrdenServicio?.Open(null)"  />
         </template>
