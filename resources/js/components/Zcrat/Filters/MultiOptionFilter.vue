@@ -1,9 +1,10 @@
 <script setup lang="ts">
   import Checkbox from '@/components/Zcrat/Inputs/form/CheckboxFilter.vue'
   import Poper from '@/components/Zcrat/Elements/poper.vue' 
-import { onMounted, ref,computed } from 'vue';
+import { onMounted, ref,computed, watch } from 'vue';
 import { option } from '@/types/generales';
-import MultiOptionFilter from '@/utils/functions/select/MultiOptionFilter';
+import getMultiOptionFilter from '@/utils/functions/select/MultiOptionFilter';
+import Search from '../Inputs/Search.vue';
 interface Props {
     api: string;
     params?: Record<string,any>;
@@ -13,9 +14,29 @@ interface Props {
 const props = defineProps<Props>();
 const options=ref<option[]>([])
 const selectedIds = defineModel<(number|string)[]>('selectedIds', { default: [] })
-onMounted(async () => {
-    options.value = await MultiOptionFilter(props.api,props.params ?? {});
-});
+const search = ref<string>('')
+
+const loadOptions = async () => {
+  options.value = await getMultiOptionFilter(props.api, props.params ?? {})
+  
+}
+
+watch( 
+  () => [props.api, props.params],
+  loadOptions,
+  { deep: true, immediate: true }
+)
+const filteredOptions = computed(() => {
+  const value = search.value.trim().toLowerCase()
+
+  if (!value) {
+    return options.value
+  }
+
+  return options.value.filter((item) =>
+    item.label.toLowerCase().includes(value)
+  )
+})
 const ToggleIds = (id: string | number) => {
   if (id === "all") {
     selectedIds.value = []
@@ -39,11 +60,23 @@ const ToggleIds = (id: string | number) => {
 }
 const poperChildren = computed(() => [
   {
+    key: 'search',
+    element: Search,
+    props: {
+      modelValue: search.value,
+      'onUpdate:modelValue': (value: string) => {
+        search.value = value
+      },
+      Classdiv: 'w-full',
+      placeholder: `Buscar ${props.label}`,
+    },
+  },
+  {
     key: 'all',
     element: Checkbox,
     props: {
       id: 'all'+props.label,
-      checked: selectedIds.value.length === 0,
+      checked: selectedIds.value.length === 0 || (search.value != '' ),
       name: 'all'+props.label,
       label: 'Todos',
       value: 'all',

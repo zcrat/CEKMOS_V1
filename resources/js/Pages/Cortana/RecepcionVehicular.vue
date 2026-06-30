@@ -26,7 +26,7 @@ const estatus = ref<string[]>([]);
 const modulos = ref<string[]>([]);
 const loading = ref<boolean>(true);
 const message_empty=ref<string>('No Hay Recepciones Vehiculares Para Mostrar')
-
+const statusParams = { categoria_id: 2 }
 const orderBy=ref<null|OrderKeyProp>(null)
 const ModalOrdenServicio = ref<InstanceType<typeof OrdenServicio> | null>(null);
 const pdf = ref<InstanceType<typeof PDFDemo> | null>(null);
@@ -73,7 +73,7 @@ useEcho(
                     <empresasselect v-model="empresa" :canNew="false"/>
                 </div>
                 <div class="flex gap-2 items-end justify-between sm:justify-start">
-                    <MultiOptionFilter v-model:selectedIds="estatus" api="select.status" :params="{'categoria_id':2}" label="Estatus"/>
+                    <MultiOptionFilter v-model:selectedIds="estatus" api="select.status" :params="statusParams" label="Estatus"/>
                     <MultiOptionFilter v-model:selectedIds="modulos" api="select.modulos.disponibles.usuario" label="Modulos"/>
                     <Datapicker />
                 </div>
