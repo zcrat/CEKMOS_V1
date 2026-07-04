@@ -18,6 +18,7 @@ input{
   --color3a: #c02a4a;
   --color4: #aaaaaa;
   --color5: #faaaaa;
+  --color_logo:#0B1A39
 }
 .ButtonOptionsEquipo1 {
   @apply bg-[--micolor] font-semibold text-[--color2];
