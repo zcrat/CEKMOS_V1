@@ -68,7 +68,7 @@ class RecepcionVehicularController extends Controller
                     'Diagnostico Iniciado'
                 )
                 :'Revisando' ) 
-                :'No Aplica',
+                :'Sin Diagnostico',
             'cambiar_archivos'=>$item->recepcion_vehicular->cambiar_archivos ?? false
         ]);
 

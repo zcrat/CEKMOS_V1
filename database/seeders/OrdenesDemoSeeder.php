@@ -23,6 +23,8 @@ use App\Models\CondicionesPinturaOrdenServicio;
 use App\Models\ResponsablesOrdenServicio;
 use App\Models\Archivos;
 use App\Models\RecepcionesVehiculares;
+use App\Models\RutasArchivo;
+use Illuminate\Support\Facades\Storage;
 
 class OrdenesDemoSeeder extends Seeder
 {
@@ -87,7 +89,7 @@ class OrdenesDemoSeeder extends Seeder
                 // Salida
                 DatosSalida::create([
                     'fecha' => Carbon::now()->addDays(1),
-                    'kilomentraje' => 10100 + ($i * 123),
+                    'kilometraje' => 10100 + ($i * 123),
                     'gasolina' => $nivelComb,
                     'orden_servicio_id' => $os->id,
                 ]);
@@ -179,27 +181,62 @@ class OrdenesDemoSeeder extends Seeder
                     'orden_servicio_id' => $os->id,
                 ]);
 
-                // Archivos asociados usando las 3 imágenes esperadas
-                Archivos::create([
-                    'nombre' => 'firma.jpeg',
-                    'recepcion_vehicular_id' => $recepcionVehicular->id,
-                    'tipo_id' => 25,
-                    'estatus_id' => 21,
-                ]);
+                // Replicar las imágenes demo para cada recepción.
+                $rutas = RutasArchivo::whereIn('tipo_id', [25, 26, 63])
+                    ->where('estatus_id', 21)
+                    ->get()
+                    ->keyBy('tipo_id');
 
-                Archivos::create([
-                    'nombre' => 'carro.jpeg',
-                    'recepcion_vehicular_id' => $recepcionVehicular->id,
-                    'tipo_id' => 26,
-                    'estatus_id' => 21,
-                ]);
+                foreach ([25, 26, 63] as $tipoId) {
+                    if (!$rutas->has($tipoId)) {
+                        throw new \RuntimeException("No existe una ruta de archivo para el tipo {$tipoId}.");
+                    }
+                }
 
-                Archivos::create([
-                    'nombre' => 'evidencia.jpeg',
-                    'recepcion_vehicular_id' => $recepcionVehicular->id,
-                    'tipo_id' => 63,
-                    'estatus_id' => 21,
-                ]);
+                $archivosDemo = [
+                    [
+                        'origen' => public_path('carro.jpeg'),
+                        'nombre' => $os->orden_servicio.'_carro_detalles.jpeg',
+                        'tipo_id' => 26,
+                    ],
+                    [
+                        'origen' => public_path('firma.jpeg'),
+                        'nombre' => $os->orden_servicio.'_firma.jpeg',
+                        'tipo_id' => 25,
+                    ],
+                ];
+
+                for ($evidencia = 1; $evidencia <= 6; $evidencia++) {
+                    $archivosDemo[] = [
+                        'origen' => public_path('evidencia.png'),
+                        'nombre' => $os->orden_servicio.'_evidencia_'.$evidencia.'.png',
+                        'tipo_id' => 63,
+                    ];
+                }
+
+                foreach ($archivosDemo as $archivoDemo) {
+                    if (!is_file($archivoDemo['origen'])) {
+                        throw new \RuntimeException("No existe la imagen demo: {$archivoDemo['origen']}");
+                    }
+
+                    $ruta = $rutas->get($archivoDemo['tipo_id']);
+                    $disk = $ruta->disk ?? 'public';
+                    $folder = $ruta->folder ?? 'desconocidos';
+                    $destino = $folder.'/'.$archivoDemo['nombre'];
+
+                    Storage::disk($disk)->makeDirectory($folder);
+
+                    if (!Storage::disk($disk)->put($destino, file_get_contents($archivoDemo['origen']))) {
+                        throw new \RuntimeException("No se pudo copiar la imagen demo a {$destino}.");
+                    }
+
+                    Archivos::create([
+                        'nombre' => $archivoDemo['nombre'],
+                        'recepcion_vehicular_id' => $recepcionVehicular->id,
+                        'tipo_id' => $archivoDemo['tipo_id'],
+                        'estatus_id' => 21,
+                    ]);
+                }
             }
         });
     }
