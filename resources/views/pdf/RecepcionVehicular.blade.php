@@ -186,17 +186,12 @@
                 <h3 class="descripcion_firma">Firma Supervisor</h3>
             </div>
         </div>
-        <div class="flex-1 flex  flex-col  gap-2">
-            <div class="descripciones_contenedor">
-                <div class="contedor_bordes w-50 p-1">
+        <div class="bloque-final-pdf">
+            <div class="flex flex-col w-50 h-100 gap-1">
+                <div class="contedor_bordes p-1 h-25">
                     <h3 class="texto-descripcion"><span class="encabezado-descripcion">Notas: </span>{{$datos['notas']}}</h3>
                 </div>
-                <div class="contedor_bordes w-50 p-1">
-                    <h3 class="texto-descripcion"><span class="encabezado-descripcion">Indicaciones:</span>{{$datos['observaciones']}}</h3>
-                </div>
-            </div>
-            <div class="flex flex-row flex-1 items-center">
-                <div class="contedor_bordes w-60 h-100 flex flex-col">
+                 <div class="contedor_bordes h-75 flex flex-col">
                     <h5 class="descripcion"> Hemos registrado los daños en su vehículo que no están relacionados con las reparaciones
                         autorizadas.
                         El que usted y nuestro representante hayan revisado estas áreas conjuntamente,
@@ -222,11 +217,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col w-40 items-end">
-                    <div class="h-50 flex items-center">
-                        <img src="{{ asset($empresa_emision['logo'])}}" alt="" class="img_contenida">
+                
+            </div>
+            <div class="flex flex-col w-50 h-100 gap-1">
+                <div class="contedor_bordes p-1 h-70 contenedor-mensaje">
+                    <h3 class="texto-descripcion"><span class="encabezado-descripcion">Indicaciones:</span>{{$datos['observaciones']}}</h3>
+                </div>
+                <div class="flex flex-row h-30">
+                    <div class="w-40 flex items-center justify-center">
+                        <img src="{{ asset('storage/logos/facturas/'.$empresa_emision['logo'])}}" alt="" class="img_contenida">
                     </div>
-                    <h4 class="h-50  direccion-empresa">
+                    <h4 class="w-60  direccion-empresa">
                         {!! $empresa_emision['direccion'] !!}
                     </h4>
                 </div>

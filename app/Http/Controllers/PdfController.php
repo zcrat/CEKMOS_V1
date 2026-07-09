@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class PdfController extends Controller
 {
-    public function RecepcionVehicular($id)
+    public function RecepcionVehicular($id, bool $renderBlade = false)
     {
         $ordenservicio=OrdenesServicio::with([
             'cliente',
@@ -73,7 +73,7 @@ class PdfController extends Controller
             $direccion_emisor = trim($prefijo_nombre . $direccion_detalle);
         }
 
-        return Pdf::view('pdf.RecepcionVehicular',[
+        $viewData = [
             'datos' => [
                 'telefono'=>$ordenservicio->telefono,
                 'cliente'=>$ordenservicio->cliente->nombre,
@@ -167,7 +167,7 @@ class PdfController extends Controller
             ],
             'vehiculo'=>[
                 'anio'=>$ordenservicio->vehiculo->año,
-                'marca'=>$ordenservicio->vehiculo->marca->descripcion,
+                'marca'=>$ordenservicio->vehiculo->modelo->marca->descripcion,
                 'modelo'=>$ordenservicio->vehiculo->modelo->descripcion,
                 'placas'=>$ordenservicio->vehiculo->placas,
                 'color'=>$ordenservicio->vehiculo->color->descripcion,
@@ -182,7 +182,12 @@ class PdfController extends Controller
             'firma' => $firma_url,
             'firma_recibido' => $firma_recibido_url,
             'firma_cliente' => $firma_cliente_url,
-            
-        ])->format('A4');
+        ];
+
+        if ($renderBlade) {
+            return view('pdf.RecepcionVehicular', $viewData);
+        }
+
+        return Pdf::view('pdf.RecepcionVehicular', $viewData)->format('A4');
     }
 }
