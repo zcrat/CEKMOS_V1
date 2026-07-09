@@ -97,7 +97,7 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
       Create(presupuesto).then((res)=>{
         if(res.status){
           updateVisibility();
-          window.location.href=route('Presupuesto.Editar',{presupuesto:res.data.id});
+          window.location.href=route('presupuesto.editar',{presupuesto:res.data.id});
         }else{
           if(res.code===422){
             console.error('Error de validacion al crear el presupuesto');
@@ -119,25 +119,25 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
   <BaseModal modaltitle="Nuevo Presupuesto" :position="'center'" :show="props.show" @close="updateVisibility" :buttonconfirm="buttonconfirm" >
     <Subtitle>Datos Generales</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2" >
-      <Combobox endpoint="Combobox.Ordenes_Servicio" label="Orden De Servicio" id="ordenservicio" v-model="presupuesto.orden_servicio"  placeholder="Buscar, Crear o Automatica"/>
+      <Combobox endpoint="combobox.ordenes_servicio" label="Orden De Servicio" id="ordenservicio" v-model="presupuesto.orden_servicio"  placeholder="Buscar, Crear o Automatica"/>
       <InputBasic id="folio" label="folio" type="text" v-model="presupuesto.folio" placeholder="Automatico O Ingresar"/>
       <InputBasic id="ordenseguimiento" label="Orden De Seguimiento" type="text" v-model="presupuesto.orden_seguimiento" placeholder="Automatico O Ingresar"/>
-      <Combobox id="ubicacion" label="Ubicacion" v-model="presupuesto.ubicacion" endpoint="Combobox.ubicaciones" placeholder="Buscar o Crear"/>
+      <Combobox id="ubicacion" label="Ubicacion" v-model="presupuesto.ubicacion" endpoint="combobox.ubicaciones.lista" placeholder="Buscar o Crear"/>
       <Datapicker label="Fecha Estimada" v-model="presupuesto.estimacion" :clearable="false" :time="true" :range="false" class="w-full"/>
       <InputBasic id="kilometraje" label="Kilometraje" type="number" v-model="presupuesto.kilometraje" placeholder="ej. 392.31"/>
       <Select id="gasolina" :canempty="true" v-model="presupuesto.gasolina" label="Gasolina" :options="optionsgasolima"></Select>
       <Select label="Tipo De Presupuesto"  v-model="presupuesto.tipo_id" id="presupuestotipo"  :options="optionstipos"></Select>
-      <Select2 :new_option="vehiculoconcepto" label="Vehiculo De Los Conceptos" endpoint="Select2.Empresas" v-model="presupuesto.vehiculo_concepto_id" id="presupuestovehiculoconcepto" placeholder="Buscar Cliente" />
-      <Select2 :new_option="empresa" label="Empresa" id="presupuestoempresa" endpoint="Select2.Empresas" v-model="presupuesto.empresa_id" placeholder="Buscar Empresas"/>
-      <Select2 :new_option="cliente" label="Cliente" endpoint="Select2.Empresas" v-model="presupuesto.cliente_id" id="presupuestoempresa" placeholder="Buscar Cliente"/>
+      <Select2 :new_option="vehiculoconcepto" label="Vehiculo De Los Conceptos" endpoint="select2.empresas" v-model="presupuesto.vehiculo_concepto_id" id="presupuestovehiculoconcepto" placeholder="Buscar Cliente" />
+      <Select2 :new_option="empresa" label="Empresa" id="presupuestoempresa" endpoint="select2.empresas" v-model="presupuesto.empresa_id" placeholder="Buscar Empresas"/>
+      <Select2 :new_option="cliente" label="Cliente" endpoint="select2.empresas" v-model="presupuesto.cliente_id" id="presupuestoempresa" placeholder="Buscar Cliente"/>
       <Select label="Modulo Orden"  v-model="presupuesto.modulo_orden" id="modulooreden" :canempty="true" :options="modulosdisponibles"></Select>
     </div>
     <Subtitle>Empleados Encargados</Subtitle>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2" >
-      <Combobox endpoint="Combobox.Administradores_Trasporte" label="Administrador de Trasportes" id="administradortrasporte" v-model="presupuesto.administrador"  placeholder="Buscar o Crear "/>
-      <Combobox endpoint="Combobox.Jefes_Procesos" label="Jefe De Procesos" id="jefeproceso" v-model="presupuesto.jefe"  placeholder="Buscar o Crear"/>
-      <Combobox endpoint="Combobox.Trabajadores" label="Trabajador" id="trabajador" v-model="presupuesto.trabajador"  placeholder="Buscar o Crear"/>
-      <Combobox endpoint="Combobox.Tecnicos" label="Tecnico" id="tecnico" v-model="presupuesto.tecnico"  placeholder="Buscar o Crear"/>
+      <Combobox endpoint="combobox.administradores_trasporte" label="Administrador de Trasportes" id="administradortrasporte" v-model="presupuesto.administrador"  placeholder="Buscar o Crear "/>
+      <Combobox endpoint="combobox.jefes_procesos" label="Jefe De Procesos" id="jefeproceso" v-model="presupuesto.jefe"  placeholder="Buscar o Crear"/>
+      <Combobox endpoint="combobox.trabajadores" label="Trabajador" id="trabajador" v-model="presupuesto.trabajador"  placeholder="Buscar o Crear"/>
+      <Combobox endpoint="combobox.tecnicos" label="Tecnico" id="tecnico" v-model="presupuesto.tecnico"  placeholder="Buscar o Crear"/>
     </div>
     <Subtitle>Notas</Subtitle>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2" >
@@ -148,8 +148,8 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
     </div>
     <Subtitle>Datos Vehiculo</Subtitle>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-      <Combobox endpoint="Combobox.Vehiculo.Economico" label="Economico" id="economico" v-model="presupuesto.economico"  placeholder="Buscar o Crear Economico" :timeout="1"/>
-      <Combobox endpoint="Combobox.Vehiculo.Placas" label="Placas" id="placas" v-model="presupuesto.placas"  placeholder="Buscar o Crear PLacas"/>
+      <Combobox endpoint="combobox.vehiculo.economico" label="Economico" id="economico" v-model="presupuesto.economico"  placeholder="Buscar o Crear Economico" :timeout="1"/>
+      <Combobox endpoint="combobox.vehiculo.placas" label="Placas" id="placas" v-model="presupuesto.placas"  placeholder="Buscar o Crear PLacas"/>
       <InputBasic id="Vin" label="Vin" type="text" v-model="presupuesto.vin" placeholder="Ej.JJSOE18P388988750 "/>
       <InputBasic id="Año" label="Año" type="number" v-model="presupuesto.año"  placeholder="ej. 2024"/>
       <InputBasic id="Marca" label="Marcas" type="text" v-model="presupuesto.marca" classname="uppercase" placeholder="ej. AUDI"/>

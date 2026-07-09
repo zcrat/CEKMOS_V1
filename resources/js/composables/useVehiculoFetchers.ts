@@ -10,7 +10,7 @@ export const useVehiculoFetcher = (
   const { get } = useCancelableGet();
 
   const fetchvehiculo = async (filter: string, value: string) => {
-    const result = await get(route('Vehiculo.Get.Datos'), { filter, value });
+    const result = await get(route('vehiculo.get.datos'), { filter, value });
 
     if (result.status && result.data) {
       cancelFlag.value = true;

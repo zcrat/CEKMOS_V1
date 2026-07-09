@@ -12,7 +12,7 @@ export const usePresupuestoFetcher = (
   const { get } = useCancelableGet();
 
   const fetchDatosPresupuesto = async (orden_servicio: string) => {
-    const result = await get(route('Presupuesto.Get.Data_Orden'), { orden_servicio });
+    const result = await get(route('presupuesto.get.data_orden'), { orden_servicio });
 
     if (result.status && result.data) {
       mapPresupuestoResponse(result.data, presupuesto, empresa, cliente, vehiculoconcepto);

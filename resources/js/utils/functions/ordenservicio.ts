@@ -8,7 +8,7 @@ import { ImagenUpload } from '@/components/Zcrat/modals/partes/ordenservicio/Ima
   
 export const GetImageTipoVehiculo = async ({Canvas,id}:{Canvas:InstanceType<typeof ZDCanvas> | null,id:number}) => {
     try {
-      const response = await axios.get(route('Vehiculo.Get.Image', { id: id }), {
+      const response = await axios.get(route('vehiculo.get.image', { id: id }), {
         responseType: 'blob'
       });
       Canvas?.dibujarImagen(response.data);
@@ -58,7 +58,7 @@ export const DeleteImageDB=async ({index,ImagenesUpload}:{index:number,ImagenesU
     if(!confirm){return}
     const registro=ImagenesUpload[index];
     if(!registro){return}
-    axios.delete(route('Cortana.Imagenes.Delete'), {params:{'id':registro.id,origen:'recepcionvehicular'}})
+    axios.delete(route('cortana.imagenes.delete'), {params:{'id':registro.id,origen:'recepcionvehicular'}})
     .then(response => {
       const data = response.data.message;
        MyBasicToast.success(data);
@@ -84,7 +84,7 @@ export const GetDataVehiculoEconomico=(Economico:EconomicoForm)=>{
         MyBasicToast.error('Longitud mínima de N# economico es de 5 caracteres');
         return;
       }
-      axios.get(route('Vehiculo.Get.Datos'), {
+      axios.get(route('vehiculo.get.datos'), {
         params: { search: Economico.economico ,filtro:'economico'}
       })
       .then(response => {
@@ -113,7 +113,7 @@ export const GetDataVehiculoPlacas=(Economico:EconomicoForm)=>{
         MyBasicToast.error('Longitud mínima de N# placas es de 6 caracteres');
         return;
       }
-      axios.get(route('Vehiculo.Get.Datos'), {
+      axios.get(route('vehiculo.get.datos'), {
         params: { search: Economico.placas ,filtro:'placas'}
       })
       .then(response => {
@@ -150,7 +150,7 @@ export const ImageCanvas = async({Canvas,FileName}:{Canvas:InstanceType<typeof Z
 export const ToggleUploadFiles = async({id,estatus}:{id:number,estatus:boolean})=>{
     const confirm=await ZdAlert({ title:'Actualizacion de Archivos', text:estatus?'Cancelar que los usuarios cambien, eliminen y agregen archivos a la Orden De Servicio' : 'Permitir que los usuarios cambien, eliminen y agregen archivos a la Orden De Servicio'});
     if(!confirm){return}
-    axios.put(route('Cortana.Orden.Toggle.Upload.Files'), {'id':id})
+    axios.put(route('cortana.orden.toggle.upload.files'), {'id':id})
     .then(response => {
       const data = response.data.message;
        MyBasicToast.success(data);

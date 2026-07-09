@@ -53,8 +53,8 @@ const classtitleposition = computed(() => ({
       <DialogOverlay :class="'fixed inset-0 bg-black/40 '+z" />
       <DialogContent 
       :class="['fixed inset-0 flex items-center justify-center',z??'' ]" >
-        <div class=" relative max-w-screen w-full m-4 sm:w-auto px-6 bg-white rounded-xl shadow-xl max-h-[90vh] overflow-auto">
-          <div v-if="modaltitle" class="flex justify-between items-center pt-4 pb-2 sticky top-0 z-10 bg-white">
+        <div class=" relative max-w-screen w-fit m-2 px-4 bg-white rounded-xl shadow-xl max-h-[90vh] overflow-auto">
+          <div v-if="modaltitle" class="flex justify-between items-center pt-3 pb-3 sticky top-0 z-10 bg-white">
           <DialogTitle
           
             :class="['text-xl font-semibold px-2', classtitleposition]"
@@ -71,7 +71,7 @@ const classtitleposition = computed(() => ({
           <div class="sm:px-4 overflow-auto">
             <slot />
           </div>
-          <div class="pt-2 pb-4 flex justify-end items-center gap-4 sticky bottom-0 z-10 bg-white ">
+          <div class="pt-2 pb-2 flex justify-end items-center gap-4 sticky bottom-0 z-10 bg-white ">
             <button
               class="px-4 py-2 bg-[--color4] h-10 rounded-md"
               @click="close"

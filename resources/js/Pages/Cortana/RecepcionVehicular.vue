@@ -79,7 +79,7 @@ useEcho(
                 </div>
             </div>
             <Pagination 
-                api="RecepcionesVehiculares.Read" 
+                api="recepcionesvehiculares.read"
                 :params="params" 
                 v-model:currentPage="currentPage" 
                 v-model:itemsPerPage="itemsPerPage" 

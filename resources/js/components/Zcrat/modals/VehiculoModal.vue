@@ -62,7 +62,7 @@ const Save = async () => {
   try {
     loading.value='Guardando Vehiculo';
     Vehiculo.error=undefined;
-    const response = await axios.post(route('Vehiculo.CreateOrUpdate'),{'id':props.id,...Vehiculo})
+    const response = await axios.post(route('vehiculo.createorupdate'),{'id':props.id,...Vehiculo})
     props.returnSave?.(response.data.vehiculo)
     MyBasicToast.success(response.data.message??'Guardo Correctamente')
     emit('close')
@@ -81,7 +81,7 @@ const Save = async () => {
 const Read = async () => {
   try {
     loading.value='Cargando Datos';
-    const response = await axios.get(route('Vehiculo.Find'),{params:{id:props.id} })
+    const response = await axios.get(route('vehiculo.find'),{params:{id:props.id} })
     const data:VehiculoProps=response.data.vehiculo;
     Vehiculo.placas=data.placas;
     Vehiculo.economico=data.economico;

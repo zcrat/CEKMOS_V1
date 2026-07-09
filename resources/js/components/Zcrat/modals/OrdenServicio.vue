@@ -86,7 +86,7 @@
   const Read= async (id:number) =>{
     loading.value=true;
     try{
-      const response=await axios.get(route('Cortana.OrdenServicio.Read'),{params:{id}});
+      const response=await axios.get(route('cortana.ordenservicio.read'),{params:{id}});
       resetvalues.value=false;
       const generales = response.data.generales;
       if (generales.estimacion) {
@@ -296,7 +296,7 @@
         label="Ubicacion"
         classInput="uppercase" 
         v-model="DetallesGenerales.ubicacion" 
-        endpoint="Combobox.ubicaciones" 
+        endpoint="combobox.ubicaciones.lista"
         placeholder="Buscar o Crear" 
         :errors="ValidationErrors?.['ubicacion']" 
         :DeleteErrors="()=>{delete ValidationErrors?.['ubicacion']}" 
@@ -321,7 +321,7 @@
         <ZDRemoteSelect
           :params="{'id_modulo':DetallesGenerales.modulo_orden}" 
           label="Vehiculo De Los Conceptos" 
-          endpoint="Select2.Vehiculos.Conceptos.Modulos" 
+          endpoint="select2.vehiculos.conceptos.modulos"
           v-model="DetallesGenerales.vehiculo_concepto_id" 
           :empty_message="DetallesGenerales.modulo_orden? 'Sin Resultados':'Selecciona Un Modulo'" 
           placeholder="Buscar Vehiculo" 
@@ -335,7 +335,7 @@
       <ZDRemoteSelect 
         label="Empresa" 
         id="presupuestoempresa" 
-        endpoint="Select2.Empresas" 
+        endpoint="select2.empresas"
         v-model="DetallesGenerales.empresa" 
         placeholder="Buscar Empresas"
         :errors="ValidationErrors?.['empresa']" 
@@ -344,7 +344,7 @@
       <ZDRemoteSelect   
         label="Cliente" 
         :params="{'empresa_id':DetallesGenerales.empresa?.value}" 
-        endpoint="Select2.Clientes" 
+        endpoint="select2.clientes"
         :empty_message="DetallesGenerales.empresa ? 'Sin Resultados' : 'Selecciona una empresa'"
         v-model="DetallesGenerales.cliente" 
         id="presupuestoempresa" 
@@ -440,7 +440,7 @@
     <Subtitle>Empleados Encargados</Subtitle>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-2" >
       <Combobox 
-        endpoint="Combobox.Administradores_Trasporte" 
+        endpoint="combobox.administradores_trasporte"
         label="Administrador de Trasportes" 
         id="administradortrasporte" 
         v-model="DetallesGenerales.administrador" 
@@ -449,7 +449,7 @@
         :DeleteErrors="()=>{delete ValidationErrors?.['administrador']}"
       />
       <Combobox 
-        endpoint="Combobox.Jefes_Procesos" 
+        endpoint="combobox.jefes_procesos"
         label="Jefe De Procesos" 
         id="jefeproceso" 
         v-model="DetallesGenerales.jefe"  
@@ -458,7 +458,7 @@
         :DeleteErrors="()=>{delete ValidationErrors?.['jefe']}"
       />
       <Combobox 
-        endpoint="Combobox.Trabajadores" 
+        endpoint="combobox.trabajadores"
         label="Trabajador" 
         id="trabajador" 
         v-model="DetallesGenerales.trabajador"  
@@ -467,7 +467,7 @@
         :DeleteErrors="()=>{delete ValidationErrors?.['trabajador']}"
       />
       <Combobox 
-        endpoint="Combobox.Tecnicos" 
+        endpoint="combobox.tecnicos"
         label="Tecnico" 
         id="tecnico" 
         v-model="DetallesGenerales.tecnico"  

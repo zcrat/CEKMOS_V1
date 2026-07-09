@@ -21,7 +21,7 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
     const ValidationErrors = ref<ArrayAsociativo>()
     const Read = async (id:string|number) => {
         try {
-        const response = await axios.get(route('Vehiculo.Find'),{params:{id} })
+        const response = await axios.get(route('vehiculo.find'),{params:{id} })
         const data:VehiculoProps=response.data.vehiculo;
             Vehiculo.id=data.id;
             Vehiculo.placas=data.placas;
@@ -61,7 +61,7 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
         label="Vehiculo" 
         :buttonNew="OpenModal"
         id="Vehiculo" 
-        endpoint="Select2.Economico" 
+        endpoint="select2.economico"
         v-model="VehiculoId" 
         placeholder="Buscar por Economico o Placas"
         :errors="errors"

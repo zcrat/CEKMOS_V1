@@ -9,6 +9,6 @@ const props = withDefaults(defineProps<{
 </script>
 <template>
     <div class="min-w-[10rem] w-auto">
-        <ZDSelect endpoint="Select2.Empresas" :can-new="props.canNew" type="empresas" v-model="empresa" id="empresasfilter" placeholder="Buscar Empresas"/>
+        <ZDSelect endpoint="select2.empresas" :can-new="props.canNew" type="empresas" v-model="empresa" id="empresasfilter" placeholder="Buscar Empresas"/>
     </div> 
 </template>

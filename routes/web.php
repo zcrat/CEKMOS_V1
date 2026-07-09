@@ -38,76 +38,76 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
 
     Route::middleware(['permission:ver_usuarios_sitema'])->group(function () {
       Route::get('/users', function () {return Inertia::render('users');})->name('users');
-      Route::get('/Get/Users',[UsersController::class,"ReadUsers"])->name('getusers');
-      Route::post('/Toggle/User',[UsersController::class,"ToggleActive"])->name('toggle.user');
-      Route::get('/Get/User',[UsersController::class,"ReadUser"])->name('user.read');
-      Route::post('/Create/User',[UsersController::class,"CreateUser"])->name('user.create');
-      Route::post('/Update/User',[UsersController::class,"UpdateUser"])->name('user.update');
+      Route::get('/get/users',[UsersController::class,"ReadUsers"])->name('getusers');
+      Route::post('/toggle/user',[UsersController::class,"ToggleActive"])->name('toggle.user');
+      Route::get('/get/user',[UsersController::class,"ReadUser"])->name('user.read');
+      Route::post('/create/user',[UsersController::class,"CreateUser"])->name('user.create');
+      Route::post('/update/user',[UsersController::class,"UpdateUser"])->name('user.update');
     });
-    Route::delete('Imagenes/delete',[ArchivosController::class,'Delete'])->name('Cortana.Imagenes.Delete');
+    Route::delete('imagenes/delete',[ArchivosController::class,'Delete'])->name('cortana.imagenes.delete');
 
     
     Route::middleware(['permission:ver_presupuestos'])->group(function () {
-      Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('Cortana.Presupuesto.Vista');
-      Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('Cortana.Presupuesto.Items');
-      Route::get('cortana/get/ordenes-servicio',[CortanaController::class,'GetOrdenesServicio'])->name('Cortana.OrdenServicio.Items');
-      Route::put('cortana/orden/toggle/files_upload',[CortanaController::class,'ToggleFilesRecepcionVehicular'])->name('Cortana.Orden.Toggle.Upload.Files');
-      Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('Presupuesto.Get.Data_Orden');
-      Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('Presupuesto.Create');
+      Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('cortana.presupuesto.vista');
+      Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('cortana.presupuesto.items');
+      Route::get('cortana/get/ordenes-servicio',[CortanaController::class,'GetOrdenesServicio'])->name('cortana.ordenservicio.items');
+      Route::put('cortana/orden/toggle/files_upload',[CortanaController::class,'ToggleFilesRecepcionVehicular'])->name('cortana.orden.toggle.upload.files');
+      Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('presupuesto.get.data_orden');
+      Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('presupuesto.create');
       });
       
       Route::middleware(['permission:ver_recepciones_vehiculares'])->group(function () {
-        Route::get('/recepciones/vehiculares',[RecepcionVehicularController::class,'view'])->name('RecepcionesVehiculares.Vista');
-      Route::get('/recepciones/vehiculares/read',[RecepcionVehicularController::class,'Read'])->name('RecepcionesVehiculares.Read');
-        Route::get('/pdf/recepciones/vehiculares/?id={id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.Cortana.RecepcionVehicular');
+        Route::get('/recepciones/vehiculares',[RecepcionVehicularController::class,'view'])->name('recepcionesvehiculares.vista');
+      Route::get('/recepciones/vehiculares/read',[RecepcionVehicularController::class,'Read'])->name('recepcionesvehiculares.read');
+        Route::get('/pdf/recepciones/vehiculares/{id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.cortana.recepcionvehicular');
       });
       Route::middleware(['permission:recepciones_vehiculares_crear'])->group(function () {
-        Route::post('/recepciones/vehiculares/update',[RecepcionVehicularController::class,'Update'])->name('RecepcionesVehiculares.Update');
-        Route::post('/recepciones/vehiculares/create',[RecepcionVehicularController::class,'Create'])->name('RecepcionesVehiculares.Create');
+        Route::post('/recepciones/vehiculares/update',[RecepcionVehicularController::class,'Update'])->name('recepcionesvehiculares.update');
+        Route::post('/recepciones/vehiculares/create',[RecepcionVehicularController::class,'Create'])->name('recepcionesvehiculares.create');
       });
 
 
 
-    Route::get('/Get/Permisos/User',[UsersController::class,"GetPermisos"])->name('getpermisosuser');
-    Route::get('/Get/Modulos/User',[UsersController::class,"GetModulos"])->name('get.modulos.user');
+    Route::get('/get/permisos/user',[UsersController::class,"GetPermisos"])->name('getpermisosuser');
+    Route::get('/get/modulos/user',[UsersController::class,"GetModulos"])->name('get.modulos.user');
     
-    Route::post('/Toggle/Modulos/User',[UsersController::class,"ToggleModulo"])->name('toggle.modulo');
-    Route::post('/Toggle/Roles/User',[UsersController::class,"ToggleRole"])->name('toggle.role');
-    Route::post('/Toggle/Permisos/User',[UsersController::class,"TogglePermiso"])->name('toggle.permiso');
-    Route::get('/User/Notifications',[UsersController::class,"GetNotificaciones"])->name('getnotifications');
-    Route::get('/User/Read/Notifications',[UsersController::class,"ReadNotification"])->name('readnotification');
+    Route::post('/toggle/modulos/user',[UsersController::class,"ToggleModulo"])->name('toggle.modulo');
+    Route::post('/toggle/roles/user',[UsersController::class,"ToggleRole"])->name('toggle.role');
+    Route::post('/toggle/permisos/user',[UsersController::class,"TogglePermiso"])->name('toggle.permiso');
+    Route::get('/user/notifications',[UsersController::class,"GetNotificaciones"])->name('getnotifications');
+    Route::get('/user/read/notifications',[UsersController::class,"ReadNotification"])->name('readnotification');
     Route::get('/employees',[EmpleadosController::class,'View'])->name('employees');
     Route::get('/employees/read',[EmpleadosController::class,'read'])->name('employees.read');
     Route::post('/employees/create',[EmpleadosController::class,'create'])->name('employees.create');
     
     
-    Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('Select2.Empresas');
-    Route::get('select2/clientes',[select2controller::class,'Clientes'])->name('Select2.Clientes');
-    Route::get('select2/economicos',[select2controller::class,'Economicos'])->name('Select2.Economico');
-    Route::get('select2/vehiculos/conceptos/disponibles',[select2controller::class,'VehiculosConceptosPorModulo'])->name('Select2.Vehiculos.Conceptos.Modulos');
-    Route::get('select2/regimenes/fiscales',[select2controller::class,'RegimenesFiscales'])->name('Select2.Regimenes.Fiscales');
+    Route::get('select2/empresas',[select2controller::class,'Empresas'])->name('select2.empresas');
+    Route::get('select2/clientes',[select2controller::class,'Clientes'])->name('select2.clientes');
+    Route::get('select2/economicos',[select2controller::class,'Economicos'])->name('select2.economico');
+    Route::get('select2/vehiculos/conceptos/disponibles',[select2controller::class,'VehiculosConceptosPorModulo'])->name('select2.vehiculos.conceptos.modulos');
+    Route::get('select2/regimenes/fiscales',[select2controller::class,'RegimenesFiscales'])->name('select2.regimenes.fiscales');
     
     Route::get('select/niveles/combustible',[selectcontroller::class,'NivelesCombustible'])->name('select.niveles.combustible');
     Route::get('select/modulos/orden',[selectcontroller::class,'ModulosOrden'])->name('select.modulos.disponibles.usuario');
     Route::get('select/estatus',[selectcontroller::class,'EstatusIdsPerCategory'])->name('select.status');
     Route::get('select/tipos/vehiculos',[selectcontroller::class,'TiposVehiculosGeneral'])->name('select.tipos.vehiculos');
     
-    Route::get('ComboBox/OrdenesServicio',[ComboboxController::class,'GetOrdenesServicio'])->name('Combobox.Ordenes_Servicio');
-    Route::get('ComboBox/Ubicacion',[ComboboxController::class,'GetUbicaciones'])->name('Combobox.Ubicaciones');
-    Route::get('ComboBox/AdministradoresTrasporte',[ComboboxController::class,'GetAdministradoresTrasporte'])->name('Combobox.Administradores_Trasporte');
-    Route::get('ComboBox/JefesProceso',[ComboboxController::class,'GetJefesProceso'])->name('Combobox.Jefes_Procesos');
-    Route::get('ComboBox/Trabajadores',[ComboboxController::class,'GetTrabajadores'])->name('Combobox.Trabajadores');
-    Route::get('ComboBox/Tecnicos',[ComboboxController::class,'GetTecnicos'])->name('Combobox.Tecnicos');
-    Route::get('ComboBox/Vehiculo/Economico',[ComboboxController::class,'GetVehiculoEconomico'])->name('Combobox.Vehiculo.Economico');
-    Route::get('ComboBox/Vehiculo/Placas',[ComboboxController::class,'GetVehiculoPlacas'])->name('Combobox.Vehiculo.Placas');
-    Route::get('ComboBox/ubicaciones',[ComboboxController::class,'GetUbicaciones'])->name('Combobox.ubicaciones');
+    Route::get('combobox/ordenesservicio',[ComboboxController::class,'GetOrdenesServicio'])->name('combobox.ordenes_servicio');
+    Route::get('combobox/ubicacion',[ComboboxController::class,'GetUbicaciones'])->name('combobox.ubicaciones');
+    Route::get('combobox/administradorestrasporte',[ComboboxController::class,'GetAdministradoresTrasporte'])->name('combobox.administradores_trasporte');
+    Route::get('combobox/jefesproceso',[ComboboxController::class,'GetJefesProceso'])->name('combobox.jefes_procesos');
+    Route::get('combobox/trabajadores',[ComboboxController::class,'GetTrabajadores'])->name('combobox.trabajadores');
+    Route::get('combobox/tecnicos',[ComboboxController::class,'GetTecnicos'])->name('combobox.tecnicos');
+    Route::get('combobox/vehiculo/economico',[ComboboxController::class,'GetVehiculoEconomico'])->name('combobox.vehiculo.economico');
+    Route::get('combobox/vehiculo/placas',[ComboboxController::class,'GetVehiculoPlacas'])->name('combobox.vehiculo.placas');
+    Route::get('combobox/ubicaciones',[ComboboxController::class,'GetUbicaciones'])->name('combobox.ubicaciones.lista');
 
-    Route::get('vehiculo/get/datos',[VehiculoController::class,'GetDatos'])->name('Vehiculo.Get.Datos');
-    Route::get('vehiculo/get/image',[VehiculoController::class,'GetImage'])->name('Vehiculo.Get.Image');
-    Route::get('vehiculo/find/datos',[VehiculoController::class,'FindDatos'])->name('Vehiculo.Find');
-    Route::post('vehiculo/Create/update',[VehiculoController::class,'CreateOrUpdate'])->name('Vehiculo.CreateOrUpdate');
-    Route::get('Admin/Caja',[CajaController::class,'View'])->name('Admin.Caja');
-    Route::get('Admin/Caja/Read',[CajaController::class,'Read'])->name('Admin.Caja.Read');
+    Route::get('vehiculo/get/datos',[VehiculoController::class,'GetDatos'])->name('vehiculo.get.datos');
+    Route::get('vehiculo/get/image',[VehiculoController::class,'GetImage'])->name('vehiculo.get.image');
+    Route::get('vehiculo/find/datos',[VehiculoController::class,'FindDatos'])->name('vehiculo.find');
+    Route::post('vehiculo/create/update',[VehiculoController::class,'CreateOrUpdate'])->name('vehiculo.createorupdate');
+    Route::get('admin/caja',[CajaController::class,'View'])->name('admin.caja');
+    Route::get('admin/caja/read',[CajaController::class,'Read'])->name('admin.caja.read');
   });
   
   Route::get('migrar/caja',[MigrateDataBaseOld::class,'migrateCaja']);
@@ -136,3 +136,8 @@ Route::get('/test-browser', function () {
     }
 
 });
+
+// Ruta temporal para previsualizar directamente la Blade del PDF.
+Route::get('/pdf/recepcion-demo', function () {
+    return app(PdfController::class)->RecepcionVehicular(11, true);
+})->name('pdf.recepcion.demo');

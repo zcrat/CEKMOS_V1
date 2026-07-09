@@ -40,7 +40,7 @@ const params = reactive({ search: debouncedSearch });
     <template #content>
         <Pagination 
             v-model="items"
-            :api="'Admin.Caja.Read'"
+            :api="'admin.caja.read'"
             :params="params"
         />
         <Table v-if="items.length >= 1" :titles="[

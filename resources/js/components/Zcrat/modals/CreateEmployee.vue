@@ -33,7 +33,7 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
       Create(Employee).then((res)=>{
         if(res.status){
           emit('close')
-          window.location.href=route('Presupuesto.Editar',{presupuesto:res.data.id});
+          window.location.href=route('presupuesto.editar',{presupuesto:res.data.id});
         }else{
           if(res.code===422){
             console.error('Error de validacion al crear el presupuesto');
@@ -72,7 +72,7 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
       <InputBasic id="rfc" label="RFC" type="text" v-model="Employee.rfc" />
       <Select2 :new_option="regimen_fiscal" 
         label="Regimen Fiscal" 
-        endpoint="Select2.Regimenes.Fiscales" 
+        endpoint="select2.regimenes.fiscales"
         v-model="Employee.regimen_fiscal" 
         id="regimen_fiscal" 
         placeholder="Buscar Regimen"

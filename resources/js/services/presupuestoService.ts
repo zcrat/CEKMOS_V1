@@ -5,7 +5,7 @@ export const getDatosPresupuesto = async (
   signal: AbortSignal
 ) => {
   try {
-    const response = await axios.get(route('Presupuesto.Get.Data_Orden'), {
+    const response = await axios.get(route('presupuesto.get.data_orden'), {
       params: { orden_servicio },
       signal,
     });

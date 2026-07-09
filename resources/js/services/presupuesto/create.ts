@@ -2,7 +2,7 @@ import axios from 'axios';
 import { NuevoPresupuesto } from '@/types/generales';
 const Create = async (data:NuevoPresupuesto) => {
   try {
-    const response = await axios.get(route('Presupuesto.Get.Data_Orden'),{params:{...data} })
+    const response = await axios.get(route('presupuesto.get.data_orden'),{params:{...data} })
     return { status: true, code: 200, data: response.data };
   } catch (error: any) {
     const status = error.response?.status ?? 0;

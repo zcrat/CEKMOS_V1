@@ -6,7 +6,7 @@ export const getVehiculoDatos = async (
   signal: AbortSignal
 ) => {
   try {
-    const response = await axios.get(route('Vehiculo.Get.Datos'), {
+    const response = await axios.get(route('vehiculo.get.datos'), {
       params: { filter, value },
       signal,
     });

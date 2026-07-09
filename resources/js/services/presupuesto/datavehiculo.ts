@@ -6,7 +6,7 @@ export const GetDatosVehiculo = async (filter:string,value:string) => {
   abortgetvehiculo.value = new AbortController();
 
   try {
-    const Vehiculo:Vehiculo|null = await axios.get(route('Vehiculo.Get.Datos'),{params:{filter,value},signal: abortgetvehiculo.value?.signal, })
+    const Vehiculo:Vehiculo|null = await axios.get(route('vehiculo.get.datos'),{params:{filter,value},signal: abortgetvehiculo.value?.signal, })
     if(Vehiculo){
       cancelgetvehiculodata = true;
       if(filter==='economico') presupuesto.placas=Vehiculo.placas;

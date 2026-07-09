@@ -38,17 +38,17 @@ const logout = () => {
             <Dropdown :align="'left-up'" width="48" classtrigger="w-full" classcontent="w-full" v-if="canAny(['ver_presupuestos','ver_recepciones_vehiculares'])">
                 <template #trigger>
                     <ButtonLink 
-                        :active="route().current('Cortana.Presupuesto.Vista') || route().current('RecepcionesVehiculares.Vista')"  
+                        :active="route().current('cortana.presupuesto.vista') || route().current('recepcionesvehiculares.vista')"
                         class="ms-2 gap-x-1 w-full text-white">
                         <font-awesome-icon icon="fa-solid fa-table-list" />
                         <span>&nbsp;Ordenes</span></ButtonLink>
                 </template>
                 
                 <template #content>
-                    <DropdownLink v-if="can('ver_presupuestos')" :href="route('Cortana.Presupuesto.Vista')">
+                    <DropdownLink v-if="can('ver_presupuestos')" :href="route('cortana.presupuesto.vista')">
                         Presupuestos
                     </DropdownLink>
-                    <DropdownLink v-if="can('ver_recepciones_vehiculares')" :href="route('RecepcionesVehiculares.Vista')">
+                    <DropdownLink v-if="can('ver_recepciones_vehiculares')" :href="route('recepcionesvehiculares.vista')">
                         Recepciones Vehiculares
                     </DropdownLink>
                 </template>
@@ -62,7 +62,7 @@ const logout = () => {
             >
                 <template #trigger>
                     <ButtonLink 
-                        :active="route().current('Admin.Caja') "  
+                        :active="route().current('admin.caja')"
                         class="ms-2 gap-x-1 w-full text-white"
                     >
                     <font-awesome-icon icon="fa-solid fa-user-gear " />
@@ -70,7 +70,7 @@ const logout = () => {
                 </template>
                 
                 <template #content>
-                    <DropdownLink v-if="can('administrar_caja')" :href="route('Admin.Caja')">
+                    <DropdownLink v-if="can('administrar_caja')" :href="route('admin.caja')">
                         Caja Movimientos
                     </DropdownLink>
                 </template>

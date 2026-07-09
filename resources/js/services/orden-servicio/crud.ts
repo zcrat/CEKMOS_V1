@@ -69,7 +69,7 @@ export const CreateorUpdate = async (data: OrdenServicioForm): Promise<responseB
       }
     }
     const response = await axios.post(
-      data.id? route( 'RecepcionesVehiculares.Update'): route( 'RecepcionesVehiculares.Create'),
+      data.id? route('recepcionesvehiculares.update'): route('recepcionesvehiculares.create'),
       formData,
       {
         headers: {

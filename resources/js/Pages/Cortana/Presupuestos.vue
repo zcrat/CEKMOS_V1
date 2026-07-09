@@ -50,7 +50,7 @@ const orderBy=ref<null|OrderKeyProp>(null)
                 
         </template>
         <template #content>
-            <Pagination api="Cortana.Presupuesto.Items" :params="{'search':search,'estatus':estatus}" :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
+            <Pagination api="cortana.presupuesto.items" :params="{'search':search,'estatus':estatus}" :currentPage="currentPage" :itemsPerPage="itemsPerPage" :totalPages="totalPages" :totalItems="totalItems"/>
             <Table v-if="items.length>=0" 
                 v-model:OrderKey="orderBy"
                 :titles="[
