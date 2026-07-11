@@ -25,69 +25,72 @@
                 default => '<i class="fa-regular fa-square"></i>'
             };
         }
+        function celda($encabezado,$texto,$w=100,$tipo=3){
+            return match ($tipo) {
+                 1 => '<div class="celda1 w-'.$w.'"><p class="texto-celda"><span class="encabezado-celda">'.$encabezado.': </span>'.$texto.'</p></div>',
+                 2 => '<div class="celda2"><span class="encabezado-celda">'.$encabezado.': </span><p class="texto-celda">'.$texto.'</p></div>',
+                 default=>'<div class="celda3  w-'.$w.'"><span class="encabezado-celda">'.$encabezado.': </span><p class="texto-celda">'.$texto.'</p></div>'
+            };
+        }
     @endphp
     <div class="flex flex-col gap-2 w-full h-full">
-        <div class="flex flex-col gap-2 h-30">
-            <div class="flex flex-row">
-                <div class="contenedor_title"><h1>REPORTE DE RECEPCION DE VEHICULO</h1></div>
-            </div>
-            <div class="flex justify-between gap-2 flex-1">
-                <div class="w-80 gap-1 flex-col flex h-full">
-                    <div class="contedor_bordes h-87">
-                        <div class="renglon h-23"> 
-                            <h3 class="celda w-45"><span>Nombre:</span>{{$empresa['nombre']}}</h3>
-                            <h3 class="celda w-35"><span>Cliente/Zona/Usuario:</span>{{$datos['cliente']}}</h3>
-                            <h3 class="celda flex-1"><span>Ord. Seguimiento: </span>{{$datos['seguimiento']}}</h3>
-                        </div>
-                        <div class="renglon h-12"> 
-                            <h3 class="celda"><span>Direccion:</span>{{$empresa['calle']}}</h3>
-                        </div>
-                        <div class="renglon h-20"> 
-                            <h3 class="celda w-20"><span>Ciudad:</span>{{$empresa['ciudad']}}</h3>
-                            <h3 class="celda w-20"><span>Estado:</span>{{$empresa['estado']}}</h3>
-                            <h3 class="celda w-20"><span>CP:</span>{{$empresa['cp']}}</h3>
-                            <h3 class="celda w-20"><span>Tel. Negocio:</span>{{$empresa['negocio']}}</h3>
-                            <h3 class="celda"><span>Tel. Casa: </span>{{$empresa['casa']}}</h3>
-                        </div>
-                        <div class="renglon h-16"> 
-                            <h3 class="celda w-40"><span>Email:</span>{{$empresa['email']}}</h3>
-                            <h3 class="celda w-20"><span>Tel. Celular:</span>{{$datos['telefono']}}</h3>
-                            <h3 class="celda w-20"><span>Gas Entrada:</span>{{$entrada['gasolina']}}</h3>
-                            <h3 class="celda"><span>Gas Salida:</span>{{$salida['gasolina']}}</h3>
-                        </div>
-                        <div class="renglon h-17"> 
-                            <h3 class="celda w-12"><span>Año: </span>{{$vehiculo['anio']}}</h3>
-                            <h3 class="celda w-14"><span>Marca: </span>{{$vehiculo['marca']}}</h3>
-                            <h3 class="celda w-14"><span>Modelo: </span>{{$vehiculo['modelo']}}</h3>
-                            <h3 class="celda w-20"><span>Color: </span>{{$vehiculo['color']}}</h3>
-                            <h3 class="celda w-20"><span>Economico: </span>{{$vehiculo['economico']}}</h3>
-                            <h3 class="celda"><span>Placas: </span>{{$vehiculo['placas']}}</h3>
-                        </div>
-                        <div class="renglon h-12  last"> 
-                            <h3 class="celda w-26"><span>Km Entrada: </span>{{$entrada['kilometraje']}}</h3>
-                            <h3 class="celda w-25"><span>Km Salida: </span>{{$salida['kilometraje']}}</h3>
-                            <h3 class="celda"><span>Vin: </span>{{$vehiculo['vin']}}</h3>
-                        </div>
+        <div class="contenedor_title"><h1>REPORTE DE RECEPCION DE VEHICULO</h1></div>
+        <div class="flex justify-between gap-2 h-30">
+            <div class="w-80 gap-1 flex-col flex h-full">
+                <div class="contedor_bordes h-87">
+                    <div class="renglon h-23">
+                        {!!celda('Nombre',$empresa['nombre'],45,1)!!}
+                        {!!celda('Cliente/Zona/Usuario',$datos['cliente'],35,1)!!}
+                        {!!celda('Ord. Seguimiento:',$datos['seguimiento'],20)!!}
                     </div>
-                    <div class="contedor_bordes flex-1 gap-1 flex flex-row text-08 justify-around items-center">
-                        <span>D = Dañado</span>
-                        <span>O = Operacional</span>
-                        <span>F = Falta Objeto</span>
-                        <span><i class="fa-solid fa-check"></i> = Sin Daño</span>
-                        <span>R = Ocupa Reparacion</span>
-                        <span>NA = No Aplica</span>
+                    <div class="renglon h-12"> 
+                        {!!celda('Email',$empresa['email'],100,2)!!}
+                    </div>
+                    <div class="renglon h-20"> 
+                        {!!celda('Ciudad',$empresa['ciudad'],20)!!}
+                        {!!celda('Estado',$empresa['estado'],20)!!}
+                        {!!celda('Codigo Postal',$empresa['cp'],20)!!}
+                        {!!celda('Direccion',$empresa['calle'],40)!!}
+                    </div>
+                    <div class="renglon h-16"> 
+                        {!!celda('Tel. Negocio',$empresa['negocio'],20)!!}
+                        {!!celda('Tel. Casa',$empresa['casa'],20)!!}
+                        {!!celda('Tel. Celular',$datos['telefono'],20)!!}
+                        {!!celda('Gas Entrada',$entrada['gasolina'],20)!!}
+                        {!!celda('Gas Salida',$salida['gasolina'],20)!!}
+                    </div>
+                    <div class="renglon h-17"> 
+                        {!!celda('Anio',$vehiculo['anio'],12)!!}
+                        {!!celda('Marca',$vehiculo['marca'],14)!!}
+                        {!!celda('Modelo',$vehiculo['modelo'],14)!!}
+                        {!!celda('Color',$vehiculo['color'],20)!!}
+                        {!!celda('Economico',$vehiculo['economico'],20)!!}
+                        {!!celda('Placas',$vehiculo['placas'],20)!!}
+                    </div>
+                    <div class="renglon h-12  last"> 
+                        {!!celda('Km Entrada',$entrada['kilometraje'],26,2)!!}
+                        {!!celda('Km Salida',$salida['kilometraje'],25,2)!!}
+                        {!!celda('Vin',$vehiculo['vin'],49,2)!!}
                     </div>
                 </div>
-                <div class="flex-1 h-full flex flex-col">
-                    <div class="contedor_bordes flex-1"> 
-                        <div class="renglon h-10"><h3 class="celda"><span>No:</span>{{$datos['orden']}}</h3></div>
-                        <div class="renglon h-15"><h3 class="celda"><span>Ubicacion:{{$datos['ubicacion']}}</span></h3></div>
-                        <div class="renglon h-15"><h3 class="celda"><span>Entrada:{{$entrada['fecha']}}</span></h3></div>
-                        <div class="renglon h-15"><h3 class="celda"><span>Recibido:{{$datos['usuario']}}</span></h3></div>
-                        <div class="renglon h-15"><h3 class="celda"><span>Compromiso:{{$entrada['estimacion']}}</span></h3></div>
-                        <div class="renglon h-15"><h3 class="celda"><span>Salida: </span>{{$salida['fecha']}}</h3></div>
-                        <div class="renglon last "><h3 class="celda"><span>Tecnico: </span>{{$datos['tecnico']}}</h3></div>
-                    </div>
+                <div class="contedor_bordes flex-1 gap-1 flex flex-row text-08 justify-around items-center">
+                    <span>D = Dañado</span>
+                    <span>O = Operacional</span>
+                    <span>F = Falta Objeto</span>
+                    <span><i class="fa-solid fa-check"></i> = Sin Daño</span>
+                    <span>R = Ocupa Reparacion</span>
+                    <span>NA = No Aplica</span>
+                </div>
+            </div>
+            <div class="flex-1 h-full flex flex-col">
+                <div class="contedor_bordes flex-1"> 
+                    <div class="renglon h-10">{!!celda('No',$datos['orden'],100,2)!!}</div>
+                    <div class="renglon h-15">{!!celda('Ubicacion',$datos['ubicacion'],100)!!}</div>
+                    <div class="renglon h-15">{!!celda('Entrada',$entrada['fecha'],100)!!}</div>
+                    <div class="renglon h-15">{!!celda('Recibido',$datos['usuario'],100,1)!!}</div>
+                    <div class="renglon h-15">{!!celda('Compromiso',$entrada['estimacion'],100)!!}</div>
+                    <div class="renglon h-15">{!!celda('Salida',$salida['fecha'],100)!!}</div>
+                    <div class="renglon last ">{!!celda('Tecnico',$datos['tecnico'],100)!!}</div>
                 </div>
             </div>
         </div>
