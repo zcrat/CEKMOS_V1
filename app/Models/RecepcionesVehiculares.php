@@ -27,22 +27,22 @@ class RecepcionesVehiculares extends Model
 
     public function interiores()
     {
-        return $this->hasOne(InterioresOrdenServicio::class, 'recepcion_vehicular_id');
+        return $this->hasOne(InterioresRV::class, 'recepcion_vehicular_id');
     }
 
     public function exteriores()
     {
-        return $this->hasOne(ExterioresOrdenServicio::class, 'recepcion_vehicular_id');
+        return $this->hasOne(ExterioresRV::class, 'recepcion_vehicular_id');
     }
 
     public function inventario()
     {
-        return $this->hasOne(InventarioOrdenServicio::class, 'recepcion_vehicular_id');
+        return $this->hasOne(InventarioRV::class, 'recepcion_vehicular_id');
     }
 
     public function condiciones_pintura()
     {
-        return $this->hasOne(CondicionesPinturaOrdenServicio::class, 'recepcion_vehicular_id');
+        return $this->hasOne(CondicionesPinturaRV::class, 'recepcion_vehicular_id');
     }
 
     public function archivos()

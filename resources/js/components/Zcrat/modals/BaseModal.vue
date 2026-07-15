@@ -4,6 +4,7 @@ import type { buttonconfirmed } from '@/types/modals'
 import {
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogOverlay,
   DialogPortal,
   DialogRoot,
@@ -17,6 +18,7 @@ const props = withDefaults(defineProps<{
   textLoading?: string
   buttonconfirm?: buttonconfirmed
   modaltitle?: string
+  modaldescription?: string
   position?: 'start' | 'center' | 'end'
   z?: 'z-[50]' | 'z-[999]' 
 }>(), {
@@ -54,6 +56,9 @@ const classtitleposition = computed(() => ({
       <DialogContent 
       :class="['fixed inset-0 flex items-center justify-center',z??'' ]" >
         <div class=" relative max-w-screen w-fit m-2 px-4 bg-white rounded-xl shadow-xl max-h-[90vh] overflow-auto">
+          <DialogDescription class="sr-only">
+            {{ modaldescription ?? modaltitle ?? 'Ventana de dialogo' }}
+          </DialogDescription>
           <div v-if="modaltitle" class="flex justify-between items-center pt-3 pb-3 sticky top-0 z-10 bg-white">
           <DialogTitle
           

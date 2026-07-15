@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-class InventarioOrdenServicio extends Model
+class InventarioRV extends Model
 {
-    protected $table = 'inventario_orden_servicios';
+    protected $table = 'inventario_rv';
     public $timestamps=false;
     protected $fillable = [
         'recepcion_vehicular_id',

@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Events\OrdenServicioEvents;
 use App\Http\Controllers\Controller;
 use App\Models\Archivos;
-use App\Models\CondicionesPinturaOrdenServicio;
+use App\Models\CondicionesPinturaRV;
 use App\Models\DatosEntrada;
-use App\Models\ExterioresOrdenServicio;
-use App\Models\InterioresOrdenServicio;
-use App\Models\InventarioOrdenServicio;
+use App\Models\ExterioresRV;
+use App\Models\InterioresRV;
+use App\Models\InventarioRV;
 use App\Models\OrdenesServicio;
 use App\Models\Presupuestos;
 use App\Models\RecepcionesVehiculares;
@@ -41,7 +41,7 @@ class RecepcionVehicularController extends Controller
         $currentPage=$request->currentPage ?? 1;
         $itemsPerPage=$request->itemsPerPage ?? 10;
         
-        $query=OrdenesServicio::query()->with(['last_seguimiento','vehiculo.modelo.marca','empresa','ubicacion','recepcion_vehicular']);
+        $query=OrdenesServicio::query()->with(['last_seguimiento','vehiculo.modelo.marca','empresa','ubicacion','recepcion_vehicular'])->whereHas('recepcion_vehicular');
         
         if(!$user->hasRole('Super Admin')){
             $user->load('modulos_orden');
@@ -53,6 +53,7 @@ class RecepcionVehicularController extends Controller
         $totalItems=$query->total();
         $items = $query->map(fn($item) => [
             'id' => $item->id,
+            'rv_id' => $item->recepcion_vehicular->id,
             'orden' => $item->orden_servicio,
             'seguimiento' => $item->orden_seguimiento,
             'ubicacion' => optional($item->ubicacion)->nombre ?? null,
@@ -73,9 +74,168 @@ class RecepcionVehicularController extends Controller
         ]);
 
         $totalPages=ceil($totalItems/$itemsPerPage);
-        return response()->json(
-            compact('currentPage', 'itemsPerPage', 'totalPages', 'totalItems', 'items')
-        );
+        return response()->json(compact('currentPage', 'itemsPerPage', 'totalPages', 'totalItems', 'items'));
+
+    }
+    public function ReadOne(Request $request){
+        $request->validate([
+            'id'=>['required','exists:ordenes_servicio,id']
+        ]);
+        $ordenservicio=OrdenesServicio::with( [
+                'interiores', 
+                'exteriores', 
+                'inventario', 
+                'condiciones_pintura',
+                'recepcion_vehicular',
+                'empresa',
+                'cliente',
+                'vehiculo',
+                'vehiculo_concepto',
+                'entrada',
+                'responsables.administrador_transporte',
+                'responsables.jefe_de_proceso',
+                'responsables.trabajador',
+                'responsables.tecnico',
+                'archivos'
+            ])->find($request->id);
+        
+        $responsables=$ordenservicio->responsables;
+        $condicionespintura=$ordenservicio->condiciones_pintura;
+        $inventariobase=$ordenservicio->inventario;
+        $interioresbase=$ordenservicio->interiores;
+        $exterioresbase=$ordenservicio->exteriores;
+
+        $generales=[
+            'id'=>$ordenservicio->id,
+            'orden_seguimiento'=>$ordenservicio->orden_seguimiento,
+            'orden_opcional'=>$ordenservicio->orden_opcional ?? '',
+            'ubicacion'=>$ordenservicio->ubicacion->nombre ,
+            'tipo_id'=>$ordenservicio->tipo_id,
+            'modulo_orden'=>$ordenservicio->modulo_orden_id,
+            'vehiculo'=>[
+                'value' => $ordenservicio->vehiculo_id,
+                'label'=>$ordenservicio->vehiculo ? 
+                ($ordenservicio->vehiculo->economico . ' - ' . $ordenservicio->vehiculo->placas): 'Desconocido', 
+            ],
+            'vehiculo_concepto_id'=>[
+                'value' => $ordenservicio->vehiculo_concepto_id,
+                'label'=>optional($ordenservicio->vehiculo_concepto)->descripcion ?? 'Desconocido',
+            ],
+            'empresa'=>[
+                'value' => $ordenservicio->empresa_id,
+                'label'=>optional($ordenservicio->empresa)->nombre ?? 'Desconocido',
+            ],
+            'cliente'=>[
+                'value' => $ordenservicio->cliente_id,
+                'label'=>optional($ordenservicio->cliente)->nombre ?? 'Desconocido',
+            ],
+            'estimacion'=>$ordenservicio->entrada->estimacion ?? null,
+            'kilometraje'=>$ordenservicio->entrada->kilometraje,
+            'gasolina'=>$ordenservicio->entrada->gasolina,
+            'telefono'=>$ordenservicio->telefono,
+            'administrador'=>optional($responsables->administrador_transporte)->nombre ?? null,
+            'jefe'=>optional($responsables->jefe_de_proceso)->nombre ?? null,
+            'trabajador'=>optional($responsables->trabajador)->nombre ?? null,
+            'tecnico'=>optional($responsables->tecnico)->nombre ?? null,
+            'descripcion_mo'=>$ordenservicio->fallas_reportadas,
+            'indicaciones_cliente'=>$ordenservicio->recepcion_vehicular->indicaciones_cliente ?? '',
+            'cambiar_archivos'=>$ordenservicio->recepcion_vehicular->cambiar_archivos ?? false,
+        ];
+
+
+        $pintura=[
+            'decolorada'=>(bool)$condicionespintura->decolorada ,
+            'color_desigual'=>(bool)$condicionespintura->color_no_igual ,
+            'rayones'=>(bool)$condicionespintura->exeso_rayones ,
+            'grietas'=>(bool)$condicionespintura->pequenias_grietas ,
+            'golpes'=>(bool)$condicionespintura->carroceria_golpes , 
+            'emblemas'=>(bool)$condicionespintura->emblemas_completos , 
+            'logos'=>(bool)$condicionespintura->logos ,
+            'rociado'=>(bool)$condicionespintura->exeso_rociado , 
+            'granizo'=>(bool)$condicionespintura->danios_granizado , 
+            'lluvia'=>(bool)$condicionespintura->lluvia_acido  
+        ];
+        $inventario=[
+            'llanta'=>(bool)$inventariobase->llanta,
+            'cables'=>(bool)$inventariobase->cables_corriente,
+            'estuche'=>(bool)$inventariobase->estuche_herramientas,
+            'llave_tuerca'=>(bool)$inventariobase->llave_tuercas,
+            'triangulo'=>(bool)$inventariobase->triangulo_seguridad,
+            'tarjeta_circulacion'=>(bool)$inventariobase->tarjeta_circulacion,
+            'cubreruedas'=>(bool)$inventariobase->cubreruedas,
+            'candado_rueda'=>(bool)$inventariobase->candado_rueda,
+            'extinguidor'=>(bool)$inventariobase->extinguidor,
+            'gato'=>(bool)$inventariobase->gato,
+            'placas'=>(bool)$inventariobase->placas,
+        ];
+        $interiores=[
+            'puerta_izq_f'=> $interioresbase->puerta_interior_frontal,
+            'puerta_izq_t'=> $interioresbase->puerta_interior_trasera,
+            'puerta_der_f'=> $interioresbase->puerta_delantera_frontal,
+            'puerta_der_t'=> $interioresbase->puerta_delantera_trasera,
+            'asiento_izq_f'=> $interioresbase->asiento_interior_frontal,
+            'asiento_izq_t'=> $interioresbase->asiento_interior_trasera,
+            'asiento_der_f'=> $interioresbase->asiento_delantera_frontal,
+            'asiento_der_t'=> $interioresbase->asiento_delantera_trasera,
+            'consola'=> $interioresbase->consola_central,
+            'claxon'=> $interioresbase->claxon,
+            'tablero'=> $interioresbase->tablero,
+            'quemacocos'=> $interioresbase->quemacocos,
+            'toldo'=> $interioresbase->toldo,
+            'elevadores'=> $interioresbase->elevadores_eletricos,
+            'luces'=> $interioresbase->luces_interiores,
+            'seguros'=> $interioresbase->seguros_eletricos,
+            'climatizador'=> $interioresbase->climatizador,
+            'radio'=> $interioresbase->radio,
+            'retrovisor'=> $interioresbase->espejos_retrovizor,
+            'tapetes'=> $interioresbase->tapetes,
+        ];
+        $exteriores=[
+            'antena_radio'=> $exterioresbase->antena_radio,
+            'estribos'=> $exterioresbase->estribos,
+            'antena_telefono'=> $exterioresbase->antena_telefono,
+            'guardafangos'=> $exterioresbase->guardafangos,
+            'antena_cb'=> $exterioresbase->antena_cb,
+            'parabrisas'=> $exterioresbase->parabrisas,
+            'alarma'=> $exterioresbase->sistema_alarma,
+            'limpiaparabrisas'=> $exterioresbase->limpia_parabrisas,
+            'luces'=> $exterioresbase->luces_exteriores,
+            'espejos_laterales'=> $exterioresbase->espejos_laterales
+        ];
+        $archivos=$ordenservicio->archivos;
+
+
+        $pathcarro     = RutasArchivo::where('tipo_id', 26)->where('estatus_id', 21)->first();
+        $pathfirma     = RutasArchivo::where('tipo_id', 25)->where('estatus_id', 21)->first();
+        $pathevidencia = RutasArchivo::where('tipo_id', 63)->where('estatus_id', 21)->first();
+
+        $carro     = $archivos->where('tipo_id', 26)->where('estatus_id', 21)->first();
+        $firma     = $archivos->where('tipo_id', 25)->where('estatus_id', 21)->first();
+        $evidencia = $archivos->where('tipo_id', 63)->where('estatus_id', 21)->values();
+
+        $urls = [];
+
+        if ($pathcarro && $carro) {
+            $urls['carro'] = ['id' => $carro->id, 'url' => Storage::disk($pathcarro->disk)->url($pathcarro->folder . '/' . $carro->nombre)];
+        } else {
+            $urls['carro'] = null;
+        }
+
+        if ($pathfirma && $firma) {
+            $urls['firma'] = ['id' => $firma->id, 'url' => Storage::disk($pathfirma->disk)->url($pathfirma->folder . '/' . $firma->nombre)];
+        } else {
+            $urls['firma'] = null;
+        }
+
+        if ($pathevidencia && $evidencia->isNotEmpty()) {
+            $urls['evidencia'] = $evidencia->map(function ($item) use ($pathevidencia) {
+                return ['id' => $item->id, 'url' => Storage::disk($pathevidencia->disk)->url($pathevidencia->folder . '/' . $item->nombre)
+                    ];
+            })->toArray();
+        } else {
+            $urls['evidencia'] = [];
+        }
+        return response()->json(compact('generales', 'pintura', 'interiores', 'exteriores', 'inventario', 'urls'));
     }
     public function Create(Request $request){
         $user=Auth::user()->load('modulos_orden');
@@ -90,7 +250,7 @@ class RecepcionVehicularController extends Controller
             'empresa_id'=>['required','exists:empresas,id'],
             'cliente_id'=>['required','exists:clientes,id'],
             'vehiculo_id'=>['required','exists:vehiculos,id'],
-            'telefono'=>['required','integer','digits:10'],
+            'telefono'=>['required','regex:/^(?:\d-?){9}\d$/'],
             'estimacion'=>['required','date'],
             'kilometraje'=>['required','integer','min:0'],
             'gasolina'=>['required','exists:niveles_combustible,id'],
@@ -200,7 +360,7 @@ class RecepcionVehicularController extends Controller
                 'cambiar_archivos'=>false,
                 'indicaciones_cliente'=>$request->indicaciones_cliente ?? '',
             ]);
-            InterioresOrdenServicio::create([
+            InterioresRV::create([
                 'recepcion_vehicular_id'=>$recepcionVehicular->id,
                 'puerta_interior_frontal'=>$request->condiciones_interiores['puerta_izq_f'],
                 'puerta_interior_trasera'=>$request->condiciones_interiores['puerta_izq_t'],
@@ -223,7 +383,7 @@ class RecepcionVehicularController extends Controller
                 'radio'=>$request->condiciones_interiores['radio'],
                 'espejos_retrovizor'=>$request->condiciones_interiores['retrovisor'],
             ]);
-            ExterioresOrdenServicio::create([
+            ExterioresRV::create([
                 'recepcion_vehicular_id'=>$recepcionVehicular->id,
                 'antena_radio'=>$request->condiciones_exteriores['antena_radio'],
                 'antena_telefono'=>$request->condiciones_exteriores['antena_telefono'],
@@ -236,7 +396,7 @@ class RecepcionVehicularController extends Controller
                 'limpia_parabrisas'=>$request->condiciones_exteriores['limpiaparabrisas'],
                 'luces_exteriores'=>$request->condiciones_exteriores['luces'],
             ]);
-            InventarioOrdenServicio::create([
+            InventarioRV::create([
                 'recepcion_vehicular_id'=>$recepcionVehicular->id,
                 'llanta'=>$request->inventario['llanta'],
                 'cubreruedas'=>$request->inventario['cubreruedas'],
@@ -251,7 +411,7 @@ class RecepcionVehicularController extends Controller
                 'placas'=>$request->inventario['placas'],
             ]);
 
-            CondicionesPinturaOrdenServicio::create([
+            CondicionesPinturaRV::create([
                 'recepcion_vehicular_id'=>$recepcionVehicular->id,
                 'decolorada'=>$request->pintura['decolorada'],
                 'emblemas_completos'=>$request->pintura['emblemas'],
@@ -328,14 +488,14 @@ class RecepcionVehicularController extends Controller
         $user=Auth::user()->load('modulos_orden');
         $rulesExtra =(new InventarioYCondicionesEquipo)->rulesbasic();
         $validator=Validator::make($request->all(),[
-            'id'=>['required','exists:clientes,id'],
+            'id'=>['required','exists:ordenes_servicio,id'],
             'orden_seguimiento'=>['required','string','max:20',Rule::unique('ordenes_servicio','orden_seguimiento')->ignore($request->id)],
             'orden_opcional'=>['nullable','string','max:20'],
             'ubicacion'=>['required','string','max:100'],
             'empresa_id'=>['required','exists:empresas,id'],
             'cliente_id'=>['required','exists:clientes,id'],
             'vehiculo_id'=>['required','exists:vehiculos,id'],
-            'telefono'=>['required','integer','digits:10'],
+            'telefono'=>['required','regex:/^(?:\d-?){9}\d$/'],
             'administrador'=>['required','string','max:100'],
             'jefe'=>['required','string','max:100'],
             'trabajador'=>['required','string','max:100'],
@@ -420,7 +580,7 @@ class RecepcionVehicularController extends Controller
                 'indicaciones_cliente'=>$request->indicaciones_cliente ?? '',
             ]);
 
-            InterioresOrdenServicio::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
+            InterioresRV::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
                 'puerta_interior_frontal'=>$request->condiciones_interiores['puerta_izq_f'],
                 'puerta_interior_trasera'=>$request->condiciones_interiores['puerta_izq_t'],
                 'puerta_delantera_frontal'=>$request->condiciones_interiores['puerta_der_f'],
@@ -442,7 +602,7 @@ class RecepcionVehicularController extends Controller
                 'radio'=>$request->condiciones_interiores['radio'],
                 'espejos_retrovizor'=>$request->condiciones_interiores['retrovisor'],
             ]);
-            ExterioresOrdenServicio::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
+            ExterioresRV::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
                 'antena_radio'=>$request->condiciones_exteriores['antena_radio'],
                 'antena_telefono'=>$request->condiciones_exteriores['antena_telefono'],
                 'antena_cb'=>$request->condiciones_exteriores['antena_cb'],
@@ -454,7 +614,7 @@ class RecepcionVehicularController extends Controller
                 'limpia_parabrisas'=>$request->condiciones_exteriores['limpiaparabrisas'],
                 'luces_exteriores'=>$request->condiciones_exteriores['luces'],
             ]);
-            InventarioOrdenServicio::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
+            InventarioRV::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
                 'llanta'=>$request->inventario['llanta'],
                 'cubreruedas'=>$request->inventario['cubreruedas'],
                 'cables_corriente'=>$request->inventario['cables'],
@@ -468,7 +628,7 @@ class RecepcionVehicularController extends Controller
                 'placas'=>$request->inventario['placas'],
             ]);
 
-            CondicionesPinturaOrdenServicio::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
+            CondicionesPinturaRV::updateOrCreate(['recepcion_vehicular_id'=>$recepcionVehicular->id],[
                 'decolorada'=>$request->pintura['decolorada'],
                 'emblemas_completos'=>$request->pintura['emblemas'],
                 'color_no_igual'=>$request->pintura['color_desigual'],

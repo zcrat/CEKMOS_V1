@@ -30,6 +30,7 @@ export interface presupuestos{
 }
 export interface RecepcionesVehiculares{
   id:number;
+  rv_id:number 
   orden:string;
   seguimiento:string;
   ubicacion:string;

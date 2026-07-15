@@ -410,7 +410,7 @@ function SetStrokes(val: StrokesArray) {
   currentStroke.value = val.currentStroke
   redraw()
 }
-watch([props.CanEdit,props.image],async ()=>{
+watch([() => props.CanEdit, () => props.image],async ()=>{
   if(props.image && props.CanEdit){
     await nextTick();
     dibujarImagen(props.image,false)

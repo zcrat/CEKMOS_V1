@@ -51,15 +51,17 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
       Route::get('cortana/presupuestos',[CortanaController::class,'PresupuestosVista'])->name('cortana.presupuesto.vista');
       Route::get('cortana/get/presusupuestos',[CortanaController::class,'GetItems'])->name('cortana.presupuesto.items');
       Route::get('cortana/get/ordenes-servicio',[CortanaController::class,'GetOrdenesServicio'])->name('cortana.ordenservicio.items');
-      Route::put('cortana/orden/toggle/files_upload',[CortanaController::class,'ToggleFilesRecepcionVehicular'])->name('cortana.orden.toggle.upload.files');
       Route::get('presupuesto/get/datos/orden',[PresupuestosController::class,'GetDataPerOrdenServicio'])->name('presupuesto.get.data_orden');
       Route::post('presupuesto/create',[PresupuestosController::class,'CreatePresupuesto'])->name('presupuesto.create');
       });
       
       Route::middleware(['permission:ver_recepciones_vehiculares'])->group(function () {
         Route::get('/recepciones/vehiculares',[RecepcionVehicularController::class,'view'])->name('recepcionesvehiculares.vista');
-      Route::get('/recepciones/vehiculares/read',[RecepcionVehicularController::class,'Read'])->name('recepcionesvehiculares.read');
+        Route::get('/recepciones/vehiculares/read',[RecepcionVehicularController::class,'Read'])->name('recepcionesvehiculares.read');
+        Route::get('/recepciones/vehiculares/read/one',[RecepcionVehicularController::class,'ReadOne'])->name('recepcionvehicular.read');
         Route::get('/pdf/recepciones/vehiculares/{id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.cortana.recepcionvehicular');
+                  Route::patch('/recepciones/vehiculares/toggle/files_upload',[RecepcionVehicularController::class,'ToggleFilesRecepcionVehicular'])->name('recepcionvehicular.toggle.upload.files');
+
       });
       Route::middleware(['permission:recepciones_vehiculares_crear'])->group(function () {
         Route::post('/recepciones/vehiculares/update',[RecepcionVehicularController::class,'Update'])->name('recepcionesvehiculares.update');

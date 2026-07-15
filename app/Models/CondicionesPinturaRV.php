@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-class CondicionesPinturaOrdenServicio extends Model
+class CondicionesPinturaRV extends Model
 {
 
-    protected $table = 'condiciones_pintura_orden_servicios';
+    protected $table = 'condiciones_pintura_rv';
     public $timestamps=false;
     protected $fillable = [
         'recepcion_vehicular_id',

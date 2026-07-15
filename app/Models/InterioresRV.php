@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class InterioresOrdenServicio extends Model
+class InterioresRV extends Model
 {
 
-    protected $table = 'interiores_orden_servicios';
+    protected $table = 'interiores_rv';
     public $timestamps=false;
     protected $fillable = [
         'recepcion_vehicular_id',

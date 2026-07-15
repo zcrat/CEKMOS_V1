@@ -148,9 +148,9 @@ export const ImageCanvas = async({Canvas,FileName}:{Canvas:InstanceType<typeof Z
     
   }
 export const ToggleUploadFiles = async({id,estatus}:{id:number,estatus:boolean})=>{
-    const confirm=await ZdAlert({ title:'Actualizacion de Archivos', text:estatus?'Cancelar que los usuarios cambien, eliminen y agregen archivos a la Orden De Servicio' : 'Permitir que los usuarios cambien, eliminen y agregen archivos a la Orden De Servicio'});
+    const confirm=await ZdAlert({ title:'Actualizacion de Archivos', text:estatus?'Cancelar que los usuarios cambien, eliminen y agregen archivos a la Recepcion Vehicular' : 'Permitir que los usuarios cambien, eliminen y agregen archivos a la Recepcion Vehicular'});
     if(!confirm){return}
-    axios.put(route('cortana.orden.toggle.upload.files'), {'id':id})
+    axios.patch(route('recepcionvehicular.toggle.upload.files'), { id })
     .then(response => {
       const data = response.data.message;
        MyBasicToast.success(data);

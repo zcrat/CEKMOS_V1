@@ -130,16 +130,16 @@ useEcho(
                                         classname:['hover:text-gray-800']
                                     },
                                     {
-                                        label:'Descargar PDF', 
+                                        label:'Ver PDF', 
                                         onClick:()=>{pdf?.Open(row.id)},
                                         classname:['hover:text-gray-800']
                                     },
                                     {
                                         label:((row.cambiar_archivos ? 'Desactivar ' : 'Activar ') + 'Cambios en los Archivos'), 
-                                        onClick:()=>{ToggleUploadFiles({id:row.id,estatus:row.cambiar_archivos})},
+                                        onClick:()=>{ToggleUploadFiles({id:row.rv_id,estatus:row.cambiar_archivos})},
                                         classname:['hover:text-gray-800']
                                     },
-                                ]
+                                ].filter(Boolean)
                                 ,
                                 contentClasses:{
                                     bg:'bg-gray-300'

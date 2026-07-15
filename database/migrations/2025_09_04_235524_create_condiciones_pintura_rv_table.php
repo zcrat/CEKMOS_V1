@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('condiciones_pintura_orden_servicios', function (Blueprint $table) {
+        Schema::create('condiciones_pintura_rv', function (Blueprint $table) {
             $table->id();
             $table->foreignId('recepcion_vehicular_id')->constrained('recepciones_vehiculares');
             $table->boolean('decolorada')->default(false);
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('condiciones_pintura_orden_servicios');
+        Schema::dropIfExists('condiciones_pintura_rv');
     }
 };

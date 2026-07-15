@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('interiores_orden_servicios', function (Blueprint $table) {
+        Schema::create('interiores_rv', function (Blueprint $table) {
             $table->id();
             $table->foreignId('recepcion_vehicular_id')->constrained('recepciones_vehiculares');
             $table->foreignId('puerta_interior_frontal')->constrained('estatus');
@@ -42,6 +42,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('interiores_orden_servicios');
+        Schema::dropIfExists('interiores_rv');
     }
 };

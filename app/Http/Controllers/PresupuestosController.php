@@ -199,10 +199,10 @@ class PresupuestosController extends Controller
             $responsables->trabajador_id = UsuariosTaller::firstOrCreate(['nombre'=>$request->trabajador,'tipo_id'=>1])->id;
             $responsables->tecnico_id = UsuariosTaller::firstOrCreate(['nombre'=>$request->tecnico,'tipo_id'=>1])->id;
 
-            $ExterioresEquipo=new \App\Models\ExterioresOrdenServicio();
-            $EquipoInventario=new \App\Models\InventarioOrdenServicio();
-            $InterioresEquipo=new \App\Models\InterioresOrdenServicio();
-            $CondicionesPintura=new \App\Models\CondicionesPinturaOrdenServicio();
+            $ExterioresEquipo=new \App\Models\ExterioresRV();
+            $EquipoInventario=new \App\Models\InventarioRV();
+            $InterioresEquipo=new \App\Models\InterioresRV();
+            $CondicionesPintura=new \App\Models\CondicionesPinturaRV();
             $recepcionVehicular=RecepcionesVehiculares::create([
                 'orden_servicio_id'=>$ordenservicio->id,
                 'is_ficticia'=>true,

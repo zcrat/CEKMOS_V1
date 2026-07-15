@@ -16,10 +16,10 @@ use App\Models\Ubicaciones;
 use App\Models\NivelesCombustible;
 use App\Models\DatosEntrada;
 use App\Models\DatosSalida;
-use App\Models\InterioresOrdenServicio;
-use App\Models\ExterioresOrdenServicio;
-use App\Models\InventarioOrdenServicio;
-use App\Models\CondicionesPinturaOrdenServicio;
+use App\Models\InterioresRV;
+use App\Models\ExterioresRV;
+use App\Models\InventarioRV;
+use App\Models\CondicionesPinturaRV;
 use App\Models\ResponsablesOrdenServicio;
 use App\Models\Archivos;
 use App\Models\RecepcionesVehiculares;
@@ -102,47 +102,47 @@ class OrdenesDemoSeeder extends Seeder
                 ]);
 
                 // Interiores (2 = sin daño)
-                InterioresOrdenServicio::create([
+                InterioresRV::create([
                     'recepcion_vehicular_id' => $recepcionVehicular->id,
-                    'puerta_interior_frontal' => 2,
-                    'puerta_interior_trasera' => 2,
-                    'puerta_delantera_frontal' => 2,
-                    'puerta_delantera_trasera' => 2,
-                    'asiento_interior_frontal' => 2,
-                    'asiento_interior_trasera' => 2,
-                    'asiento_delantera_frontal' => 2,
-                    'asiento_delantera_trasera' => 2,
-                    'consola_central' => 2,
-                    'claxon' => 2,
-                    'tablero' => 2,
-                    'quemacocos' => 2,
-                    'toldo' => 2,
-                    'elevadores_eletricos' => 2,
-                    'luces_interiores' => 2,
-                    'seguros_eletricos' => 2,
-                    'tapetes' => 2,
-                    'climatizador' => 2,
-                    'radio' => 2,
-                    'espejos_retrovizor' => 2,
+                    'puerta_interior_frontal' => 19,
+                    'puerta_interior_trasera' => 19,
+                    'puerta_delantera_frontal' => 19,
+                    'puerta_delantera_trasera' => 19,
+                    'asiento_interior_frontal' => 19,
+                    'asiento_interior_trasera' => 19,
+                    'asiento_delantera_frontal' => 19,
+                    'asiento_delantera_trasera' => 19,
+                    'consola_central' => 19,
+                    'claxon' => 19,
+                    'tablero' => 19,
+                    'quemacocos' => 19,
+                    'toldo' => 19,
+                    'elevadores_eletricos' => 19,
+                    'luces_interiores' => 19,
+                    'seguros_eletricos' => 19,
+                    'tapetes' => 19,
+                    'climatizador' => 19,
+                    'radio' => 19,
+                    'espejos_retrovizor' => 19,
                 ]);
 
-                // Exteriores (2 = sin daño)
-                ExterioresOrdenServicio::create([
+                // Exteriores (19 = sin daño)
+                ExterioresRV::create([
                     'recepcion_vehicular_id' => $recepcionVehicular->id,
-                    'antena_radio' => 2,
-                    'estribos' => 2,
-                    'antena_telefono' => 2,
-                    'guardafangos' => 2,
-                    'antena_cb' => 2,
-                    'parabrisas' => 2,
-                    'sistema_alarma' => 2,
-                    'limpia_parabrisas' => 2,
-                    'luces_exteriores' => 2,
-                    'espejos_laterales' => 2,
+                    'antena_radio' => 19,
+                    'estribos' => 19,
+                    'antena_telefono' => 19,
+                    'guardafangos' => 19,
+                    'antena_cb' => 19,
+                    'parabrisas' => 19,
+                    'sistema_alarma' => 19,
+                    'limpia_parabrisas' => 19,
+                    'luces_exteriores' => 19,
+                    'espejos_laterales' => 19,
                 ]);
 
                 // Inventario
-                InventarioOrdenServicio::create([
+                InventarioRV::create([
                     'recepcion_vehicular_id' => $recepcionVehicular->id,
                     'llanta' => true,
                     'cubreruedas' => true,
@@ -158,7 +158,7 @@ class OrdenesDemoSeeder extends Seeder
                 ]);
 
                 // Condiciones de pintura (false = no aplica/ok)
-                CondicionesPinturaOrdenServicio::create([
+                CondicionesPinturaRV::create([
                     'recepcion_vehicular_id' => $recepcionVehicular->id,
                     'decolorada' => false,
                     'emblemas_completos' => true,

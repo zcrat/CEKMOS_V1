@@ -86,7 +86,7 @@
   const Read= async (id:number) =>{
     loading.value=true;
     try{
-      const response=await axios.get(route('cortana.ordenservicio.read'),{params:{id}});
+      const response=await axios.get(route('recepcionvehicular.read'),{params:{id}});
       resetvalues.value=false;
       const generales = response.data.generales;
       if (generales.estimacion) {
@@ -108,6 +108,7 @@
       if (error.response) {
         MyBasicToast.error(error.response.data.mensaje || "Error Indefinido.");
       }else {
+        console.error(error.message)
         MyBasicToast.error(error.message || "Error Indefinido.");
       }
       loading.value=false;
@@ -134,7 +135,7 @@
       empresa_id: DetallesGenerales.empresa?.value,
       cliente_id: DetallesGenerales.cliente?.value,
       vehiculo_id: DetallesGenerales.vehiculo?.value,
-      telefono: DetallesGenerales.telefono ?? 0,
+      telefono: DetallesGenerales.telefono ?? '',
       estimacion: DetallesGenerales.estimacion,
       kilometraje: DetallesGenerales.kilometraje ?? 0,
       gasolina: Number(DetallesGenerales.gasolina) ?? 0,
@@ -369,7 +370,7 @@
       <InputBasic 
         id="telefono" 
         label="Telefono" 
-        type="number" 
+        type="text" 
         v-model="DetallesGenerales.telefono"  
         placeholder="ej. 4433221100"
         :errors="ValidationErrors?.['telefono']" 

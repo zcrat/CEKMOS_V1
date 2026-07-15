@@ -84,7 +84,7 @@ class OrdenesServicio extends Model
     public function interiores()
     {
         return $this->hasOneThrough(
-            InterioresOrdenServicio::class,
+            InterioresRV::class,
             RecepcionesVehiculares::class,
             'orden_servicio_id',
             'recepcion_vehicular_id',
@@ -95,7 +95,7 @@ class OrdenesServicio extends Model
     public function exteriores()
     {
         return $this->hasOneThrough(
-            ExterioresOrdenServicio::class,
+            ExterioresRV::class,
             RecepcionesVehiculares::class,
             'orden_servicio_id',
             'recepcion_vehicular_id',
@@ -106,7 +106,7 @@ class OrdenesServicio extends Model
     public function inventario()
     {
         return $this->hasOneThrough(
-            InventarioOrdenServicio::class,
+            InventarioRV::class,
             RecepcionesVehiculares::class,
             'orden_servicio_id',
             'recepcion_vehicular_id',
@@ -117,7 +117,7 @@ class OrdenesServicio extends Model
     public function condiciones_pintura()
     {
         return $this->hasOneThrough(
-            CondicionesPinturaOrdenServicio::class,
+            CondicionesPinturaRV::class,
             RecepcionesVehiculares::class,
             'orden_servicio_id',
             'recepcion_vehicular_id',
