@@ -82,11 +82,11 @@ class RecepcionVehicularController extends Controller
             'id'=>['required','exists:ordenes_servicio,id']
         ]);
         $ordenservicio=OrdenesServicio::with( [
-                'interiores', 
-                'exteriores', 
-                'inventario', 
-                'condiciones_pintura',
-                'recepcion_vehicular',
+                'recepcion_vehicular.interiores',
+                'recepcion_vehicular.exteriores',
+                'recepcion_vehicular.inventario',
+                'recepcion_vehicular.condiciones_pintura',
+                'recepcion_vehicular.archivos',
                 'empresa',
                 'cliente',
                 'vehiculo',
@@ -96,14 +96,14 @@ class RecepcionVehicularController extends Controller
                 'responsables.jefe_de_proceso',
                 'responsables.trabajador',
                 'responsables.tecnico',
-                'archivos'
             ])->find($request->id);
         
         $responsables=$ordenservicio->responsables;
-        $condicionespintura=$ordenservicio->condiciones_pintura;
-        $inventariobase=$ordenservicio->inventario;
-        $interioresbase=$ordenservicio->interiores;
-        $exterioresbase=$ordenservicio->exteriores;
+        $recepcionVehicular=$ordenservicio->recepcion_vehicular;
+        $condicionespintura=$recepcionVehicular?->condiciones_pintura;
+        $inventariobase=$recepcionVehicular?->inventario;
+        $interioresbase=$recepcionVehicular?->interiores;
+        $exterioresbase=$recepcionVehicular?->exteriores;
 
         $generales=[
             'id'=>$ordenservicio->id,
@@ -138,8 +138,8 @@ class RecepcionVehicularController extends Controller
             'trabajador'=>optional($responsables->trabajador)->nombre ?? null,
             'tecnico'=>optional($responsables->tecnico)->nombre ?? null,
             'descripcion_mo'=>$ordenservicio->fallas_reportadas,
-            'indicaciones_cliente'=>$ordenservicio->recepcion_vehicular->indicaciones_cliente ?? '',
-            'cambiar_archivos'=>$ordenservicio->recepcion_vehicular->cambiar_archivos ?? false,
+            'indicaciones_cliente'=>$recepcionVehicular?->indicaciones_cliente ?? '',
+            'cambiar_archivos'=>$recepcionVehicular?->cambiar_archivos ?? false,
         ];
 
 
@@ -202,7 +202,7 @@ class RecepcionVehicularController extends Controller
             'luces'=> $exterioresbase->luces_exteriores,
             'espejos_laterales'=> $exterioresbase->espejos_laterales
         ];
-        $archivos=$ordenservicio->archivos;
+        $archivos=$recepcionVehicular?->archivos ?? collect([]);
 
 
         $pathcarro     = RutasArchivo::where('tipo_id', 26)->where('estatus_id', 21)->first();

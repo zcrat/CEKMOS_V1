@@ -30,16 +30,6 @@ class OrdenesServicio extends Model
         'estimacion' => 'datetime'
     ];
 
-    public function archivos(){
-        return $this->hasManyThrough(
-            Archivos::class,
-            RecepcionesVehiculares::class,
-            'orden_servicio_id',
-            'recepcion_vehicular_id',
-            'id',
-            'id'
-        );
-    }
     public function modulo_ordenes_servicio()
     {
         return $this->belongsTo(ModuloOrdenesServicio::class, 'modulo_orden_id');
@@ -80,50 +70,6 @@ class OrdenesServicio extends Model
     public function recepcion_vehicular()
     {
         return $this->hasOne(RecepcionesVehiculares::class,'orden_servicio_id');
-    }
-    public function interiores()
-    {
-        return $this->hasOneThrough(
-            InterioresRV::class,
-            RecepcionesVehiculares::class,
-            'orden_servicio_id',
-            'recepcion_vehicular_id',
-            'id',
-            'id'
-        );
-    }
-    public function exteriores()
-    {
-        return $this->hasOneThrough(
-            ExterioresRV::class,
-            RecepcionesVehiculares::class,
-            'orden_servicio_id',
-            'recepcion_vehicular_id',
-            'id',
-            'id'
-        );
-    }
-    public function inventario()
-    {
-        return $this->hasOneThrough(
-            InventarioRV::class,
-            RecepcionesVehiculares::class,
-            'orden_servicio_id',
-            'recepcion_vehicular_id',
-            'id',
-            'id'
-        );
-    }
-    public function condiciones_pintura()
-    {
-        return $this->hasOneThrough(
-            CondicionesPinturaRV::class,
-            RecepcionesVehiculares::class,
-            'orden_servicio_id',
-            'recepcion_vehicular_id',
-            'id',
-            'id'
-        );
     }
     public function pedidos_almacen(){
         return $this->hasMany(PedidosOrdenesAlmacen::class,'orden_servicio_id');
