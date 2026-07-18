@@ -7,12 +7,12 @@ class Vehiculo
     public function CreateOrFind($placas, $economico, $vin, $marca_id, $modelo_id, $año){
         $vehiculo=Vehiculos::firstOrCreate(
             [
-                'economico'=>$request->economico,
-                'placas'=>$request->placas,
-                'vin'=>$request->vin,
-                'marca_id'=>$request->marca_id,
-                'modelo_id'=>$request->modelo_id,
-                'año'=>$request->año,
+                'economico'=>$economico,
+                'placas'=>$placas,
+                'vin'=>$vin,
+                'marca_id'=>$marca_id,
+                'modelo_id'=>$modelo_id,
+                'año'=>$año,
             ]
         );
         return response()->json($vehiculo);
