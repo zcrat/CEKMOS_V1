@@ -131,7 +131,12 @@ useEcho(
                                     },
                                     {
                                         label:'Ver PDF', 
-                                        onClick:()=>{pdf?.Open(row.id)},
+                                        onClick:()=>{pdf?.Open(row.id,1)},
+                                        classname:['hover:text-gray-800']
+                                    },
+                                    {
+                                        label:'Inspeccion Vehicular',
+                                        onClick:()=>{pdf?.Open(row.id,2)},
                                         classname:['hover:text-gray-800']
                                     },
                                     {

@@ -42,6 +42,18 @@
   text-align: center;
   margin: 0.25rem;
 }
+.renglon2{
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  & > :not(:last-child) {
+    border-inline-start-width: 0px;
+    border-inline-end-width: 1px;
+    border-inline-end-style: solid;
+    border-inline-end-color: navy;
+  }
+}
 .renglon{
   border-bottom: 1px solid navy;
   box-sizing: border-box;
@@ -316,6 +328,9 @@
 .h-70{
   height: 70%;
 }
+.h-65{
+  height: 65%;
+}
 .h-60{
   height: 70%;
 }
@@ -379,6 +394,9 @@
 .h-8{
   height: 8%;
 }
+.h-4rem{
+  height: 4rem;
+}
 .h-1rem{
   height: 1rem;
 }
@@ -431,6 +449,16 @@
   border: 0;
 
   text-indent: 0%;
+}
+.titulopdf{ color: var(--textcolor);
+    font-weight: 600;
+    font-size: 1.25rem;
+    background-color: #c2d7f7;
+    border-radius: 0.5rem;
+    text-align: center;
+    padding: auto;
+    margin: 0;
+    line-height: 1.2;
 }
 .condiciones{
   display: flex;
@@ -510,7 +538,9 @@
 .overflow{
   overflow: auto;
 }
-
+.overflow-hidden{
+  overflow: hidden;
+}
 .col-span-2{
   grid-column:span 2 / span 2
 }
@@ -614,4 +644,342 @@
   line-height: 1.25;
   text-align: justify;
   padding: 0;
+}
+.bg-1{
+  background-color: #c2d7f7;
+}
+
+/* Inspeccion vehicular multipunto */
+.inspeccion-pdf{
+  color: #17152f;
+}
+.inspeccion-pdf .texto-celda{
+  font-size: 10px;
+}
+.inspeccion-pdf .encabezado-celda{
+  font-size: 10px;
+}
+.inspeccion-encabezado{
+  min-height: 0;
+}
+.inspeccion-resumen{
+  min-height: 0;
+  overflow: hidden;
+}
+.inspection-legend{
+  box-sizing: border-box;
+  flex: 0 0 24px;
+  min-height: 24px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #24204e;
+}
+.inspection-panels{
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-height: 0;
+}
+.inspection-panel{
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 10px 7px;
+  border: 5px solid;
+  border-top-width: 0;
+  border-radius: 5px 5px 3px 3px;
+  overflow: hidden;
+}
+.inspection-panel--26{
+  border-color: #c65a42;
+}
+.inspection-panel--57{
+  border-color: #625a87;
+}
+.inspection-panel__title{
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 27px;
+  align-items: center;
+  gap: 6px;
+  height: 27px;
+  margin: 0 -10px 5px;
+  padding: 2px 12px;
+  color: #fff;
+  font-size: 10px;
+  line-height: 1;
+}
+.inspection-panel--26 .inspection-panel__title{
+  background: #c65a42;
+}
+.inspection-panel--57 .inspection-panel__title{
+  background: #625a87;
+}
+.inspection-panel__title small{
+  margin-left: 2px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.inspection-panel__number{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  color: #625a87;
+  font-size: 10px;
+  font-weight: 800;
+}
+.inspection-panel--26 .inspection-panel__number{
+  color: #c65a42;
+}
+.inspection-columns{
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  gap: 12px;
+  min-height: 0;
+}
+.inspection-column{
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+.inspection-column--26{
+  flex: 0 0 calc(26% - 8px);
+}
+.inspection-column--32{
+  flex: 0 0 calc(32% - 8px);
+}
+.inspection-column--33{
+  flex: 0 0 calc(33% - 8px);
+}
+.inspection-column--34{
+  flex: 0 0 calc(34% - 8px);
+}
+.inspection-column--35{
+  flex: 0 0 calc(35% - 8px);
+}
+.inspection-column--40{
+  flex: 0 0 calc(40% - 8px);
+}
+.inspection-section{
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0 0 5px;
+  break-inside: avoid;
+}
+.inspection-section:last-child{
+  margin-bottom: 0;
+}
+.inspection-section__title{
+  box-sizing: border-box;
+  min-height: 15px;
+  margin: 0 0 2px;
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: #625a87;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.inspection-section__title--secondary{
+  background: #b7d3fa;
+  color: #221d50;
+  text-align: center;
+}
+.inspection-section--compact .inspection-section__title{
+  min-height: 12px;
+  padding: 1px 4px;
+  font-size: 10px;
+}
+.inspection-row{
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-height: 18px;
+  border-bottom: 1px solid #29263a;
+  font-size: 10px;
+  line-height: 1;
+}
+.inspection-row__label{
+  flex: 0 1 auto;
+  min-width: 0;
+  padding-right: 2px;
+  font-weight: 700;
+  line-height: 1.05;
+  white-space: normal;
+}
+.inspection-row__line{
+  flex: 1 1 auto;
+  min-width: 8px;
+}
+.inspection-markers{
+  display: inline-flex;
+  flex: 0 0 44px;
+  align-items: center;
+  gap: 1px;
+  height: 15px;
+  margin-right: 2px;
+}
+.inspection-square,
+.inspection-circle,
+.inspection-triangle{
+  box-sizing: border-box;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+.inspection-square{
+  width: 13px;
+  height: 13px;
+  background: #ff0a0a;
+}
+.inspection-circle{
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #24e91b;
+}
+.inspection-triangle{
+  width: 0;
+  height: 0;
+  border-right: 7px solid transparent;
+  border-bottom: 13px solid #fff000;
+  border-left: 7px solid transparent;
+}
+.inspection-marker--muted{
+  opacity: 0.18;
+}
+.inspection-marker--selected{
+  outline: 1px solid #1f1f1f;
+  outline-offset: 1px;
+}
+.inspection-table-head{
+  display: grid;
+  align-items: end;
+  min-height: 14px;
+  color: #29263a;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+.inspection-table-head--liquids{
+  grid-template-columns: 1fr 18px 25px;
+}
+.inspection-table-head--tires{
+  grid-template-columns: 1fr 45px;
+}
+.inspection-row--liquid{
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 18px 25px;
+}
+.inspection-row--liquid .inspection-markers,
+.inspection-row--tire .inspection-markers{
+  margin-right: 0;
+}
+.inspection-checkbox{
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 12px;
+  margin: 0 auto;
+  border: 1px solid #1f1f1f;
+  border-radius: 4px;
+  color: #128c0c;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+}
+.inspection-row--tire{
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 45px;
+}
+.inspection-pressure{
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 12px;
+  border: 1px solid #1f1f1f;
+  border-radius: 4px;
+  font-size: 10px;
+}
+.inspection-pair-head,
+.inspection-pair-row{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 6px;
+}
+.inspection-pair-row{
+  flex: 1 1 auto;
+  min-height: 18px;
+}
+.inspection-pair-head{
+  min-height: 14px;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+.inspection-pair-cell{
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  min-height: 18px;
+  border-bottom: 1px solid #29263a;
+  font-size: 10px;
+}
+.inspection-pair-cell .inspection-markers{
+  flex-basis: 44px;
+  margin-right: 2px;
+}
+.inspeccion-firmas{
+  min-height: 0;
+}
+.notas-inspeccion-vehicular{
+  box-sizing: border-box;
+  width: 100%;
+  height: 51px;
+  margin: 0;
+  padding: 0;
+  font-size: 10px;
+  line-height: 17px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 15px,
+    #29263a 15px 16px,
+    transparent 16px 17px
+  );
+  white-space: normal;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.encabezado-notas{
+  display: inline;
+  margin-right: 3px;
+  padding: 1px 3px;
+  background: #625a87;
+  color: #fff;
+  font-size: 10px;
+  line-height: 17px;
 }

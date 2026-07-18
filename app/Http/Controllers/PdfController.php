@@ -6,10 +6,18 @@ use App\Models\OrdenesServicio;
 use Carbon\Carbon;
 use Spatie\LaravelPdf\Facades\Pdf;
 use App\Models\RutasArchivo;
+use App\Models\Estatus;
+use App\Models\InspeccionVehicular;
 use Illuminate\Support\Facades\Storage;
 
 class PdfController extends Controller
 {
+    private const ESTATUS_INSPECCION_IDS = [
+        'inmediata' => 23,
+        'futura' => 24,
+        'bien' => 25,
+    ];
+
     public function RecepcionVehicular($id, bool $renderBlade = false)
     {
         $ordenservicio=OrdenesServicio::with([
@@ -194,5 +202,119 @@ class PdfController extends Controller
         }
 
         return Pdf::view('pdf.RecepcionVehicular', $viewData)->format('A4');
+    }
+    public function InspeccionVehicular($id, bool $renderBlade = false)
+    {
+        $ordenservicio=OrdenesServicio::with([
+            'empresa',
+            'entrada',
+            'vehiculo.modelo.marca',
+            'recepcion_vehicular.archivos',
+            'modulo_ordenes_servicio.emisor',
+        ])->find($id);
+        if(!$ordenservicio){
+            return  Pdf::html('<h1>Orden de servicio no encontrada</h1>')->format('A4');
+        }
+
+        [$inspeccion, $estatusInspeccion] = $this->datosInspeccionVehicular($ordenservicio->id);
+
+        $recepcionVehicular=$ordenservicio->recepcion_vehicular;
+        $archivos=$recepcionVehicular?->archivos ?? collect([]);
+        $carro=$archivos->where('tipo_id',26)->first();
+
+        $carro_url=null;
+        if($carro){
+            $rutaCarro=RutasArchivo::where('tipo_id',26)->first();
+            $carro_url=Storage::url(($rutaCarro->folder ?? 'desconocidos').'/'.$carro->nombre);
+        }
+        // Datos del emisor (empresa que emite) usando la relación Emisor
+        $emisor = optional(optional($ordenservicio->modulo_ordenes_servicio)->emisor);
+        // Construcción en una sola línea con el formato:
+        // "{NOMBRE} {CALLE}, {COLONIA}. C.P. {CP}, {CIUDAD}, {ESTADO}, TEL {TELEFONO}"
+        $direccion_emisor = '';
+        if ($emisor) {
+            $bloques = [];
+            if (!empty($emisor->calle)) { $bloques[] = $emisor->calle; }
+            // Colonia sin el prefijo "COL.", seguido de punto, y CP
+            $col_cp = '';
+            if (!empty($emisor->colonia)) { $col_cp .= $emisor->colonia . '. '; }
+            if (!empty($emisor->cp)) { $col_cp .= 'C.P. ' . $emisor->cp; }
+            $col_cp = trim($col_cp);
+            if (!empty($col_cp)) { $bloques[] = $col_cp; }
+            if (!empty($emisor->ciudad)) { $bloques[] = $emisor->ciudad; }
+            if (!empty($emisor->estado)) { $bloques[] = $emisor->estado; }
+            if (!empty($emisor->telefono)) { $bloques[] = 'TEL ' . $emisor->telefono; }
+            $direccion_detalle = implode(', ', array_filter($bloques));
+            $prefijo_nombre = !empty($emisor->nombre) ? trim($emisor->nombre) . ' ' : '';
+            $direccion_emisor = trim($prefijo_nombre . $direccion_detalle);
+        }
+
+        $viewData = [
+            'datos' => [
+                'telefono'=>$ordenservicio->telefono,
+                'orden'=>$ordenservicio->orden_servicio,
+                'observaciones'=>$recepcionVehicular?->indicaciones_cliente ?? '',
+            ],
+            'empresa'=>[
+                'nombre'=>$ordenservicio->empresa->nombre,
+            ],
+            'entrada'=>[
+                'fecha'=>Carbon::parse($ordenservicio->entrada->fecha)->format('d/m/Y'),
+                'kilometraje'=>$ordenservicio->entrada->kilometraje,
+            ],
+            'vehiculo'=>[
+                'anio'=>$ordenservicio->vehiculo->año,
+                'marca'=>$ordenservicio->vehiculo->modelo->marca->descripcion,
+                'modelo'=>$ordenservicio->vehiculo->modelo->descripcion,
+                'placas'=>$ordenservicio->vehiculo->placas,
+                'economico'=>$ordenservicio->vehiculo->economico,
+                'vin'=>$ordenservicio->vehiculo->vin
+            ],
+            'empresa_emision'=>[
+                'logo' => $emisor->logotipo ?? 'desconocido.png',
+                'direccion' => $direccion_emisor ?: ($emisor->nombre ?? ''),
+            ],
+            'carro' => $carro_url,
+            'inspeccion' => $inspeccion,
+            'estatus_inspeccion' => $estatusInspeccion,
+        ];
+        if ($renderBlade) {
+            return view('pdf.InspeccionVehicular', $viewData);
+        }
+
+        return Pdf::view('pdf.InspeccionVehicular', $viewData)->format('A4');
+    }
+
+    private function datosInspeccionVehicular(int $ordenServicioId): array
+    {
+        $inspeccion = InspeccionVehicular::with([
+            'llantas',
+            'liquidos',
+            'bandas',
+            'seguridad',
+            'filtros',
+            'escape',
+            'suspencion_direccion',
+            'afinacion_motor',
+            'tren_transmision',
+            'frenos',
+            'electrico',
+            'luces_espias',
+            'mangueras',
+        ])->where('orden_servicio_id', $ordenServicioId)->first();
+
+        $descripciones = Estatus::whereIn('id', array_values(self::ESTATUS_INSPECCION_IDS))
+            ->pluck('descripcion', 'id');
+
+        $estatus = collect(self::ESTATUS_INSPECCION_IDS)->mapWithKeys(
+            fn ($id, $tipo) => [
+                $id => [
+                    'tipo' => $tipo,
+                    'descripcion' => $descripciones->get($id, ''),
+                ],
+            ]
+        )->all();
+
+        return [$inspeccion, $estatus];
     }
 }

@@ -7,16 +7,19 @@ import Loading from '../Elements/Loading.vue';
   const show = ref<boolean>(false);
   const id = ref<number | null>(null);
   const loading = ref<boolean>(false);
+  const tipo = ref<1|2|null>(null);
 
   const updateVisibility = () => {
     show.value = false;
     id.value = null;
+    tipo.value = null;
     loading.value = false;
   }
-  const Open = (Id: number | null) => {
+  const Open = (Id: number | null,Tipo:1|2) => {
     id.value = Id;
     show.value = Id !== null;
     loading.value = Id !== null;
+    tipo.value=Tipo;
   }
 
   const finishLoading = () => {
@@ -45,8 +48,8 @@ import Loading from '../Elements/Loading.vue';
     </div>
 
     <iframe
-      v-if="id !== null"
-      :src="route('pdf.cortana.recepcionvehicular', { id })"
+      v-if="id !== null && tipo != null"
+      :src="tipo == 1 ? route('pdf.cortana.recepcionvehicular', { id }) : route('pdf.cortana.inspeccion.vehicular', { id })"
       class="block h-full w-full border-0"
       @load="finishLoading"
     />
