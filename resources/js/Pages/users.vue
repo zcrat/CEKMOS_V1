@@ -21,7 +21,6 @@ import UserRegister from '@/components/Zcrat/modals/UserRegister.vue';
 
 interface DataEvent {
     message: string;
-    tipo: number;
     id_user: number;
 };
 
@@ -54,24 +53,27 @@ const {debouncedGetElements,GetElements} = GetElementsFuntion({loading,
 
 useEcho(
   `UsersEvents`,
-  '.Events',
+  '.delete',
   (data: DataEvent) => {
-    if (data.tipo === 58) {
-      rows.value = rows.value.map(function(user){
-        if( user.id == data.id_user){
-            user.deleted_at=new Date();
-        }
-        return user
-      } );
-    }
-    if (data.tipo === 62) {
-      rows.value = rows.value.map(function(user){
-        if( user.id == data.id_user){
-            user.deleted_at=null
-        }
-        return user
-      } );
-    }
+    rows.value = rows.value.map(function(user){
+      if( user.id == data.id_user){
+          user.deleted_at=new Date();
+      }
+      return user
+    } );
+  }
+)
+
+useEcho(
+  `UsersEvents`,
+  '.reactive',
+  (data: DataEvent) => {
+    rows.value = rows.value.map(function(user){
+      if( user.id == data.id_user){
+          user.deleted_at=null
+      }
+      return user
+    } );
   }
 )
 const ToggleActiveUser=async ()=>{

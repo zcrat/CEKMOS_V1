@@ -27,20 +27,22 @@ class DataUserEvents implements ShouldBroadcastNow {
 
     public function broadcastAs()
     {
-        return 'DataUserEvent';
+        return match ($this->typedata) {
+            'delete', 'roles', 'permisos' => $this->typedata,
+            default => 'update',
+        };
     }
 
     public function broadcastWith()
     {
-        if($this->typedata=='delete'){
-            return ['message' => 'Se Elimino Tu Usuario','tipo'=> 58];
-        }elseif($this->typedata=='roles'){
-            return ['message' => 'Se Actualizaron Los Roles De Tu Usuario','tipo'=> 60];
-        }elseif($this->typedata=='permisos'){
-            return ['message' => 'Se Actualizaron Los Permisos De Tu Usuario','tipo'=> 61];
-        }else{
-            return ['message' => 'Se Actualizo Tu Usuario','tipo'=> 0];
-        }
+        $message = match ($this->typedata) {
+            'delete' => 'Se Elimino Tu Usuario',
+            'roles' => 'Se Actualizaron Los Roles De Tu Usuario',
+            'permisos' => 'Se Actualizaron Los Permisos De Tu Usuario',
+            default => 'Se Actualizo Tu Usuario',
+        };
+
+        return ['message' => $message];
     }
 
 }

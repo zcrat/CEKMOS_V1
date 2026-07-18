@@ -28,22 +28,26 @@ class UsersEvents implements ShouldBroadcastNow
 
     public function broadcastAs()
     {
-        return 'Events';
+        return match ($this->typedata) {
+            'delete', 'roles', 'permisos', 'reactive' => $this->typedata,
+            default => 'update',
+        };
     }
 
     public function broadcastWith()
     {
-        if($this->typedata=='delete'){
-            return ['message' => 'Se Elimino Tu Usuario','tipo'=> 58, 'id_user'=>$this->userId];
-        }elseif($this->typedata=='roles'){
-            return ['message' => 'Se Actualizaron Los Roles De Tu Usuario','tipo'=> 60, 'id_user'=>$this->userId];
-        }elseif($this->typedata=='permisos'){
-            return ['message' => 'Se Actualizaron Los Permisos De Tu Usuario','tipo'=> 61, 'id_user'=>$this->userId];
-        }elseif($this->typedata=='reactive'){
-            return ['message' => 'Se Restauro  un Usuario','tipo'=> 62,'id_user'=>$this->userId];
-        }else{
-            return ['message' => 'Se Actualizo Tu Usuario','tipo'=> 59, 'id_user'=>$this->userId];
-        }
+        $message = match ($this->typedata) {
+            'delete' => 'Se Elimino Tu Usuario',
+            'roles' => 'Se Actualizaron Los Roles De Tu Usuario',
+            'permisos' => 'Se Actualizaron Los Permisos De Tu Usuario',
+            'reactive' => 'Se Restauro un Usuario',
+            default => 'Se Actualizo Tu Usuario',
+        };
+
+        return [
+            'message' => $message,
+            'id_user' => $this->userId,
+        ];
     }
 
 }

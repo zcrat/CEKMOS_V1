@@ -10,10 +10,6 @@ import { useEcho } from '@laravel/echo-vue';
 import MyBasicToast from '@/utils/ToastNotificationBasic';
 import { useAuth } from '@/composables/useAuth';
 const { can,canAny } = useAuth();
-interface DataEvent {
-    message: string;
-    tipo: number;
-}
 interface Props {
   ClassNav?: string;
   IsRow: boolean;
@@ -22,12 +18,10 @@ interface Props {
 const props = defineProps<Props>();
 useEcho(
   `Data.User.${props.IdUser}`,
-  '.DataUserEvent',
-  (data: DataEvent) => {
-    if (data.tipo === 58) {
-      MyBasicToast.success('Se Te Ha Revocado El Acceso')
-      window.location.reload()
-    }
+  '.delete',
+  () => {
+    MyBasicToast.success('Se Te Ha Revocado El Acceso')
+    window.location.reload()
   }
 )
 const emit = defineEmits(['toggle','toggle_smartphone_active']);
