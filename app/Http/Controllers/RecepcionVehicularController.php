@@ -207,11 +207,11 @@ class RecepcionVehicularController extends Controller
 
         $pathcarro     = RutasArchivo::where('tipo_id', 26)->where('estatus_id', 21)->first();
         $pathfirma     = RutasArchivo::where('tipo_id', 25)->where('estatus_id', 21)->first();
-        $pathevidencia = RutasArchivo::where('tipo_id', 63)->where('estatus_id', 21)->first();
+        $pathevidencia = RutasArchivo::where('tipo_id', 58)->where('estatus_id', 21)->first();
 
         $carro     = $archivos->where('tipo_id', 26)->where('estatus_id', 21)->first();
         $firma     = $archivos->where('tipo_id', 25)->where('estatus_id', 21)->first();
-        $evidencia = $archivos->where('tipo_id', 63)->where('estatus_id', 21)->values();
+        $evidencia = $archivos->where('tipo_id', 58)->where('estatus_id', 21)->values();
 
         $urls = [];
 
@@ -427,7 +427,7 @@ class RecepcionVehicularController extends Controller
             
             $pathcarro     = RutasArchivo::where('tipo_id',26)->where('estatus_id',21)->first();
             $pathfirma     = RutasArchivo::where('tipo_id',25)->where('estatus_id',21)->first();
-            $pathevidencia = RutasArchivo::where('tipo_id',63)->where('estatus_id',21)->first();
+            $pathevidencia = RutasArchivo::where('tipo_id',58)->where('estatus_id',21)->first();
             $filessaves=[];
             if (!Storage::disk($pathcarro->disk ?? 'public')->exists($pathcarro->folder ?? 'desconocidos')) {
                     Storage::disk($pathcarro->disk ?? 'public')->makeDirectory($pathcarro->folder ?? 'desconocidos');
@@ -461,7 +461,7 @@ class RecepcionVehicularController extends Controller
                     $orden.'_evidencia_'.$i.'.'.$ext,
                     $pathevidencia->disk ?? 'public'
                 );
-                $filessaves[]=['folder'=>($pathevidencia->folder ?? 'desconocidos'),'name'=>$orden.'_evidencia_'.$i.'.'.$ext,'disk'=> $pathevidencia->disk ?? 'public','tipo'=>63];
+                $filessaves[]=['folder'=>($pathevidencia->folder ?? 'desconocidos'),'name'=>$orden.'_evidencia_'.$i.'.'.$ext,'disk'=> $pathevidencia->disk ?? 'public','tipo'=>58];
             }
 
             foreach ($filessaves as $image){
@@ -643,7 +643,7 @@ class RecepcionVehicularController extends Controller
             if($recepcionVehicular->cambiar_archivos){
                 $pathcarro     = RutasArchivo::where('tipo_id',26)->where('estatus_id',21)->first();
                 $pathfirma     = RutasArchivo::where('tipo_id',25)->where('estatus_id',21)->first();
-                $pathevidencia = RutasArchivo::where('tipo_id',63)->where('estatus_id',21)->first();
+                $pathevidencia = RutasArchivo::where('tipo_id',58)->where('estatus_id',21)->first();
                 $filessaves=[];
                 if (!Storage::disk($pathcarro->disk ?? 'public')->exists($pathcarro->folder ?? 'desconocidos')) {
                     Storage::disk($pathcarro->disk ?? 'public')->makeDirectory($pathcarro->folder ?? 'desconocidos');
@@ -682,7 +682,7 @@ class RecepcionVehicularController extends Controller
                             $orden.'_evidencia_'.$i.'.'.$ext,
                             $pathevidencia->disk ?? 'public'
                         );
-                        $filessaves[]=['folder'=>($pathevidencia->folder ?? 'desconocidos'),'name'=>$orden.'_evidencia_'.$i.'.'.$ext,'disk'=> $pathevidencia->disk ?? 'public','tipo'=>63];
+                        $filessaves[]=['folder'=>($pathevidencia->folder ?? 'desconocidos'),'name'=>$orden.'_evidencia_'.$i.'.'.$ext,'disk'=> $pathevidencia->disk ?? 'public','tipo'=>58];
                     }
                 }
                         

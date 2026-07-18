@@ -22,8 +22,8 @@ class Categorias extends Seeder
             ['descripcion' => 'Conceptos_Presupuesto'],
             ['descripcion' => 'Notificaciones'],
             ['descripcion' => 'Hoja de Conceptos'],
-            ['descripcion' => 'WEB SOCKETS'],
-            ['descripcion' => 'Detalles Equipo'],
+            ['descripcion' => 'Inspeccion Vehicular'],
+            ['descripcion' => 'Recepcion Vehicular'],
             ['descripcion' => 'Seguimiento Ordenes Servicio'],
         ];
         foreach ($categorias as $data) {

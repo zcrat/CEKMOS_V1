@@ -71,20 +71,7 @@ class Tipos extends Seeder
             ['descripcion' => 'Mano Obra', 'categoria_id' => 9],
             ['descripcion' => 'Sub-Contratados', 'categoria_id' => 9],
             ['descripcion' => 'Otros', 'categoria_id' => 9],
-            ['descripcion' => 'Se elimino un usuario', 'categoria_id' => 10],
-            ['descripcion' => 'se actualizo un usuario', 'categoria_id' => 10],
-            ['descripcion' => 'se actualizo roles de un usuario', 'categoria_id' => 10],
-            ['descripcion' => 'se actualizo permisos de un usuario', 'categoria_id' => 10],
-            ['descripcion' => 'se restauro  un usuario', 'categoria_id' => 10],
             ['descripcion' => 'Files Evidencias', 'categoria_id' => 4],
-            ['descripcion' => 'Diagnostico Iniciado', 'categoria_id' => 12],
-            ['descripcion' => 'Diagnostico Terminado', 'categoria_id' => 12],
-            ['descripcion' => 'Mano Obra Terminada', 'categoria_id' => 12],
-            ['descripcion' => 'Revicion Mano Obra', 'categoria_id' => 12],
-            ['descripcion' => 'Mano Obra Denegada', 'categoria_id' => 12],
-            ['descripcion' => 'Mano Obra Aprovada', 'categoria_id' => 12],
-            ['descripcion' => 'Unidad Entregada al Cliente', 'categoria_id' => 12],
-            ['descripcion' => 'Unidad Reingresada al Taller', 'categoria_id' => 12],
             
         ];
         foreach ($usuarios_taller as $data) {

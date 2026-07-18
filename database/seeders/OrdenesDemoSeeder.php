@@ -182,12 +182,12 @@ class OrdenesDemoSeeder extends Seeder
                 ]);
 
                 // Replicar las imágenes demo para cada recepción.
-                $rutas = RutasArchivo::whereIn('tipo_id', [25, 26, 63])
+                $rutas = RutasArchivo::whereIn('tipo_id', [25, 26, 58])
                     ->where('estatus_id', 21)
                     ->get()
                     ->keyBy('tipo_id');
 
-                foreach ([25, 26, 63] as $tipoId) {
+                foreach ([25, 26, 58] as $tipoId) {
                     if (!$rutas->has($tipoId)) {
                         throw new \RuntimeException("No existe una ruta de archivo para el tipo {$tipoId}.");
                     }
@@ -210,7 +210,7 @@ class OrdenesDemoSeeder extends Seeder
                     $archivosDemo[] = [
                         'origen' => public_path('evidencia.png'),
                         'nombre' => $os->orden_servicio.'_evidencia_'.$evidencia.'.png',
-                        'tipo_id' => 63,
+                        'tipo_id' => 58,
                     ];
                 }
 

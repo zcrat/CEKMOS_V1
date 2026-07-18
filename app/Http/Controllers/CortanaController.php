@@ -189,12 +189,12 @@ class CortanaController extends Controller
 
         $pathcarro     = RutasArchivo::where('tipo_id', 26)->where('estatus_id', 21)->first();
         $pathfirma     = RutasArchivo::where('tipo_id', 25)->where('estatus_id', 21)->first();
-        $pathevidencia = RutasArchivo::where('tipo_id', 63)->where('estatus_id', 21)->first();
+        $pathevidencia = RutasArchivo::where('tipo_id', 58)->where('estatus_id', 21)->first();
 
         Log::info($archivos);
         $carro     = $archivos->where('tipo_id', 26)->where('estatus_id', 21)->first();
         $firma     = $archivos->where('tipo_id', 25)->where('estatus_id', 21)->first();
-        $evidencia = $archivos->where('tipo_id', 63)->where('estatus_id', 21)->values();
+        $evidencia = $archivos->where('tipo_id', 58)->where('estatus_id', 21)->values();
 
         $urls = [];
 

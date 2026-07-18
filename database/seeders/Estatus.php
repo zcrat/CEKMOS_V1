@@ -36,6 +36,17 @@ class Estatus extends Seeder
             ['descripcion' => 'Procesando', 'categoria_id' => 4],
             ['descripcion' => 'Exitoso', 'categoria_id' => 4],
             ['descripcion' => 'Erroneo', 'categoria_id' => 4],
+            ['descripcion' => 'REQUIERE ATENCION INMEDIATA', 'categoria_id' => 10],
+            ['descripcion' => 'REQUIERE ATENCION FUTURA', 'categoria_id' => 10],
+            ['descripcion' => 'BIEN', 'categoria_id' => 10],
+            ['descripcion' => 'Diagnostico Iniciado', 'categoria_id' => 12],
+            ['descripcion' => 'Diagnostico Terminado', 'categoria_id' => 12],
+            ['descripcion' => 'Mano Obra Terminada', 'categoria_id' => 12],
+            ['descripcion' => 'Revision Mano Obra', 'categoria_id' => 12],
+            ['descripcion' => 'Mano Obra Denegada', 'categoria_id' => 12],
+            ['descripcion' => 'Mano Obra Aprobada', 'categoria_id' => 12],
+            ['descripcion' => 'Unidad Entregada al Cliente', 'categoria_id' => 12],
+            ['descripcion' => 'Unidad Reingresada al Taller', 'categoria_id' => 12],
         ];
         foreach ($estatus as $data) {
             EstatusModel::create($data);

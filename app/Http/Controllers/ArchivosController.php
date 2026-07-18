@@ -22,7 +22,7 @@ class ArchivosController extends Controller
             if(!$file){
                 throw new \Exception('Imagen Eliminada Anteriormente');
             }
-            if(($origen === 'recepcionvehicular' && (!$file->recepcion_vehicular_id || (int)$file->tipo_id !== 63) ) || ($origen === 'presupuesto' && !$file->presupuesto_id )){
+            if(($origen === 'recepcionvehicular' && (!$file->recepcion_vehicular_id || (int)$file->tipo_id !== 58) ) || ($origen === 'presupuesto' && !$file->presupuesto_id )){
                 throw new \Exception('Imagen No Valida Para Eliminar por este medio ');
             }
 
