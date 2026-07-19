@@ -25,10 +25,14 @@
                     ? ' inspection-marker--muted'
                     : ($seleccion === $tipo ? ' inspection-marker--selected' : '');
 
+                $palomita = static fn ($tipo) => $seleccion === $tipo
+                    ? '<span class="inspection-marker-check">&#10003;</span>'
+                    : '';
+
                 return '<span class="inspection-markers" title="'.e($estatusActual['descripcion'] ?? '').'">'
-                    .'<i class="inspection-square'.$clase('inmediata').'"></i>'
-                    .'<i class="inspection-triangle'.$clase('futura').'"></i>'
-                    .'<i class="inspection-circle'.$clase('bien').'"></i>'
+                    .'<i class="inspection-square'.$clase('inmediata').'">'.$palomita('inmediata').'</i>'
+                    .'<i class="inspection-triangle'.$clase('futura').'">'.$palomita('futura').'</i>'
+                    .'<i class="inspection-circle'.$clase('bien').'">'.$palomita('bien').'</i>'
                     .'</span>';
             }
         }
@@ -66,7 +70,7 @@
                         'filas' => [
                             ['etiqueta' => 'Código(s):', 'valor' => $lucesEspias?->codigo],
                         ],
-                        'notas' =>'',
+                        'notas' =>$lucesEspias?->notas,
                     ],
                     [
                         'titulo' => 'LÍQUIDOS',

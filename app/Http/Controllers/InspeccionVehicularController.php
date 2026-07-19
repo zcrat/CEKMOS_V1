@@ -147,8 +147,10 @@ class InspeccionVehicularController extends Controller
 
         $data = [];
         foreach (self::SECTIONS as $section => $definition) {
-            $fields = $this->fieldsFor($definition);
-            $data[$section] = $inspeccion->{$section}?->only($fields) ?? [];
+            $data[$section] = $this->dataForSection(
+                $inspeccion->{$section},
+                $definition
+            );
         }
 
         return response()->json([
@@ -253,5 +255,32 @@ class InspeccionVehicularController extends Controller
             ...($definition['numeric'] ?? []),
             ...(($definition['notes'] ?? false) ? ['notas'] : []),
         ];
+    }
+
+    private function dataForSection($sectionModel, array $definition): array
+    {
+        if (! $sectionModel) {
+            return [];
+        }
+
+        $data = $sectionModel->only($this->fieldsFor($definition));
+
+        foreach ($definition['status'] as $field) {
+            $data[$field] = isset($data[$field]) ? (int) $data[$field] : null;
+        }
+
+        foreach ($definition['boolean'] ?? [] as $field) {
+            $data[$field] = (bool) ($data[$field] ?? false);
+        }
+
+        foreach ($definition['numeric'] ?? [] as $field) {
+            $data[$field] = (float) ($data[$field] ?? 0);
+        }
+
+        if ($definition['notes'] ?? false) {
+            $data['notas'] = (string) ($data['notas'] ?? '');
+        }
+
+        return $data;
     }
 }
