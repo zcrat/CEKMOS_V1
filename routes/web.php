@@ -17,6 +17,7 @@ use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\presupuestosController;
 use App\Http\Controllers\PruebasController;
 use App\Http\Controllers\RecepcionVehicularController;
+use App\Http\Controllers\InspeccionVehicularController;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
@@ -61,12 +62,14 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
         Route::get('/recepciones/vehiculares/read/one',[RecepcionVehicularController::class,'ReadOne'])->name('recepcionvehicular.read');
         Route::get('/pdf/recepciones/vehiculares/{id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.cortana.recepcionvehicular');
         Route::get('/pdf/inspeccion/vehicular/{id}', [PdfController::class, 'InspeccionVehicular'])->name('pdf.cortana.inspeccion.vehicular');
+        Route::get('/inspeccion/vehicular/{ordenServicio}', [InspeccionVehicularController::class, 'read'])->name('inspeccionvehicular.read');
                   Route::patch('/recepciones/vehiculares/toggle/files_upload',[RecepcionVehicularController::class,'ToggleFilesRecepcionVehicular'])->name('recepcionvehicular.toggle.upload.files');
 
       });
       Route::middleware(['permission:recepciones_vehiculares_crear'])->group(function () {
         Route::post('/recepciones/vehiculares/update',[RecepcionVehicularController::class,'Update'])->name('recepcionesvehiculares.update');
         Route::post('/recepciones/vehiculares/create',[RecepcionVehicularController::class,'Create'])->name('recepcionesvehiculares.create');
+        Route::post('/inspeccion/vehicular/save', [InspeccionVehicularController::class, 'save'])->name('inspeccionvehicular.save');
       });
 
 

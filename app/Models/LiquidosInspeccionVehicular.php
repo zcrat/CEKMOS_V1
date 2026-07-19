@@ -31,7 +31,7 @@ class LiquidosInspeccionVehicular extends Model
         'limpiaparabrisas_lleno',
         'notas'
     ];
-    protected $cast=[
+    protected $casts=[
         'alternador_aire_acondicionado_ok'=>'boolean',
         'alternador_aire_acondicionado_lleno'=>'boolean',
         'transmision_ok'=>'boolean',

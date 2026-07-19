@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('pastillas_derecha_trasera')->constrained('estatus');
             $table->foreignId('rotores_izquierda_delantera')->constrained('estatus');
             $table->foreignId('rotores_izquierda_trasera')->constrained('estatus');
-            $table->foreignId('rotores_derecha_delantera	')->constrained('estatus');
+            $table->foreignId('rotores_derecha_delantera')->constrained('estatus');
             $table->foreignId('rotores_derecha_trasera')->constrained('estatus');
             $table->foreignId('pinzas_cilindros_rueda_izquierda_delantera')->constrained('estatus');
             $table->foreignId('pinzas_cilindros_rueda_izquierda_trasera')->constrained('estatus');

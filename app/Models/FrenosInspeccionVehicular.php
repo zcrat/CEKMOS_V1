@@ -14,7 +14,7 @@ class FrenosInspeccionVehicular extends Model
         'pastillas_derecha_trasera',
         'rotores_izquierda_delantera',
         'rotores_izquierda_trasera',
-        'rotores_derecha_delantera	',
+        'rotores_derecha_delantera',
         'rotores_derecha_trasera',
         'pinzas_cilindros_rueda_izquierda_delantera',
         'pinzas_cilindros_rueda_izquierda_trasera',

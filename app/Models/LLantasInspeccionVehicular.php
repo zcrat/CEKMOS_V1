@@ -20,7 +20,7 @@ class LLantasInspeccionVehicular extends Model
         'refaccion_presion',
         'alineacion_balanceo',
     ];
-    protected $cast=[
+    protected $casts=[
         'izquierda_delantera_presion'=>'decimal:2',
         'izquierda_trasera_presion'=>'decimal:2',
         'derecha_delantera_presion'=>'decimal:2',

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('inspeccion_vehicular', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('orden_servicio_id')->constrained('unidades_sat');
+            $table->foreignId('orden_servicio_id')->unique()->constrained('ordenes_servicio');
             $table->foreignId('llantas_id')->constrained('llantas_inspeccion_vehicular');
             $table->foreignId('liquidos_id')->constrained('liquidos_inspeccion_vehicular');
             $table->foreignId('bandas_id')->constrained('bandas_inspeccion_vehicular');

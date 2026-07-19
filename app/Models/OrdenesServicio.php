@@ -71,6 +71,10 @@ class OrdenesServicio extends Model
     {
         return $this->hasOne(RecepcionesVehiculares::class,'orden_servicio_id');
     }
+    public function inspeccion_vehicular()
+    {
+        return $this->hasOne(InspeccionVehicular::class, 'orden_servicio_id');
+    }
     public function pedidos_almacen(){
         return $this->hasMany(PedidosOrdenesAlmacen::class,'orden_servicio_id');
     }

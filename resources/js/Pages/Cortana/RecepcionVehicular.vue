@@ -15,6 +15,7 @@ import { OrderKeyProp } from '@/types/tablecomponent';
 import { ToggleUploadFiles } from '@/utils/functions/ordenservicio';
 import { useEcho } from '@laravel/echo-vue';
 import PDFDemo from '@/components/Zcrat/modals/PDFDemo.vue';
+import InspeccionVehicularModal from '@/components/Zcrat/modals/InspeccionVehicularModal.vue';
 
 const currentPage=ref<number>(1)
 const itemsPerPage=ref<number>(10)
@@ -30,6 +31,7 @@ const statusParams = { categoria_id: 2 }
 const orderBy=ref<null|OrderKeyProp>(null)
 const ModalOrdenServicio = ref<InstanceType<typeof OrdenServicio> | null>(null);
 const pdf = ref<InstanceType<typeof PDFDemo> | null>(null);
+const inspeccionModal = ref<InstanceType<typeof InspeccionVehicularModal> | null>(null);
 interface DaTaUpdateWebSocket extends Record<string,any> {
     id:number
 }
@@ -131,12 +133,12 @@ useEcho(
                                     },
                                     {
                                         label:'Ver PDF', 
-                                        onClick:()=>{pdf?.Open(row.id,1)},
+                                        onClick:()=>{pdf?.Open(row.id)},
                                         classname:['hover:text-gray-800']
                                     },
                                     {
-                                        label:'Inspeccion Vehicular',
-                                        onClick:()=>{pdf?.Open(row.id,2)},
+                                        label:'Capturar / editar inspección',
+                                        onClick:()=>{inspeccionModal?.Open(row.id)},
                                         classname:['hover:text-gray-800']
                                     },
                                     {
@@ -162,5 +164,6 @@ useEcho(
         </template>
     </AppLayout>
     <OrdenServicio ref="ModalOrdenServicio"/>
+    <InspeccionVehicularModal ref="inspeccionModal"/>
     <PDFDemo ref="pdf"/>
 </template>
