@@ -14,6 +14,7 @@ export const GetDatosVehiculo = async (filter:string,value:string) => {
       presupuesto.vin=Vehiculo.vin;
       presupuesto.marca=Vehiculo.modelo?.marca?.descripcion??'';
       presupuesto.modelo=Vehiculo.modelo?.descripcion??'';
+      presupuesto.motor=Vehiculo.modelo?.motor?.descripcion??'';
       presupuesto.año=Vehiculo.año;
       cancelgetvehiculodata = false;
     }

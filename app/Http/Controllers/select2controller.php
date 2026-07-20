@@ -9,6 +9,9 @@ use App\Models\RegimenesFiscales;
 use App\Models\Vehiculos;
 use App\Models\VehiculosConceptos;
 use App\Models\VehiculosConceptosDisponibles;
+use App\Models\Marcas;
+use App\Models\Modelos;
+use App\Models\Motores;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -85,6 +88,57 @@ class select2controller extends Controller
             'label'=>$item->descripcion
             ]);
         }
+        return response()->json(compact('options'));
+    }
+    public function MarcasCatalogo(Request $request){
+        $search='%'.trim($request->input('query', '')).'%';
+        $options=Marcas::query()
+            ->where('descripcion','LIKE',$search)
+            ->orderBy('descripcion')
+            ->take(20)
+            ->get()
+            ->map(fn($item)=>[
+                'value'=>$item->id,
+                'label'=>$item->descripcion,
+            ]);
+        return response()->json(compact('options'));
+    }
+    public function MotoresCatalogo(Request $request){
+        $search='%'.trim($request->input('query', '')).'%';
+        $options=Motores::query()
+            ->where('descripcion','LIKE',$search)
+            ->orderBy('descripcion')
+            ->take(20)
+            ->get()
+            ->map(fn($item)=>[
+                'value'=>$item->id,
+                'label'=>$item->descripcion,
+            ]);
+        return response()->json(compact('options'));
+    }
+    public function ModelosCatalogo(Request $request){
+        $validation=Validator::make($request->all(),[
+            'marca_id'=>['required','exists:marcas,id'],
+            'query'=>['nullable','string'],
+        ]);
+        if ($validation->fails()) {
+            return response()->json(['options'=>[]]);
+        }
+
+        $validated=$validation->validated();
+        $search='%'.trim($validated['query']??'').'%';
+        $options=Modelos::query()
+            ->where('marca_id',$validated['marca_id'])
+            ->where('descripcion','LIKE',$search)
+            ->select('descripcion')
+            ->distinct()
+            ->orderBy('descripcion')
+            ->take(20)
+            ->get()
+            ->map(fn($item)=>[
+                'value'=>$item->descripcion,
+                'label'=>$item->descripcion,
+            ]);
         return response()->json(compact('options'));
     }
 }

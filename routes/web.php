@@ -92,6 +92,9 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('select2/economicos',[select2controller::class,'Economicos'])->name('select2.economico');
     Route::get('select2/vehiculos/conceptos/disponibles',[select2controller::class,'VehiculosConceptosPorModulo'])->name('select2.vehiculos.conceptos.modulos');
     Route::get('select2/regimenes/fiscales',[select2controller::class,'RegimenesFiscales'])->name('select2.regimenes.fiscales');
+    Route::get('select2/catalogo/marcas',[select2controller::class,'MarcasCatalogo'])->name('select2.catalogo.marcas');
+    Route::get('select2/catalogo/motores',[select2controller::class,'MotoresCatalogo'])->name('select2.catalogo.motores');
+    Route::get('select2/catalogo/modelos',[select2controller::class,'ModelosCatalogo'])->name('select2.catalogo.modelos');
     
     Route::get('select/niveles/combustible',[selectcontroller::class,'NivelesCombustible'])->name('select.niveles.combustible');
     Route::get('select/modulos/orden',[selectcontroller::class,'ModulosOrden'])->name('select.modulos.disponibles.usuario');
@@ -106,12 +109,14 @@ Route::middleware(['auth:sanctum',config('jetstream.auth_session'),'verified',])
     Route::get('combobox/tecnicos',[ComboboxController::class,'GetTecnicos'])->name('combobox.tecnicos');
     Route::get('combobox/vehiculo/economico',[ComboboxController::class,'GetVehiculoEconomico'])->name('combobox.vehiculo.economico');
     Route::get('combobox/vehiculo/placas',[ComboboxController::class,'GetVehiculoPlacas'])->name('combobox.vehiculo.placas');
+    Route::get('combobox/motores',[ComboboxController::class,'GetMotores'])->name('combobox.motores');
     Route::get('combobox/ubicaciones',[ComboboxController::class,'GetUbicaciones'])->name('combobox.ubicaciones.lista');
 
     Route::get('vehiculo/get/datos',[VehiculoController::class,'GetDatos'])->name('vehiculo.get.datos');
     Route::get('vehiculo/get/image',[VehiculoController::class,'GetImage'])->name('vehiculo.get.image');
     Route::get('vehiculo/find/datos',[VehiculoController::class,'FindDatos'])->name('vehiculo.find');
     Route::post('vehiculo/create/update',[VehiculoController::class,'CreateOrUpdate'])->name('vehiculo.createorupdate');
+    Route::post('vehiculo/catalogo/create',[VehiculoController::class,'CreateCatalog'])->name('vehiculo.catalogo.create');
     Route::get('admin/caja',[CajaController::class,'View'])->name('admin.caja');
     Route::get('admin/caja/read',[CajaController::class,'Read'])->name('admin.caja.read');
   });

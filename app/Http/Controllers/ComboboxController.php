@@ -8,6 +8,7 @@ use App\Models\OrdenesServicio;
 use App\Models\Ubicaciones;
 use App\Models\usuariosTaller;
 use App\Models\Vehiculos;
+use App\Models\Motores;
 
 class ComboboxController extends Controller
 {
@@ -53,5 +54,14 @@ class ComboboxController extends Controller
         $search=$request->search??'';
         $placas=Vehiculos::where('placas','LIKE','%'.$search.'%')->pluck('placas')->unique()->values();
         return response()->json(['options'=>$placas]);
+    }
+    public function GetMotores(Request $request){
+        $search=trim($request->search??'');
+        $motores=Motores::where('descripcion','LIKE','%'.$search.'%')
+            ->orderBy('descripcion')
+            ->pluck('descripcion')
+            ->unique()
+            ->values();
+        return response()->json(['options'=>$motores]);
     }
 }

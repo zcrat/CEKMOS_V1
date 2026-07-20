@@ -61,6 +61,7 @@ const presupuesto = reactive<NuevoPresupuesto>({
   vin: '',
   marca: '',
   modelo: '',
+  motor: '',
   año: null,
   vigencia: null,
   modulo_orden:''
@@ -154,6 +155,7 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
       <InputBasic id="Año" label="Año" type="number" v-model="presupuesto.año"  placeholder="ej. 2024"/>
       <InputBasic id="Marca" label="Marcas" type="text" v-model="presupuesto.marca" classname="uppercase" placeholder="ej. AUDI"/>
       <InputBasic id="Modelo" label="Modelo" type="text" v-model="presupuesto.modelo" classname="uppercase" placeholder="ej. A3"/>
+      <Combobox id="Motor" label="Motor" endpoint="combobox.motores" v-model="presupuesto.motor" placeholder="Seleccionar o crear motor" :getallways="true"/>
     </div>
   </BaseModal>
 </template>

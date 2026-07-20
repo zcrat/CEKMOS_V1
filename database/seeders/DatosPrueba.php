@@ -57,6 +57,7 @@ class DatosPrueba extends Seeder
         ]);
         Modelos::create([
             'marca_id'=>1,
+            'motor_id'=>1,
             'descripcion'=>'Modelo de Prueba',
         ]);
         Vehiculos::create([

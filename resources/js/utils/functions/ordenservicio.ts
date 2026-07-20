@@ -95,6 +95,7 @@ export const GetDataVehiculoEconomico=(Economico:EconomicoForm)=>{
           Economico.anio = data.año;
           Economico.marca = data.modelo.marca.descripcion;
           Economico.modelo = data.modelo.descripcion;
+          Economico.motor = data.modelo.motor.descripcion;
           Economico.tipo_id = data.tipo_id;
         } else {
           if(!Economico.placas){
@@ -124,6 +125,7 @@ export const GetDataVehiculoPlacas=(Economico:EconomicoForm)=>{
           Economico.anio = data.año;
           Economico.marca = data.modelo.marca.descripcion;
           Economico.modelo = data.modelo.descripcion;
+          Economico.motor = data.modelo.motor.descripcion;
           Economico.tipo_id = data.tipo_id;
         } else {
           if(!Economico.economico){

@@ -37,6 +37,7 @@ const props = withDefaults(defineProps<{
     close_when_selected?:boolean
     DeleteErrors?: () => void
     errors?: string[]
+    disabled?: boolean
 }>(), {
   timeout: 400,
   canNew:false,
@@ -60,6 +61,10 @@ let currentRequestId = 0
 const GetOptions = async () => {
   let requestId: number | null = null
   try {
+    if (props.disabled) {
+      options.value = []
+      return
+    }
     if (controller) controller.abort()
     controller = new AbortController()
     requestId = ++currentRequestId
@@ -89,12 +94,14 @@ const onSelect = () => {
     }
 }
 const onFocus = () => {
+  if (props.disabled) return
   isOpen.value = true
   if(!props.cacheoptions){
     GetOptions()
   }
 }
 const onMouseDown = (e: MouseEvent) => {
+  if (props.disabled) return
   if (isOpen.value) {
     e.preventDefault() // 👈 evita que vuelva a hacer focus
     isOpen.value = false
@@ -115,6 +122,14 @@ watch(isOpen, (open) => {
 })
 watch(() => props.params, (newVal, oldVal) => {
   if (!isEqual(newVal, oldVal)) {
+    GetOptions()
+  }
+})
+watch(() => props.disabled, (disabled) => {
+  if (disabled) {
+    isOpen.value = false
+    options.value = []
+  } else {
     GetOptions()
   }
 })
@@ -159,17 +174,18 @@ onBeforeUnmount(() => {
 <template>
   <div class="flex flex-col w-full relative" >
     <label for="" v-if="props.label">{{ props.label }}</label>
-  <ComboboxRoot class="relative" v-model="optionselect" v-model:open="isOpen">
+  <ComboboxRoot class="relative" v-model="optionselect" v-model:open="isOpen" :disabled="props.disabled">
     <ComboboxAnchor 
-      :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen },{inputerror: props.errors && props.errors.length > 0}]"
+      :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen },{inputerror: props.errors && props.errors.length > 0},{'bg-gray-100 opacity-60 cursor-not-allowed': props.disabled}]"
       >
       <ComboboxInput asChild>
         <div class="relative flex items-center w-full">
-          <button class="px-2 h-full border-r border-black flex items-center" v-if="buttonNew" @click="buttonNew"><font-awesome-icon :icon="optionselect ? 'fa-regular fa-pen-to-square': 'fa-solid fa-plus' "  :class="optionselect? 'text-xl':''"/></button>
+          <button type="button" class="px-2 h-full border-r border-black flex items-center" v-if="buttonNew" :disabled="props.disabled" @click="buttonNew"><font-awesome-icon :icon="canNew ? 'fa-solid fa-plus' : optionselect ? 'fa-regular fa-pen-to-square': 'fa-solid fa-plus' "  :class="optionselect && !canNew ? 'text-xl':''"/></button>
           <div class="relative flex w-full">
             <ZDIconError :errors="props.errors"/>
             <input
             ref="inputRef"
+            :disabled="props.disabled"
             :class="['w-full ps-2 pr-8 rounded border-none inputnotfocus',
                         props.errors && props.errors.length > 0 ? 'ps-[2rem]' : ''
                     ]"

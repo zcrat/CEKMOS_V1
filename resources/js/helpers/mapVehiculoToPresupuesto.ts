@@ -11,5 +11,6 @@ export const mapVehiculoToPresupuesto = (
   presupuesto.vin = vehiculo.vin;
   presupuesto.marca = vehiculo.modelo?.marca?.descripcion ?? '';
   presupuesto.modelo = vehiculo.modelo?.descripcion ?? '';
+  presupuesto.motor = vehiculo.modelo?.motor?.descripcion ?? '';
   presupuesto.año = vehiculo.año;
 };

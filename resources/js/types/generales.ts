@@ -95,7 +95,7 @@ export interface Vehiculo {
   vin:string,
   tipo_id:number|null,
   color_id:number|null,
-  modelo_id:number|null
+  modelo_id:number|null,
   modelo?:modelo,
   color?:color,
 }
@@ -107,7 +107,13 @@ export interface modelo {
   id?:number,
   descripcion:string,
   marca_id:number|null,
+  motor_id:number|null,
   marca?:marca,
+  motor?:motor,
+}
+export interface motor {
+  id?:number,
+  descripcion:string,
 }
 export interface color {
   id?:number,
@@ -145,6 +151,7 @@ export interface NuevoPresupuesto {
   vin: string,
   marca: string,
   modelo: string,
+  motor: string,
   año: number|null,
   modulo_orden: number|string,
   //datos posibles
@@ -177,8 +184,9 @@ export interface NuevoPresupuesto {
   año:string,
   tipo_id:number|null,
   color:string,
-  modelo:string,
-  marca:string,
+  modelo:option|null,
+  marca:option|null,
+  motor:option|null,
   vin:string,
   error?:{
     placas?:string[],
@@ -188,6 +196,10 @@ export interface NuevoPresupuesto {
     color?:string[],
     modelo?:string[],
     marca?:string[],
+    motor?:string[],
+    modelo_id?:string[],
+    marca_id?:string[],
+    motor_id?:string[],
     vin?:string[],
   }
 }

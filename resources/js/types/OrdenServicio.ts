@@ -8,6 +8,7 @@ import { color } from './generales';
     anio:number|"",
     marca:string,
     modelo:string,
+    motor:string,
     color:string,
     tipo_id: number|null
   }

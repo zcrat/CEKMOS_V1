@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             modulos::class,
             Estatus::class,
             NivelesCombustible::class,
+            Motores::class,
             VehiculosConceptos::class,
             VehiculosConceptosDisponibles::class,
             EstadosandMunicipios::class,

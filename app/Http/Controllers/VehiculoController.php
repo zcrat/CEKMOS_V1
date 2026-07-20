@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Colores;
 use App\Models\Marcas;
 use App\Models\Modelos;
+use App\Models\Motores;
 use Illuminate\Http\Request;
 use App\Models\Vehiculos;
 use App\Rules\TipoCategoriaRule;
@@ -23,7 +24,7 @@ class VehiculoController extends Controller
         if(!in_array($filtro,['economico','placas','id'])){
            return response()->json(['message'=>'Filtro no valido'],400);
         }
-        $vehiculo=Vehiculos::where($filtro,'LIKE',$search)->with('modelo.marca')->first();
+        $vehiculo=Vehiculos::where($filtro,'LIKE',$search)->with(['modelo.marca', 'modelo.motor'])->first();
         
     return response()->json(['datos'=>$vehiculo]);
     }
@@ -46,7 +47,7 @@ class VehiculoController extends Controller
         $request->validate([
             'id'=>['required','exists:vehiculos,id']
         ]);
-        $vehiculo=Vehiculos::with(['modelo.marca','color'])->find($request->id);
+        $vehiculo=Vehiculos::with(['modelo.marca', 'modelo.motor', 'color'])->find($request->id);
         return response()->json(['vehiculo'=>$vehiculo]);
     }
     public function CreateOrUpdate(Request $request){
@@ -58,20 +59,21 @@ class VehiculoController extends Controller
             'año'=>['required','integer','min:1899','max:'.(date('Y')+1)],
             'tipo_id'=>['required', new TipoCategoriaRule(3)],
             'color'=>['required','string'],
-            'modelo'=>['required','string'],
-            'marca'=>['required','string'],
+            'marca_id'=>['required','exists:marcas,id'],
+            'motor_id'=>['required','exists:motores,id'],
+            'modelo'=>['required','string','max:100'],
         ]);
         $color=Colores::firstOrCreate([
-            'descripcion'=>strtolower($request->color)
+            'descripcion'=>$this->normalizeDescription($request->color)
         ]);
-        $marca=Marcas::firstOrCreate([
-            'descripcion'=>strtolower($request->marca)
+        $modelo=Modelos::withTrashed()->firstOrCreate([
+            'descripcion'=>$this->normalizeDescription($request->modelo),
+            'marca_id'=>$request->marca_id,
+            'motor_id'=>$request->motor_id,
         ]);
-        $modelo=Modelos::firstOrCreate([
-            'descripcion'=>strtolower($request->modelo),
-            'marca_id'=>$marca->id
-        ]);
-
+        if ($modelo->trashed()) {
+            $modelo->restore();
+        }
         $vehiculo = Vehiculos::updateOrCreate(
             ['id' => $request->id], // condición de búsqueda
 
@@ -85,7 +87,37 @@ class VehiculoController extends Controller
                 'modelo_id' => $modelo->id,
             ]
         );
-        $vehiculo->load('modelo.marca');
+        $vehiculo->load(['modelo.marca', 'modelo.motor']);
         return response()->json(['vehiculo'=>$vehiculo,'message'=>($request->id? 'Actualizado' : 'Creado').' Correctamente']);
+    }
+
+    public function CreateCatalog(Request $request)
+    {
+        $validated=$request->validate([
+            'tipo'=>['required',Rule::in(['marca','motor'])],
+            'descripcion'=>['required','string','max:100'],
+        ]);
+        $descripcion=$this->normalizeDescription($validated['descripcion']);
+
+        if ($validated['tipo'] === 'marca') {
+            $catalogo=Marcas::withTrashed()->firstOrCreate(compact('descripcion'));
+        } elseif ($validated['tipo'] === 'motor') {
+            $catalogo=Motores::withTrashed()->firstOrCreate(compact('descripcion'));
+        }
+        if ($catalogo->trashed()) {
+            $catalogo->restore();
+        }
+
+        return response()->json([
+            'option'=>[
+                'value'=>$catalogo->id,
+                'label'=>$catalogo->descripcion,
+            ],
+        ],201);
+    }
+
+    private function normalizeDescription(string $description): string
+    {
+        return mb_strtolower(trim($description), 'UTF-8');
     }
 }

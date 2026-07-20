@@ -158,6 +158,7 @@ export const EconomicoBase: EconomicoForm ={
     anio:'',
     marca:'',
     modelo:'',
+    motor:'',
     color:'',
     tipo_id: null
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Modelos;
 use App\Models\Marcas;
+use App\Models\Motores;
 use App\Models\ModuloOrdenesServicio;
 use App\Models\OrdenesServicio;
 use App\Models\RecepcionesVehiculares;
@@ -34,6 +35,7 @@ class PresupuestosController extends Controller
                 'responsables.trabajador',
                 'responsables.tecnico',
                 'vehiculo.modelo.marca',
+                'vehiculo.modelo.motor',
                 'vehiculo_concepto',
                 'empresa',
                 'cliente',
@@ -70,6 +72,7 @@ class PresupuestosController extends Controller
                     'vin'=> $data->vehiculo->vin,
                     'marca'=> $data->vehiculo->modelo->marca->descripcion,
                     'modelo'=> $data->vehiculo->modelo->descripcion,
+                    'motor'=> $data->vehiculo->modelo->motor->descripcion,
                     'año'=> $data->vehiculo->año,
                     'vigencia'=> null,
                     'modulo_orden'=>$data->modulo_orden_id,
@@ -113,6 +116,7 @@ class PresupuestosController extends Controller
             'vin'=>['required','string','max:50'],
             'marca'=>['required','string','max:50'],
             'modelo'=>['required','string','max:50'],
+            'motor'=>['required','string','max:100'],
             'año'=>['required','integer','min:1900','max:2100'],
             // 'vigencia'=>['nullable','date'],
             'modulo_orden'=>['required','integer','exists:modulo_ordenes_servicios,id'],
@@ -151,16 +155,30 @@ class PresupuestosController extends Controller
 
         $ordenservicio=OrdenesServicio::where('orden_servicio',$orden)->first();;
         if(!$ordenservicio){
+            $marca = Marcas::firstOrCreate([
+                'descripcion' => $this->normalizeDescription($request->marca),
+            ]);
+            $motor = Motores::withTrashed()->firstOrCreate([
+                'descripcion' => $this->normalizeDescription($request->motor),
+            ]);
+            if ($motor->trashed()) {
+                $motor->restore();
+            }
+            $modelo = Modelos::withTrashed()->firstOrCreate([
+                'descripcion' => $this->normalizeDescription($request->modelo),
+                'marca_id' => $marca->id,
+                'motor_id' => $motor->id,
+            ]);
+            if ($modelo->trashed()) {
+                $modelo->restore();
+            }
             $vehiculo=Vehiculos::firstOrCreate([
                 'economico' => $request->economico,
                 'placas' => $request->placas,
             ], [
-                'año' => $request->anio,
+                'año' => $request->año,
                 'vin' => $request->vin,
-                'modelo_id' => Modelos::firstOrCreate([
-                    'descripcion' => $request->modelo,
-                    'marca_id' => Marcas::firstOrCreate(['descripcion' => $request->marca])->id,
-                ])->id  ,
+                'modelo_id' => $modelo->id,
                 'tipo_id' => 1,
                 'color_id' => 1,
             ]);
@@ -279,5 +297,10 @@ class PresupuestosController extends Controller
         
         
         return response()->json(['message' => 'Presupuesto creado exitosamente', 'orden_servicio' => $ordenservicio->orden_servicio], 201);
+    }
+
+    private function normalizeDescription(string $description): string
+    {
+        return mb_strtolower(trim($description), 'UTF-8');
     }
 }

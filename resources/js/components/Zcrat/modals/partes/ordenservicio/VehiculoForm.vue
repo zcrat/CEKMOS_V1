@@ -32,6 +32,7 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
             Vehiculo.tipo_id=Number(data.tipo_id);
             Vehiculo.modelo=data.modelo?.descripcion ?? 'No Encontrado';
             Vehiculo.marca=data.modelo?.marca?.descripcion ?? 'No Encontrado';
+            Vehiculo.motor=data.modelo?.motor?.descripcion ?? 'No Encontrado';
         } catch (error: any) {
             console.error('Error:', error)
             props.Close?.()
@@ -49,6 +50,7 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
             Vehiculo.color='';
             Vehiculo.modelo='';
             Vehiculo.marca='';
+            Vehiculo.motor='';
             Vehiculo.id=undefined;
         }
     },{immediate:true})
@@ -108,6 +110,14 @@ import Button from '@/components/Zcrat/Inputs/Button.vue';
         placeholder="ej. A3"
         :errors="ValidationErrors?.['modelo']" 
         :DeleteErrors="()=>{delete ValidationErrors?.['modelo']}"
+        />
+        <InputBasic
+        id="Motor"
+        disabled
+        label="Motor"
+        type="text"
+        v-model="Vehiculo.motor"
+        placeholder="Motor"
         />
         <InputBasic 
         id="Color" 
