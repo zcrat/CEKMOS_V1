@@ -35,6 +35,31 @@ const logout = () => {
                 <font-awesome-icon icon="fa-solid fa-address-book "/>
                 <span>&nbsp;Empleados</span>
             </NavLink>
+            <Dropdown
+                :align="'left-up'"
+                width="48"
+                classtrigger="w-full"
+                classcontent="w-full"
+            >
+                <template #trigger>
+                    <ButtonLink
+                        :active="route().current('catalogos.*')"
+                        class="ms-2 gap-x-1 w-full text-white"
+                    >
+                        <font-awesome-icon icon="fa-solid fa-book-open"/>
+                        <span>&nbsp;Catálogos</span>
+                    </ButtonLink>
+                </template>
+
+                <template #content>
+                    <DropdownLink :href="route('catalogos.conceptos')">
+                        Conceptos
+                    </DropdownLink>
+                    <DropdownLink :href="route('catalogos.conceptos-contratos')">
+                        Conceptos Contratos
+                    </DropdownLink>
+                </template>
+            </Dropdown>
             <Dropdown :align="'left-up'" width="48" classtrigger="w-full" classcontent="w-full" v-if="canAny(['ver_presupuestos','ver_recepciones_vehiculares'])">
                 <template #trigger>
                     <ButtonLink 

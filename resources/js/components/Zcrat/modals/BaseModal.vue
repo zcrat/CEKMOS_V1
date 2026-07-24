@@ -83,6 +83,7 @@ const classtitleposition = computed(() => ({
             >
               Cerrar
             </button>
+            <slot name="footer" />
             <button
               v-if="buttonconfirm"
               :class="[

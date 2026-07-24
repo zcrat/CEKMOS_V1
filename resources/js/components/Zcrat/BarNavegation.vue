@@ -51,6 +51,23 @@ const logout = () => {
             <NavLink  :title="IsRow ? '' : 'Inicio'" :href="route('dashboard')" :active="route().current('dashboard')"><font-awesome-icon icon="fa-solid fa-house" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Inicio</span></NavLink>
             <NavLink v-if="can('ver_usuarios_sitema')" :title="IsRow ? '' : 'Usuarios'" :href="route('users')" :active="route().current('users')"><font-awesome-icon icon="fa-solid fa-users " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Usuarios</span></NavLink>
             <NavLink v-if="can('ver_empleados')" :title="IsRow ? '' : 'Empleados'" :href="route('employees')" :active="route().current('employees')"><font-awesome-icon icon="fa-solid fa-address-book " :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Empleados</span></NavLink>
+            <Dropdown :align="IsRow?'right':'left-up' " width="48">
+                <template #trigger>
+                    <ButtonLink :title="IsRow ? '' : 'Catálogos'" :active="route().current('catalogos.*')">
+                        <font-awesome-icon icon="fa-solid fa-book-open" :class="IsRow?'':'sm:text-[1.3rem]'"/>
+                        <span :class="IsRow?'':'sm:hidden'">&nbsp;Catálogos</span>
+                    </ButtonLink>
+                </template>
+
+                <template #content>
+                    <DropdownLink :href="route('catalogos.conceptos')">
+                        Conceptos
+                    </DropdownLink>
+                    <DropdownLink :href="route('catalogos.conceptos-contratos')">
+                        Conceptos Contratos
+                    </DropdownLink>
+                </template>
+            </Dropdown>
             <Dropdown :align="IsRow?'right':'left-up' " width="48" v-if="canAny(['ver_presupuestos','ver_recepciones_vehiculares'])">
                 <template #trigger>
                     <ButtonLink :title="IsRow ? '' : 'Ordenes'"  :active="route().current('cortana.presupuesto.vista')"><font-awesome-icon icon="fa-solid fa-table-list" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Ordenes</span></ButtonLink>

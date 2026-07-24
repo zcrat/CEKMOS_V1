@@ -30,6 +30,7 @@ const props = withDefaults(defineProps<{
     cacheoptions?:boolean
     placeholder?:string
     label?: string
+    classDiv?: string
     timeout?: number
     params?:Record<string,any>
     empty_message?:string
@@ -172,76 +173,76 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full relative" >
+  <div :class="['flex flex-col relative ',classDiv ??'w-full ']" >
     <label for="" v-if="props.label">{{ props.label }}</label>
-  <ComboboxRoot class="relative" v-model="optionselect" v-model:open="isOpen" :disabled="props.disabled">
-    <ComboboxAnchor 
-      :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen },{inputerror: props.errors && props.errors.length > 0},{'bg-gray-100 opacity-60 cursor-not-allowed': props.disabled}]"
-      >
-      <ComboboxInput asChild>
-        <div class="relative flex items-center w-full">
-          <button type="button" class="px-2 h-full border-r border-black flex items-center" v-if="buttonNew" :disabled="props.disabled" @click="buttonNew"><font-awesome-icon :icon="canNew ? 'fa-solid fa-plus' : optionselect ? 'fa-regular fa-pen-to-square': 'fa-solid fa-plus' "  :class="optionselect && !canNew ? 'text-xl':''"/></button>
-          <div class="relative flex w-full">
-            <ZDIconError :errors="props.errors"/>
-            <input
-            ref="inputRef"
-            :disabled="props.disabled"
-            :class="['w-full ps-2 pr-8 rounded border-none inputnotfocus',
-                        props.errors && props.errors.length > 0 ? 'ps-[2rem]' : ''
-                    ]"
-            @input="onInputChange"
-            :readonly="props.searchable === false"
-            :placeholder="placeholder"
-            @focus="onFocus"
-            :value="isOpen ? query : optionselect?.label ?? ''"
-            @mousedown="onMouseDown"
-          />
-          </div>
-        </div>
-      </ComboboxInput>
-      <ComboboxTrigger class="absolute inset-y-0 right-0 px-2 w-8" v-if="!optionselect || !clearable">
-        <font-awesome-icon icon="fa-solid fa-angle-down" class="text-[1.25rem]" v-if="!isOpen"/>
-        <font-awesome-icon icon="fa-solid fa-angle-up" class="text-[1.25rem]" v-else/>
-      </ComboboxTrigger>
-      <ComboboxCancel class="absolute inset-y-0 right-0 px-2 w-8" v-if="optionselect && clearable && !isOpen" @click="clearSelect">
-        <font-awesome-icon icon="fa-solid fa-x" class="text-[0.8rem]"/>
-      </ComboboxCancel>
-    </ComboboxAnchor>
-
-    <ComboboxPortal>
-    <ComboboxContent 
-      position="popper"
-      :avoidCollisions="true"
-      :collisionPadding="8"
-      :sideOffset="4"
-      class="z-15 w-[var(--reka-combobox-trigger-width)] bg-white border-2 border-gray-500 rounded-md select2-dropdown">
-      <ComboboxViewport>
-        <div v-if="loading" class="text-mauve8 text-xs font-medium text-center py-2">
-          {{ loading_message }}
-        </div>
-        <template v-else>
-        <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2">
-          {{empty_message }}
-        </ComboboxEmpty>
-
-        <ComboboxGroup class="max-h-[25rem] overflow-auto">
-          <ComboboxItem
-            v-for="option in options"
-            :key="option.value"
-            :value="option"
-            @select="onSelect"
-            as="template"
-            > 
-            <div :class="['px-4 py-2 rounded-sm ', option.value === optionselect?.value ? 'optionactive' : 'hoveroptionselect']">
-              {{ option.label }}
+    <ComboboxRoot class="relative" v-model="optionselect" v-model:open="isOpen" :disabled="props.disabled">
+      <ComboboxAnchor 
+        :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen },{inputerror: props.errors && props.errors.length > 0},{'bg-gray-100 opacity-60 cursor-not-allowed': props.disabled}]"
+        >
+        <ComboboxInput asChild>
+          <div class="relative flex items-center w-full">
+            <button type="button" class="px-2 h-full border-r border-black flex items-center" v-if="buttonNew" :disabled="props.disabled" @click="buttonNew"><font-awesome-icon :icon="canNew ? 'fa-solid fa-plus' : optionselect ? 'fa-regular fa-pen-to-square': 'fa-solid fa-plus' "  :class="optionselect && !canNew ? 'text-xl':''"/></button>
+            <div class="relative flex w-full">
+              <ZDIconError :errors="props.errors"/>
+              <input
+              ref="inputRef"
+              :disabled="props.disabled"
+              :class="['w-full ps-2 pr-8 rounded border-none inputnotfocus',
+                          props.errors && props.errors.length > 0 ? 'ps-[2rem]' : ''
+                      ]"
+              @input="onInputChange"
+              :readonly="props.searchable === false"
+              :placeholder="placeholder"
+              @focus="onFocus"
+              :value="isOpen ? query : optionselect?.label ?? ''"
+              @mousedown="onMouseDown"
+            />
             </div>
-          </ComboboxItem>
-        </ComboboxGroup>
-        </template>
-      </ComboboxViewport>
-    </ComboboxContent>
-    </ComboboxPortal>
-  </ComboboxRoot>
-   <ZDListErrors :errors="props.errors"/>
+          </div>
+        </ComboboxInput>
+        <ComboboxTrigger class="absolute inset-y-0 right-0 px-2 w-8" v-if="!optionselect || !clearable">
+          <font-awesome-icon icon="fa-solid fa-angle-down" class="text-[1.25rem]" v-if="!isOpen"/>
+          <font-awesome-icon icon="fa-solid fa-angle-up" class="text-[1.25rem]" v-else/>
+        </ComboboxTrigger>
+        <ComboboxCancel class="absolute inset-y-0 right-0 px-2 w-8" v-if="optionselect && clearable && !isOpen" @click="clearSelect">
+          <font-awesome-icon icon="fa-solid fa-x" class="text-[0.8rem]"/>
+        </ComboboxCancel>
+      </ComboboxAnchor>
+
+      <ComboboxPortal>
+      <ComboboxContent 
+        position="popper"
+        :avoidCollisions="true"
+        :collisionPadding="8"
+        :sideOffset="4"
+        class="z-15 w-[var(--reka-combobox-trigger-width)] bg-white border-2 border-gray-500 rounded-md select2-dropdown">
+        <ComboboxViewport>
+          <div v-if="loading" class="text-mauve8 text-xs font-medium text-center py-2">
+            {{ loading_message }}
+          </div>
+          <template v-else>
+          <ComboboxEmpty class="text-mauve8 text-xs font-medium text-center py-2">
+            {{empty_message }}
+          </ComboboxEmpty>
+
+          <ComboboxGroup class="max-h-[25rem] overflow-auto">
+            <ComboboxItem
+              v-for="option in options"
+              :key="option.value"
+              :value="option"
+              @select="onSelect"
+              as="template"
+              > 
+              <div :class="['px-4 py-2 rounded-sm ', option.value === optionselect?.value ? 'optionactive' : 'hoveroptionselect']">
+                {{ option.label }}
+              </div>
+            </ComboboxItem>
+          </ComboboxGroup>
+          </template>
+        </ComboboxViewport>
+      </ComboboxContent>
+      </ComboboxPortal>
+    </ComboboxRoot>
+    <ZDListErrors :errors="props.errors"/>
   </div>
 </template>
