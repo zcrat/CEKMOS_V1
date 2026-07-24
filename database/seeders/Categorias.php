@@ -19,7 +19,7 @@ class Categorias extends Seeder
             ['descripcion' => 'Archivos'],
             ['descripcion' => 'Acciones'],
             ['descripcion' => 'Facturas'],
-            ['descripcion' => 'Conceptos_Presupuesto'],
+            ['descripcion' => 'Conceptos Presupuesto'],
             ['descripcion' => 'Notificaciones'],
             ['descripcion' => 'Hoja de Conceptos'],
             ['descripcion' => 'Inspeccion Vehicular'],

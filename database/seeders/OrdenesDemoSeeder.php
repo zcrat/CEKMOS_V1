@@ -2,28 +2,28 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\OrdenesServicio;
-use App\Models\Empresas;
+use App\Models\Archivos;
 use App\Models\Clientes;
-use App\Models\Vehiculos;
-use App\Models\VehiculosConceptos;
-use App\Models\ModuloOrdenesServicio;
-use App\Models\Ubicaciones;
-use App\Models\NivelesCombustible;
+use App\Models\CondicionesPinturaRV;
 use App\Models\DatosEntrada;
 use App\Models\DatosSalida;
-use App\Models\InterioresRV;
+use App\Models\Empresas;
 use App\Models\ExterioresRV;
+use App\Models\InterioresRV;
 use App\Models\InventarioRV;
-use App\Models\CondicionesPinturaRV;
-use App\Models\ResponsablesOrdenServicio;
-use App\Models\Archivos;
+use App\Models\ModuloOrdenesServicio;
+use App\Models\NivelesCombustible;
+use App\Models\OrdenesServicio;
 use App\Models\RecepcionesVehiculares;
+use App\Models\ResponsablesOrdenServicio;
 use App\Models\RutasArchivo;
+use App\Models\Ubicaciones;
+use App\Models\User;
+use App\Models\Vehiculos;
+use App\Models\VehiculosConceptos;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class OrdenesDemoSeeder extends Seeder
@@ -73,7 +73,7 @@ class OrdenesDemoSeeder extends Seeder
                     'diagnostico' => Carbon::now()->addHours(rand(1, 8)),
                     'fallas_reportadas' => 'Sin novedades relevantes',
                     'notas_retraso' => null,
-                    'telefono' => '443-000-000' . ($i % 10),
+                    'telefono' => '443-000-000'.($i % 10),
                     'ubicacion_id' => $ubicacion->id,
                 ]);
 
@@ -188,7 +188,7 @@ class OrdenesDemoSeeder extends Seeder
                     ->keyBy('tipo_id');
 
                 foreach ([25, 26, 58] as $tipoId) {
-                    if (!$rutas->has($tipoId)) {
+                    if (! $rutas->has($tipoId)) {
                         throw new \RuntimeException("No existe una ruta de archivo para el tipo {$tipoId}.");
                     }
                 }
@@ -215,7 +215,7 @@ class OrdenesDemoSeeder extends Seeder
                 }
 
                 foreach ($archivosDemo as $archivoDemo) {
-                    if (!is_file($archivoDemo['origen'])) {
+                    if (! is_file($archivoDemo['origen'])) {
                         throw new \RuntimeException("No existe la imagen demo: {$archivoDemo['origen']}");
                     }
 
@@ -226,7 +226,7 @@ class OrdenesDemoSeeder extends Seeder
 
                     Storage::disk($disk)->makeDirectory($folder);
 
-                    if (!Storage::disk($disk)->put($destino, file_get_contents($archivoDemo['origen']))) {
+                    if (! Storage::disk($disk)->put($destino, file_get_contents($archivoDemo['origen']))) {
                         throw new \RuntimeException("No se pudo copiar la imagen demo a {$destino}.");
                     }
 
@@ -241,5 +241,3 @@ class OrdenesDemoSeeder extends Seeder
         });
     }
 }
-
-

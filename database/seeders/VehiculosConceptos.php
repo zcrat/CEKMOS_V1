@@ -2,24 +2,39 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\Marcas;
+use App\Models\Modelos;
+use App\Models\Motores;
 use App\Models\VehiculosConceptos as ModelVehiculos;
+use Illuminate\Database\Seeder;
+
 class VehiculosConceptos extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
-    
     {
-        $data=[
-            ['descripcion' => '4 Cilindros'],
-            ['descripcion' => '6 Cilindros'],
-            ['descripcion' => '8 Cilindros'],
-        ];
-        foreach ($data as $registro) {
-            ModelVehiculos::create($registro);
+        $marca = Marcas::firstOrCreate([
+            'descripcion' => 'Sin Especificar',
+        ]);
+
+        $motores = Motores::query()
+            ->orderBy('id')
+            ->limit(5)
+            ->get();
+
+        foreach ($motores as $motor) {
+            $modelo = Modelos::firstOrCreate([
+                'descripcion' => 'Sin Especificar',
+                'marca_id' => $marca->id,
+                'motor_id' => $motor->id,
+            ]);
+
+            ModelVehiculos::firstOrCreate(
+                ['modelo_id' => $modelo->id],
+                [
+                    'descripcion' => "Todos Los Modelos de {$motor->descripcion}",
+                    'años' => [],
+                ]
+            );
         }
     }
 }

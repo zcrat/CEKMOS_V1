@@ -10,15 +10,11 @@ class Motores extends Seeder
     public function run(): void
     {
         $motores = [
-            '4 cilindros gasolina',
-            '4 cilindros diésel',
-            '6 cilindros gasolina',
-            '6 cilindros diésel',
-            '8 cilindros gasolina',
-            '8 cilindros diésel',
-            '10 cilindros gasolina',
-            '10 cilindros diésel',
-            'eléctrico',
+            '4 cilindros',
+            '6 cilindros',
+            '8 cilindros',
+            '10 cilindros',
+            'Eléctrico',
         ];
 
         foreach ($motores as $descripcion) {
