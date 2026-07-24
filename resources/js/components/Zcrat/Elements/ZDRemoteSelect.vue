@@ -176,7 +176,7 @@ onBeforeUnmount(() => {
   <div :class="['flex flex-col relative ',classDiv ??'w-full ']" >
     <label for="" v-if="props.label">{{ props.label }}</label>
     <ComboboxRoot class="relative" v-model="optionselect" v-model:open="isOpen" :disabled="props.disabled">
-      <ComboboxAnchor 
+      <ComboboxAnchor
         :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen },{inputerror: props.errors && props.errors.length > 0},{'bg-gray-100 opacity-60 cursor-not-allowed': props.disabled}]"
         >
         <ComboboxInput asChild>
@@ -210,7 +210,7 @@ onBeforeUnmount(() => {
       </ComboboxAnchor>
 
       <ComboboxPortal>
-      <ComboboxContent 
+      <ComboboxContent
         position="popper"
         :avoidCollisions="true"
         :collisionPadding="8"
@@ -232,7 +232,7 @@ onBeforeUnmount(() => {
               :value="option"
               @select="onSelect"
               as="template"
-              > 
+              >
               <div :class="['px-4 py-2 rounded-sm ', option.value === optionselect?.value ? 'optionactive' : 'hoveroptionselect']">
                 {{ option.label }}
               </div>
