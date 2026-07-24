@@ -17,6 +17,11 @@ return new class extends Migration
             $table->foreignId('modulo_orden_id')->constrained('modulo_ordenes_servicios');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(
+                ['vehiculo_concepto_id', 'modulo_orden_id'],
+                'vehiculos_conceptos_disponibles_unique'
+            );
         });
     }
 

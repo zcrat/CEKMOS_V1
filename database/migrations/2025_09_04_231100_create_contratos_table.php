@@ -6,24 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('contratos', function (Blueprint $table) {
             $table->id();
             $table->string('descripcion');
-            $table->string('numero');
+            $table->string('tipo')->nullable();
+            $table->string('numero')->nullable();
             $table->decimal('monto',10,2);
+            $table->foreignId('modulo_id')->constrained('modulos');
+            $table->foreignId('zona_id')->constrained('zonas');
+            $table->year('año');
             $table->timestamps();
             $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('contratos');

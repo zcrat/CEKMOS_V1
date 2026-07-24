@@ -14,8 +14,12 @@ return new class extends Migration
         Schema::create('vehiculos_conceptos', function (Blueprint $table) {
             $table->id();
             $table->string('descripcion');
+            $table->json('años')->nullable();
+            $table->foreignId('modelo_id')->constrained('modelos');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique('modelo_id', 'vehiculos_conceptos_modelo_unique');
         });
     }
 

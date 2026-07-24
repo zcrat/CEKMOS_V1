@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class ModuloOrdenesServicio extends Model
-{       
+{
     use SoftDeletes;
+
     protected $table = 'modulo_ordenes_servicios';
+
     protected $fillable = [
         'descripcion',
         'clave',
@@ -17,33 +20,54 @@ class ModuloOrdenesServicio extends Model
         'año',
         'emisor_id',
     ];
+
     public function modulo()
     {
         return $this->belongsTo(Modulos::class, 'modulo_id');
     }
+
     public function zona()
     {
         return $this->belongsTo(Zonas::class, 'zona_id');
     }
+
     public function emisor()
     {
         return $this->belongsTo(Emisor::class, 'emisor_id');
     }
+
     public function contrato()
     {
         return $this->belongsTo(Contratos::class, 'contrato_id');
     }
+
     public function ordenes_servicio()
     {
         return $this->hasMany(OrdenesServicio::class, 'modulo_orden_id');
     }
-    public function vehiculos_conceptos(){
+
+    public function vehiculos_conceptos()
+    {
         return $this->hasMany(VehiculosConceptosDisponibles::class, 'modulo_orden_id');
     }
-    public function conceptos_presupuestos(){
-        return $this->hasMany(ConceptosPresupuestos::class,'modulo_orden_servicio_id');
+
+    public function conceptos_presupuestos()
+    {
+        return $this->hasMany(ConceptosPresupuestos::class, 'modulo_orden_servicio_id');
     }
-    public function usuarios_orden(){
+
+    public function costos_conceptos_presupuestos()
+    {
+        return $this->hasManyThrough(
+            CostosConceptosPresupuestos::class,
+            ConceptosPresupuestos::class,
+            'modulo_orden_servicio_id',
+            'concepto_presupuesto_id'
+        );
+    }
+
+    public function usuarios_orden()
+    {
         return $this->hasMany(ModulosPerUser::class, 'modulo_orden_id');
     }
 }

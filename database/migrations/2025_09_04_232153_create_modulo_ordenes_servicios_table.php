@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('descripcion');
             $table->string('clave');
             $table->foreignId('modulo_id')->constrained('modulos');
-            $table->foreignId('contrato_id')->constrained('contratos');
+            $table->foreignId('contrato_id')->nullable()->constrained('contratos');
             $table->foreignId('zona_id')->constrained('zonas');
             $table->foreignId('emisor_id')->constrained('emisores');
             $table->year('año');
