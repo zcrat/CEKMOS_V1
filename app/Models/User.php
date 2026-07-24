@@ -15,13 +15,16 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasApiTokens;
-    use HasRoles;
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
+
     use HasProfilePhoto;
+
+    use HasRoles;
     use Notifiable;
-    use TwoFactorAuthenticatable;
     use SoftDeletes;
+    use TwoFactorAuthenticatable;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -33,8 +36,9 @@ class User extends Authenticatable
         'email',
         'password',
     ];
-protected $dateFormat = 'Y-m-d H:i:s.v'; // Formato compatible con SQL Server
- // formato compatible con SQL Server
+
+    protected $dateFormat = 'Y-m-d H:i:s.v'; // Formato compatible con SQL Server
+    // formato compatible con SQL Server
 
     /**
      * The attributes that should be hidden for serialization.
@@ -69,34 +73,64 @@ protected $dateFormat = 'Y-m-d H:i:s.v'; // Formato compatible con SQL Server
             'password' => 'hashed',
         ];
     }
-    public function modulos_orden(){
+
+    public function modulos_orden()
+    {
         return $this->hasMany(ModulosPerUser::class, 'user_id');
     }
-    public function clientes(){
-        return $this->hasMany(Clientes::class,'user_id'); 
+
+    public function clientes()
+    {
+        return $this->hasMany(Clientes::class, 'user_id');
     }
-    public function empresas(){
-        return $this->hasMany(Empresas::class,'user_id'); 
+
+    public function empresas()
+    {
+        return $this->hasMany(Empresas::class, 'user_id');
     }
-    public function facturas(){
-        return $this->hasMany(Facturas::class,'user_id'); 
+
+    public function facturas()
+    {
+        return $this->hasMany(Facturas::class, 'user_id');
     }
-    public function notifications(){
-        return $this->hasMany(Notificaciones::class,'user_id'); 
+
+    public function notifications()
+    {
+        return $this->hasMany(Notificaciones::class, 'user_id');
     }
-    public function ordenes_servicio(){
-        return $this->hasMany(OrdenesServicio::class,'user_id'); 
+
+    public function ordenes_servicio()
+    {
+        return $this->hasMany(OrdenesServicio::class, 'user_id');
     }
-    public function conceptos_presupuestos(){
-        return $this->hasMany(ConceptosPerPresupuesto::class,'user_id');
+
+    public function conceptos_presupuestos()
+    {
+        return $this->hasMany(ConceptosPerPresupuesto::class, 'user_id');
     }
-    public function vales_almacen(){
-        return $this->hasMany(ValesAlmacen::class,'user_id');
+
+    public function costos_conceptos_presupuestos()
+    {
+        return $this->hasMany(CostosConceptosPresupuestos::class, 'usuario_id');
     }
-    public function caja_movimientos(){
-        return $this->hasMany(CajaMovimientos::class,'user_id');
+
+    public function archivos_sistema()
+    {
+        return $this->hasMany(ArchivoSistema::class, 'usuario_id');
     }
-    public function bitacora(){
-        return $this->hasMany(BitacoraAccionesUsers::class,'user_id');
+
+    public function vales_almacen()
+    {
+        return $this->hasMany(ValesAlmacen::class, 'user_id');
+    }
+
+    public function caja_movimientos()
+    {
+        return $this->hasMany(CajaMovimientos::class, 'user_id');
+    }
+
+    public function bitacora()
+    {
+        return $this->hasMany(BitacoraAccionesUsers::class, 'user_id');
     }
 }

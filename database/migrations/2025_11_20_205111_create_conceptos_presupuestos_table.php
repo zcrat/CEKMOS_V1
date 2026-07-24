@@ -15,11 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('num');
             $table->text('descripcion');
-            $table->decimal('p_refaccion',10,2);
-            $table->decimal('p_mano_obra',10,2);
-            $table->decimal('p_total',10,2);
+            $table->unsignedInteger('garantia_dias')->nullable();
+            $table->boolean('fijo')->default(false);
             $table->foreignId('tipo_id')->constrained('tipos');
-            $table->foreignId('vehiculo_concepto_id')->constrained('vehiculos_conceptos');
             $table->foreignId('modulo_orden_servicio_id')->constrained('modulo_ordenes_servicios');
             $table->foreignId('categoria_sat_id')->constrained('categorias_sat');
             $table->foreignId('unidad_sat_id')->constrained('unidades_sat');
