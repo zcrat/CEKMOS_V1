@@ -120,15 +120,25 @@ const clearSelect = () => {
   <div class="flex flex-col w-full relative" >
     <label for="" v-if="props.label">{{ props.label }}</label>
     <ComboboxRoot :disabled="props.disabled" class="relative" v-model="optionselect" v-model:open="isOpen">
-      <ComboboxAnchor :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen }]">
+      <ComboboxAnchor
+        :class="[
+          'inline-flex w-full relative border rounded-md transition-colors',
+          props.disabled
+            ? 'cursor-not-allowed border-gray-400 bg-gray-200 text-gray-500'
+            : 'border-black bg-white',
+          { inputfocusalways: isOpen },
+        ]"
+      >
 
         <ComboboxInput asChild>
           <div class="relative flex items-center w-full">
             <ZDIconError :errors="props.errors"/>
             <input
               :class="['w-full ps-2 pr-8 truncate rounded border-none inputnotfocus',
-                        props.errors && props.errors.length > 0 ? 'inputerror ps-[2rem]' : ''
+                        props.errors && props.errors.length > 0 ? 'inputerror ps-[2rem]' : '',
+                        props.disabled ? 'cursor-not-allowed bg-gray-200 text-gray-500' : 'bg-transparent'
                       ]"
+              :disabled="props.disabled"
               @input="onInputChange"
               :readonly="!props.searchable"
               :placeholder="placeholder"
@@ -138,7 +148,13 @@ const clearSelect = () => {
               />
           </div>
         </ComboboxInput>
-        <ComboboxTrigger class="absolute inset-y-0 right-0 px-2 w-8" v-if="!optionselect || !clearable">
+        <ComboboxTrigger
+          v-if="!optionselect || !clearable"
+          :class="[
+            'absolute inset-y-0 right-0 px-2 w-8',
+            props.disabled ? 'cursor-not-allowed text-gray-500' : '',
+          ]"
+        >
           <font-awesome-icon icon="fa-solid fa-angle-down" class="text-[1.25rem]" v-if="!isOpen"/>
           <font-awesome-icon icon="fa-solid fa-angle-up" class="text-[1.25rem]" v-else/>
         </ComboboxTrigger>
