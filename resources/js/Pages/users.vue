@@ -134,8 +134,7 @@ onMounted(()=>{
                         {element:row.email, classname:'lowercase'},
                         {element:row.verified ? 'Verificado':'Sin Verificar',classname:'uppercase'},
                         {element:row.date+'', classname:'uppercase'},
-                        {classname:'flex justify-center', 
-                        element: Dropdown,
+                        {element: Dropdown,
                             props: {
                                 triggerText:'Opciones',
                                 options: [
