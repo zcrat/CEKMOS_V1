@@ -11,9 +11,12 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import type { option } from '@/types/generales';
 import MyBasicToast from '@/utils/ToastNotificationBasic';
 import { ZdAlert } from '@/utils/ZdAlert';
+import { useAuth } from '@/composables/useAuth';
 import { useDebounce } from '@vueuse/core';
 import axios from 'axios';
 import { computed, ref } from 'vue';
+
+const { can, canAny } = useAuth();
 
 interface ConceptoPresupuesto {
     id: number;
@@ -108,7 +111,13 @@ const deleteConcepto = async (row: ConceptoPresupuesto) => {
 <template>
     <AppLayout title="Conceptos" description="Catálogo de conceptos" :loading="loading" messageLoading="Cargando conceptos">
         <template #header>
-            <Button text="Nuevo concepto" type="save" icon="fa-solid fa-circle-plus" @click="openCreate" />
+            <Button
+                v-if="can('crear_catalogo_conceptos')"
+                text="Nuevo concepto"
+                type="save"
+                icon="fa-solid fa-circle-plus"
+                @click="openCreate"
+            />
         </template>
 
         <template #filtering>
@@ -117,7 +126,7 @@ const deleteConcepto = async (row: ConceptoPresupuesto) => {
                     <Search v-model="search" Classdiv="w-full sm:w-[22rem]" placeholder="Buscar por descripción del concepto" />
                     <ZDRemoteSelect
                         v-model="categoriaSat"
-                        endpoint="catalogos.conceptos.opciones.categorias-sat"
+                        endpoint="select2.catalogo.categorias-sat"
                         label="Categoría SAT"
                         placeholder="Descripción o código SAT"
                         classDiv="w-full sm:w-[16rem]"
@@ -125,7 +134,7 @@ const deleteConcepto = async (row: ConceptoPresupuesto) => {
                     />
                     <ZDRemoteSelect
                         v-model="unidadSat"
-                        endpoint="catalogos.conceptos.opciones.unidades-sat"
+                        endpoint="select2.catalogo.unidades-sat"
                         label="Unidad SAT"
                         placeholder="Descripción o código"
                         classDiv="w-full sm:w-[16rem]"
@@ -133,7 +142,7 @@ const deleteConcepto = async (row: ConceptoPresupuesto) => {
                     />
                     <ZDRemoteSelect
                         v-model="vehiculo"
-                        endpoint="catalogos.conceptos.opciones.vehiculos"
+                        endpoint="select2.catalogo.vehiculos-conceptos"
                         label="Vehículo"
                         placeholder="Buscar vehículo"
                         classDiv="w-full sm:w-[16rem]"
@@ -141,7 +150,7 @@ const deleteConcepto = async (row: ConceptoPresupuesto) => {
                     />
                     <ZDRemoteSelect
                         v-model="categoria"
-                        endpoint="catalogos.conceptos.opciones.categorias"
+                        endpoint="select2.catalogo.categorias-conceptos"
                         label="Categoría"
                         placeholder="Buscar categoría"
                         classDiv="w-full sm:w-[16rem]"
@@ -185,7 +194,9 @@ const deleteConcepto = async (row: ConceptoPresupuesto) => {
                     'Vehículo',
                     'Usuario',
                     'Total',
-                    'Acciones',
+                    ...(canAny(['editar_catalogo_conceptos', 'eliminar_catalogo_conceptos'])
+                        ? ['Acciones']
+                        : []),
                 ]"
                 :rows="
                     items.map((row) => ({
@@ -201,25 +212,31 @@ const deleteConcepto = async (row: ConceptoPresupuesto) => {
                             { element: escapeHtml(row.vehiculo), classname: 'normal-case' },
                             { element: escapeHtml(row.usuario), classname: 'normal-case' },
                             { element: formatCurrency(row.total), classname: 'whitespace-nowrap text-right' },
-                            {
-                                element: Dropdown,
-                                props: {
-                                    triggerText: 'Acciones',
-                                    options: [
-                                        {
-                                            label: 'Modificar',
-                                            onClick: () => openEdit(row.id),
-                                            classname: ['hover:text-blue-700'],
-                                        },
-                                        {
-                                            label: 'Eliminar',
-                                            onClick: () => deleteConcepto(row),
-                                            classname: ['hover:text-red-700'],
-                                        },
-                                    ],
-                                    contentClasses: { bg: 'bg-white' },
-                                },
-                            },
+                            ...(canAny(['editar_catalogo_conceptos', 'eliminar_catalogo_conceptos'])
+                                ? [{
+                                    element: Dropdown,
+                                    props: {
+                                        triggerText: 'Acciones',
+                                        options: [
+                                            ...(can('editar_catalogo_conceptos')
+                                                ? [{
+                                                    label: 'Modificar',
+                                                    onClick: () => openEdit(row.id),
+                                                    classname: ['hover:text-blue-700'],
+                                                }]
+                                                : []),
+                                            ...(can('eliminar_catalogo_conceptos')
+                                                ? [{
+                                                    label: 'Eliminar',
+                                                    onClick: () => deleteConcepto(row),
+                                                    classname: ['hover:text-red-700'],
+                                                }]
+                                                : []),
+                                        ],
+                                        contentClasses: { bg: 'bg-white' },
+                                    },
+                                }]
+                                : []),
                         ],
                     }))
                 "

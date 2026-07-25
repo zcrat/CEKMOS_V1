@@ -9,23 +9,6 @@ import MyBasicToast from '@/utils/ToastNotificationBasic';
 import axios from 'axios';
 import { computed, reactive, ref, watch } from 'vue';
 
-interface CatalogItem {
-    id: number;
-    descripcion: string;
-    codigo_sat?: string;
-    codigo?: string;
-    modulo_id?: number;
-    modulo?: string;
-}
-
-interface Catalogos {
-    tipos: CatalogItem[];
-    modulos: CatalogItem[];
-    categorias_sat: CatalogItem[];
-    unidades_sat: CatalogItem[];
-    vehiculos: CatalogItem[];
-}
-
 interface ConceptoForm {
     numero: string;
     descripcion: string;
@@ -63,17 +46,10 @@ const emptyForm = (): ConceptoForm => ({
 });
 
 const form = reactive<ConceptoForm>(emptyForm());
-const catalogos = ref<Catalogos>({
-    tipos: [],
-    modulos: [],
-    categorias_sat: [],
-    unidades_sat: [],
-    vehiculos: [],
-});
 const errors = ref<Record<string, string[]>>({});
 const loading = ref(false);
-const loadedCatalogs = ref(false);
 const selectedCategoria = ref<option | null>(null);
+const selectedModulo = ref<option | null>(null);
 const selectedCategoriaSat = ref<option | null>(null);
 const selectedUnidadSat = ref<option | null>(null);
 const selectedVehiculo = ref<option | null>(null);
@@ -92,19 +68,12 @@ const formatCurrency = (value: number) =>
 const resetForm = () => {
     Object.assign(form, emptyForm());
     selectedCategoria.value = null;
+    selectedModulo.value = null;
     selectedCategoriaSat.value = null;
     selectedUnidadSat.value = null;
     selectedVehiculo.value = null;
     errors.value = {};
 };
-
-const asOption = (item: CatalogItem | undefined, label: string): option | null =>
-    item
-        ? {
-              value: item.id,
-              label,
-          }
-        : null;
 
 const clearError = (field: string) => {
     delete errors.value[field];
@@ -112,6 +81,9 @@ const clearError = (field: string) => {
 
 watch(selectedCategoria, (value) => {
     form.tipo_id = value ? Number(value.value) : null;
+});
+watch(selectedModulo, (value) => {
+    form.modulo_id = value ? Number(value.value) : null;
 });
 watch(selectedCategoriaSat, (value) => {
     form.categoria_sat_id = value ? Number(value.value) : null;
@@ -137,38 +109,21 @@ const loadData = async () => {
     resetForm();
 
     try {
-        if (!loadedCatalogs.value) {
-            const response = await axios.get<Catalogos>(route('catalogos.conceptos.catalogos'));
-            catalogos.value = response.data;
-            loadedCatalogs.value = true;
-        }
-
         if (props.costoId !== null) {
             const response = await axios.get(route('catalogos.conceptos.show', props.costoId));
             Object.assign(form, {
                 numero: response.data.numero,
                 descripcion: response.data.descripcion,
                 garantia_dias: response.data.garantia_dias,
-                tipo_id: response.data.tipo_id,
-                modulo_id: response.data.modulo_id,
-                categoria_sat_id: response.data.categoria_sat_id,
-                unidad_sat_id: response.data.unidad_sat_id,
-                vehiculo_id: response.data.vehiculo_id,
                 p_refaccion: Number(response.data.p_refaccion),
                 p_mano_obra: Number(response.data.p_mano_obra),
             });
 
-            const tipo = catalogos.value.tipos.find((item) => item.id === response.data.tipo_id);
-            const categoriaSat = catalogos.value.categorias_sat.find((item) => item.id === response.data.categoria_sat_id);
-            const unidadSat = catalogos.value.unidades_sat.find((item) => item.id === response.data.unidad_sat_id);
-            const vehiculo = catalogos.value.vehiculos.find(
-                (item) => item.id === response.data.vehiculo_id && item.modulo_id === response.data.modulo_id,
-            );
-
-            selectedCategoria.value = asOption(tipo, tipo?.descripcion ?? '');
-            selectedCategoriaSat.value = asOption(categoriaSat, `${categoriaSat?.descripcion ?? ''} — ${categoriaSat?.codigo_sat ?? ''}`);
-            selectedUnidadSat.value = asOption(unidadSat, `${unidadSat?.descripcion ?? ''} — ${unidadSat?.codigo ?? ''}`);
-            selectedVehiculo.value = asOption(vehiculo, vehiculo?.descripcion ?? '');
+            selectedCategoria.value = response.data.tipo;
+            selectedModulo.value = response.data.modulo;
+            selectedCategoriaSat.value = response.data.categoria_sat;
+            selectedUnidadSat.value = response.data.unidad_sat;
+            selectedVehiculo.value = response.data.vehiculo;
         }
     } catch {
         MyBasicToast.error('No fue posible cargar los datos del concepto');
@@ -263,7 +218,7 @@ const fieldError = (field: string) => errors.value[field]?.[0];
 
             <ZDRemoteSelect
                 v-model="selectedCategoria"
-                endpoint="catalogos.conceptos.opciones.categorias"
+                endpoint="select2.catalogo.categorias-conceptos"
                 label="Categoría"
                 placeholder="Buscar categoría"
                 :cacheoptions="false"
@@ -271,20 +226,19 @@ const fieldError = (field: string) => errors.value[field]?.[0];
                 :DeleteErrors="() => clearError('tipo_id')"
             />
 
-            <label class="flex flex-col">
-                Módulo
-                <select v-model.number="form.modulo_id" class="rounded-md">
-                    <option :value="null" disabled>Selecciona un módulo</option>
-                    <option v-for="item in catalogos.modulos" :key="item.id" :value="item.id">
-                        {{ item.descripcion }}
-                    </option>
-                </select>
-                <span v-if="fieldError('modulo_id')" class="text-sm text-red-600">{{ fieldError('modulo_id') }}</span>
-            </label>
+            <ZDRemoteSelect
+                v-model="selectedModulo"
+                endpoint="select2.catalogo.modulos-orden"
+                label="Módulo"
+                placeholder="Buscar módulo"
+                :cacheoptions="false"
+                :errors="errors.modulo_id"
+                :DeleteErrors="() => clearError('modulo_id')"
+            />
 
             <ZDRemoteSelect
                 v-model="selectedCategoriaSat"
-                endpoint="catalogos.conceptos.opciones.categorias-sat"
+                endpoint="select2.catalogo.categorias-sat"
                 label="Categoría SAT"
                 placeholder="Descripción o código SAT"
                 :cacheoptions="false"
@@ -294,7 +248,7 @@ const fieldError = (field: string) => errors.value[field]?.[0];
 
             <ZDRemoteSelect
                 v-model="selectedUnidadSat"
-                endpoint="catalogos.conceptos.opciones.unidades-sat"
+                endpoint="select2.catalogo.unidades-sat"
                 label="Unidad SAT"
                 placeholder="Descripción o código"
                 :cacheoptions="false"
@@ -304,10 +258,10 @@ const fieldError = (field: string) => errors.value[field]?.[0];
 
             <ZDRemoteSelect
                 v-model="selectedVehiculo"
-                endpoint="catalogos.conceptos.opciones.vehiculos"
+                endpoint="select2.catalogo.vehiculos-conceptos"
                 label="Vehículo"
                 placeholder="Buscar vehículo"
-                class="sm:col-span-2"
+                classDiv="sm:col-span-2"
                 :params="vehiculoParams"
                 :disabled="form.modulo_id === null"
                 :cacheoptions="false"

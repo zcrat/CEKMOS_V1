@@ -36,6 +36,7 @@ const logout = () => {
                 <span>&nbsp;Empleados</span>
             </NavLink>
             <Dropdown
+                v-if="canAny(['ver_catalogo_conceptos', 'ver_importacion_conceptos'])"
                 :align="'left-up'"
                 width="48"
                 classtrigger="w-full"
@@ -52,10 +53,10 @@ const logout = () => {
                 </template>
 
                 <template #content>
-                    <DropdownLink :href="route('catalogos.conceptos')">
+                    <DropdownLink v-if="can('ver_catalogo_conceptos')" :href="route('catalogos.conceptos')">
                         Conceptos
                     </DropdownLink>
-                    <DropdownLink :href="route('catalogos.conceptos-contratos')">
+                    <DropdownLink v-if="can('ver_importacion_conceptos')" :href="route('catalogos.conceptos-contratos')">
                         Conceptos Contratos
                     </DropdownLink>
                 </template>

@@ -1,10 +1,11 @@
 <?php
 
 namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use App\Models\User;
+
 class asignarrolesypermisos extends Seeder
 {
     /**
@@ -22,7 +23,12 @@ class asignarrolesypermisos extends Seeder
             'ver_presupuestos',
             'ver_recepciones_vehiculares',
             'administrar_caja',
-            'crear_ordenes_servicio'
+            'crear_ordenes_servicio',
+            'ver_catalogo_conceptos',
+            'crear_catalogo_conceptos',
+            'editar_catalogo_conceptos',
+            'eliminar_catalogo_conceptos',
+            'ver_importacion_conceptos',
         ];
 
         foreach ($permissions as $permission) {

@@ -6,6 +6,7 @@ use App\Http\Controllers\ComboboxController;
 use App\Http\Controllers\ConceptosPresupuestosController;
 use App\Http\Controllers\CortanaController;
 use App\Http\Controllers\EmpleadosController;
+use App\Http\Controllers\ImportacionConceptosController;
 use App\Http\Controllers\InspeccionVehicularController;
 use App\Http\Controllers\MigrateDataBaseOld;
 use App\Http\Controllers\PdfController;
@@ -32,44 +33,50 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
-    Route::get('/catalogos/conceptos', function () {
-        return Inertia::render('Catalogos/Conceptos');
-    })->name('catalogos.conceptos');
-    Route::get('/catalogos/conceptos-contratos', function () {
-        return Inertia::render('Catalogos/ConceptosContratos');
-    })->name('catalogos.conceptos-contratos');
-    Route::get('/catalogos/conceptos/read', [ConceptosPresupuestosController::class, 'read'])
-        ->name('catalogos.conceptos.read');
-    Route::get('/catalogos/conceptos/catalogos', [ConceptosPresupuestosController::class, 'catalogos'])
-        ->name('catalogos.conceptos.catalogos');
-    Route::get('/catalogos/conceptos/opciones/categorias-sat', [ConceptosPresupuestosController::class, 'categoriasSatOptions'])
-        ->name('catalogos.conceptos.opciones.categorias-sat');
-    Route::get('/catalogos/conceptos/opciones/unidades-sat', [ConceptosPresupuestosController::class, 'unidadesSatOptions'])
-        ->name('catalogos.conceptos.opciones.unidades-sat');
-    Route::get('/catalogos/conceptos/opciones/vehiculos', [ConceptosPresupuestosController::class, 'vehiculosOptions'])
-        ->name('catalogos.conceptos.opciones.vehiculos');
-    Route::get('/catalogos/conceptos/opciones/categorias', [ConceptosPresupuestosController::class, 'categoriasOptions'])
-        ->name('catalogos.conceptos.opciones.categorias');
-    Route::get('/catalogos/conceptos/plantilla', [ConceptosPresupuestosController::class, 'plantilla'])
-        ->name('catalogos.conceptos.plantilla');
-    Route::post('/catalogos/conceptos/importar', [ConceptosPresupuestosController::class, 'encolarImportacion'])
-        ->name('catalogos.conceptos.importar');
-    Route::get('/catalogos/conceptos/importaciones', [ConceptosPresupuestosController::class, 'importaciones'])
-        ->name('catalogos.conceptos.importaciones');
-    Route::get('/catalogos/conceptos/importaciones/{archivoSistema}/progreso', [ConceptosPresupuestosController::class, 'progresoImportacion'])
-        ->name('catalogos.conceptos.importaciones.progreso');
-    Route::get('/catalogos/conceptos/importaciones/{archivoSistema}/resultado', [ConceptosPresupuestosController::class, 'descargarResultado'])
-        ->name('catalogos.conceptos.importaciones.resultado');
-    Route::delete('/catalogos/conceptos/importaciones/{archivoSistema}', [ConceptosPresupuestosController::class, 'destroyImportacion'])
-        ->name('catalogos.conceptos.importaciones.destroy');
-    Route::post('/catalogos/conceptos', [ConceptosPresupuestosController::class, 'store'])
-        ->name('catalogos.conceptos.store');
-    Route::get('/catalogos/conceptos/{costo}', [ConceptosPresupuestosController::class, 'show'])
-        ->name('catalogos.conceptos.show');
-    Route::put('/catalogos/conceptos/{costo}', [ConceptosPresupuestosController::class, 'update'])
-        ->name('catalogos.conceptos.update');
-    Route::delete('/catalogos/conceptos/{costo}', [ConceptosPresupuestosController::class, 'destroy'])
-        ->name('catalogos.conceptos.destroy');
+    Route::middleware(['permission:ver_catalogo_conceptos'])->group(function () {
+        Route::get('/catalogos/conceptos', function () {
+            return Inertia::render('Catalogos/Conceptos');
+        })->name('catalogos.conceptos');
+        Route::get('/catalogos/conceptos/read', [ConceptosPresupuestosController::class, 'read'])
+            ->name('catalogos.conceptos.read');
+    });
+
+    Route::middleware(['permission:crear_catalogo_conceptos'])->group(function () {
+        Route::post('/catalogos/conceptos', [ConceptosPresupuestosController::class, 'store'])
+            ->name('catalogos.conceptos.store');
+    });
+
+    Route::middleware(['permission:editar_catalogo_conceptos'])->group(function () {
+        Route::get('/catalogos/conceptos/{costo}', [ConceptosPresupuestosController::class, 'show'])
+            ->name('catalogos.conceptos.show');
+        Route::put('/catalogos/conceptos/{costo}', [ConceptosPresupuestosController::class, 'update'])
+            ->name('catalogos.conceptos.update');
+    });
+
+    Route::middleware(['permission:eliminar_catalogo_conceptos'])->group(function () {
+        Route::delete('/catalogos/conceptos/{costo}', [ConceptosPresupuestosController::class, 'destroy'])
+            ->name('catalogos.conceptos.destroy');
+    });
+
+    Route::middleware(['permission:ver_importacion_conceptos'])->group(function () {
+        Route::get('/catalogos/conceptos-contratos', function () {
+            return Inertia::render('Catalogos/ConceptosContratos');
+        })->name('catalogos.conceptos-contratos');
+        Route::get('/catalogos/conceptos/catalogos', [ImportacionConceptosController::class, 'catalogos'])
+            ->name('catalogos.conceptos.catalogos');
+        Route::get('/catalogos/conceptos/plantilla', [ImportacionConceptosController::class, 'plantilla'])
+            ->name('catalogos.conceptos.plantilla');
+        Route::post('/catalogos/conceptos/importar', [ImportacionConceptosController::class, 'encolarImportacion'])
+            ->name('catalogos.conceptos.importar');
+        Route::get('/catalogos/conceptos/importaciones', [ImportacionConceptosController::class, 'importaciones'])
+            ->name('catalogos.conceptos.importaciones');
+        Route::get('/catalogos/conceptos/importaciones/{archivoSistema}/progreso', [ImportacionConceptosController::class, 'progresoImportacion'])
+            ->name('catalogos.conceptos.importaciones.progreso');
+        Route::get('/catalogos/conceptos/importaciones/{archivoSistema}/resultado', [ImportacionConceptosController::class, 'descargarResultado'])
+            ->name('catalogos.conceptos.importaciones.resultado');
+        Route::delete('/catalogos/conceptos/importaciones/{archivoSistema}', [ImportacionConceptosController::class, 'destroyImportacion'])
+            ->name('catalogos.conceptos.importaciones.destroy');
+    });
 
     Route::middleware(['permission:ver_usuarios_sitema'])->group(function () {
         Route::get('/users', function () {
@@ -127,6 +134,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('select2/catalogo/marcas', [select2controller::class, 'MarcasCatalogo'])->name('select2.catalogo.marcas');
     Route::get('select2/catalogo/motores', [select2controller::class, 'MotoresCatalogo'])->name('select2.catalogo.motores');
     Route::get('select2/catalogo/modelos', [select2controller::class, 'ModelosCatalogo'])->name('select2.catalogo.modelos');
+    Route::get('select2/catalogo/categorias-sat', [select2controller::class, 'CategoriasSatCatalogo'])->name('select2.catalogo.categorias-sat');
+    Route::get('select2/catalogo/unidades-sat', [select2controller::class, 'UnidadesSatCatalogo'])->name('select2.catalogo.unidades-sat');
+    Route::get('select2/catalogo/vehiculos-conceptos', [select2controller::class, 'VehiculosConceptosCatalogo'])->name('select2.catalogo.vehiculos-conceptos');
+    Route::get('select2/catalogo/categorias-conceptos', [select2controller::class, 'CategoriasConceptosCatalogo'])->name('select2.catalogo.categorias-conceptos');
+    Route::get('select2/catalogo/modulos-orden', [select2controller::class, 'ModulosOrdenCatalogo'])->name('select2.catalogo.modulos-orden');
 
     Route::get('select/niveles/combustible', [selectcontroller::class, 'NivelesCombustible'])->name('select.niveles.combustible');
     Route::get('select/modulos/orden', [selectcontroller::class, 'ModulosOrden'])->name('select.modulos.disponibles.usuario');
