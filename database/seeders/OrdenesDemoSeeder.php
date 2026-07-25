@@ -8,15 +8,19 @@ use App\Models\CondicionesPinturaRV;
 use App\Models\DatosEntrada;
 use App\Models\DatosSalida;
 use App\Models\Empresas;
+use App\Models\Estatus;
 use App\Models\ExterioresRV;
 use App\Models\InterioresRV;
 use App\Models\InventarioRV;
 use App\Models\ModuloOrdenesServicio;
+use App\Models\ModulosPerUser;
 use App\Models\NivelesCombustible;
 use App\Models\OrdenesServicio;
+use App\Models\Presupuestos;
 use App\Models\RecepcionesVehiculares;
 use App\Models\ResponsablesOrdenServicio;
 use App\Models\RutasArchivo;
+use App\Models\Tipos;
 use App\Models\Ubicaciones;
 use App\Models\User;
 use App\Models\Vehiculos;
@@ -52,6 +56,20 @@ class OrdenesDemoSeeder extends Seeder
             ]);
 
             $nivelComb = NivelesCombustible::inRandomOrder()->value('id') ?? 1;
+            $tiposPresupuesto = Tipos::query()
+                ->where('categoria_id', 2)
+                ->orderBy('id')
+                ->get();
+            $estatusPresupuesto = Estatus::query()
+                ->where('categoria_id', 2)
+                ->orderBy('id')
+                ->get();
+
+            if ($tiposPresupuesto->isEmpty() || $estatusPresupuesto->isEmpty()) {
+                throw new \RuntimeException(
+                    'Se requieren tipos y estatus de presupuesto para crear los datos demo.'
+                );
+            }
 
             for ($i = 1; $i <= 10; $i++) {
                 $user = $users[$i % max(1, $users->count())];
@@ -75,6 +93,11 @@ class OrdenesDemoSeeder extends Seeder
                     'notas_retraso' => null,
                     'telefono' => '443-000-000'.($i % 10),
                     'ubicacion_id' => $ubicacion->id,
+                ]);
+
+                ModulosPerUser::firstOrCreate([
+                    'user_id' => $user->id,
+                    'modulo_orden_id' => $os->modulo_orden_id,
                 ]);
 
                 // Entrada
@@ -180,6 +203,39 @@ class OrdenesDemoSeeder extends Seeder
                     'tecnico_id' => 4,
                     'orden_servicio_id' => $os->id,
                 ]);
+
+                // Distribución: 4 órdenes con 2, 3 órdenes con 3 y 3 órdenes con 1.
+                $cantidadPresupuestos = match (true) {
+                    $i <= 4 => 2,
+                    $i <= 7 => 3,
+                    default => 1,
+                };
+
+                for ($presupuestoIndex = 1; $presupuestoIndex <= $cantidadPresupuestos; $presupuestoIndex++) {
+                    $tipoPresupuesto = $tiposPresupuesto[
+                        ($i + $presupuestoIndex - 2) % $tiposPresupuesto->count()
+                    ];
+                    $estatus = $estatusPresupuesto[
+                        ($i + $presupuestoIndex - 2) % $estatusPresupuesto->count()
+                    ];
+
+                    Presupuestos::create([
+                        'orden_servicio_id' => $os->id,
+                        'observaciones' => 'Tiempo estimado sujeto al diagnóstico de la unidad.',
+                        'descripcion_mo' => "Presupuesto demo {$presupuestoIndex} para la orden {$orden}.",
+                        'garantia' => 'LO ESTIPULADO EN EL CONTRATO',
+                        'folio' => sprintf(
+                            'DEMO-PRE-%s-%02d-%02d',
+                            date('Y'),
+                            $i,
+                            $presupuestoIndex
+                        ),
+                        'vigencia' => Carbon::now()->addDays(15 + $presupuestoIndex),
+                        'factura_id' => null,
+                        'tipo_id' => $tipoPresupuesto->id,
+                        'estatus_id' => $estatus->id,
+                    ]);
+                }
 
                 // Replicar las imágenes demo para cada recepción.
                 $rutas = RutasArchivo::whereIn('tipo_id', [25, 26, 58])
