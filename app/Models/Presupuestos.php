@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Presupuestos extends Model
 {
-     use SoftDeletes;
+    use SoftDeletes;
 
     protected $table = 'presupuestos';
 
@@ -22,30 +23,57 @@ class Presupuestos extends Model
         'estatus_id',
     ];
 
+    protected $casts = [
+        'vigencia' => 'datetime',
+    ];
+
     // Relaciones
-    public function orden_servicio(){
-        return $this->belongsTo(OrdenesServicio::class,'orden_servicio_id');
-    }
-    public function factura(){
-        return $this->belongsTo(Facturas::class,'factura_id');
-    }
-    public function tipo(){
-        return $this->belongsTo(Tipos::class,'tipo_id');
-    }
-    public function estatus(){
-        return $this->belongsTo(Estatus::class,'estatus_id');
-    }
-    public function pagos(){
-        return $this->hasMany(PagosPresupuestos::class,'presupuestos_id');
-    }
-    public function archivos(){
-        return $this->hasMany(Archivos::class,'presupuesto_id');
-    }
-    public function log_acciones(){
-        return $this->hasMany(LogAccionesOS::class,'presupuesto_id');
-    }
-    public function conceptos_presupuesto(){
-        return $this->hasMany(ConceptosPerPresupuesto::class,'presupuesto_id');
+    public function orden_servicio()
+    {
+        return $this->belongsTo(OrdenesServicio::class, 'orden_servicio_id');
     }
 
+    public function factura()
+    {
+        return $this->belongsTo(Facturas::class, 'factura_id');
+    }
+
+    public function tipo()
+    {
+        return $this->belongsTo(Tipos::class, 'tipo_id');
+    }
+
+    public function categorias_conceptos_disponibles()
+    {
+        return $this->hasMany(
+            CategoriasConceptosDisponibles::class,
+            'tipo_presupuesto_id',
+            'tipo_id'
+        );
+    }
+
+    public function estatus()
+    {
+        return $this->belongsTo(Estatus::class, 'estatus_id');
+    }
+
+    public function pagos()
+    {
+        return $this->hasMany(PagosPresupuestos::class, 'presupuestos_id');
+    }
+
+    public function archivos()
+    {
+        return $this->hasMany(Archivos::class, 'presupuesto_id');
+    }
+
+    public function log_acciones()
+    {
+        return $this->hasMany(LogAccionesOS::class, 'presupuesto_id');
+    }
+
+    public function conceptos_presupuesto()
+    {
+        return $this->hasMany(ConceptosPerPresupuesto::class, 'presupuesto_id');
+    }
 }

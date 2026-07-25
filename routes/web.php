@@ -10,7 +10,7 @@ use App\Http\Controllers\ImportacionConceptosController;
 use App\Http\Controllers\InspeccionVehicularController;
 use App\Http\Controllers\MigrateDataBaseOld;
 use App\Http\Controllers\PdfController;
-use App\Http\Controllers\presupuestosController;
+use App\Http\Controllers\PresupuestosController;
 use App\Http\Controllers\RecepcionVehicularController;
 use App\Http\Controllers\select2controller;
 use App\Http\Controllers\selectcontroller;
@@ -96,6 +96,18 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('cortana/get/ordenes-servicio', [CortanaController::class, 'GetOrdenesServicio'])->name('cortana.ordenservicio.items');
         Route::get('presupuesto/get/datos/orden', [PresupuestosController::class, 'GetDataPerOrdenServicio'])->name('presupuesto.get.data_orden');
         Route::post('presupuesto/create', [PresupuestosController::class, 'CreatePresupuesto'])->name('presupuesto.create');
+        Route::get('presupuesto/conceptos-disponibles', [PresupuestosController::class, 'conceptosDisponibles'])
+            ->name('presupuesto.conceptos.disponibles');
+        Route::get('select2/presupuesto/categorias-conceptos', [select2controller::class, 'CategoriasConceptosPorPresupuesto'])
+            ->name('select2.presupuesto.categorias-conceptos');
+        Route::get('presupuesto/{presupuesto}', [PresupuestosController::class, 'show'])
+            ->name('presupuesto.show');
+        Route::put('presupuesto/{presupuesto}', [PresupuestosController::class, 'update'])
+            ->name('presupuesto.update');
+        Route::delete('presupuesto/{presupuesto}', [PresupuestosController::class, 'destroy'])
+            ->name('presupuesto.destroy');
+        Route::post('presupuesto/{presupuesto}/conceptos', [PresupuestosController::class, 'agregarConceptos'])
+            ->name('presupuesto.conceptos.agregar');
     });
 
     Route::middleware(['permission:ver_recepciones_vehiculares'])->group(function () {
@@ -143,6 +155,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('select/niveles/combustible', [selectcontroller::class, 'NivelesCombustible'])->name('select.niveles.combustible');
     Route::get('select/modulos/orden', [selectcontroller::class, 'ModulosOrden'])->name('select.modulos.disponibles.usuario');
     Route::get('select/estatus', [selectcontroller::class, 'EstatusIdsPerCategory'])->name('select.status');
+    Route::get('select/tipos', [selectcontroller::class, 'TiposIdsPerCategory'])->name('select.tipos');
     Route::get('select/tipos/vehiculos', [selectcontroller::class, 'TiposVehiculosGeneral'])->name('select.tipos.vehiculos');
 
     Route::get('combobox/ordenesservicio', [ComboboxController::class, 'GetOrdenesServicio'])->name('combobox.ordenes_servicio');

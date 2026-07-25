@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CategoriasConceptosDisponibles;
 use App\Models\CategoriasSat;
 use App\Models\Clientes;
 use App\Models\Empresas;
@@ -9,6 +10,7 @@ use App\Models\Marcas;
 use App\Models\Modelos;
 use App\Models\ModuloOrdenesServicio;
 use App\Models\Motores;
+use App\Models\Presupuestos;
 use App\Models\RegimenesFiscales;
 use App\Models\Tipos;
 use App\Models\UnidadesSat;
@@ -96,9 +98,9 @@ class select2controller extends Controller
                 ->where('vehiculos_conceptos_disponibles.modulo_orden_id', $validation->validated()['id_modulo'])
                 ->where('descripcion', 'LIKE', $search)
                 ->get()->map(fn ($item) => [
-                'value' => $item->id,
-                'label' => $item->descripcion,
-            ]);
+                    'value' => $item->id,
+                    'label' => $item->descripcion,
+                ]);
         }
 
         return response()->json(compact('options'));
@@ -259,6 +261,58 @@ class select2controller extends Controller
                 'value' => $item->id,
                 'label' => $item->descripcion,
             ]);
+
+        return response()->json(compact('options'));
+    }
+
+    public function CategoriasConceptosPorPresupuesto(Request $request)
+    {
+        $validated = $request->validate([
+            'presupuesto_id' => ['required', 'integer', 'exists:presupuestos,id'],
+            'query' => ['nullable', 'string', 'max:255'],
+        ]);
+        $presupuesto = Presupuestos::query()
+            ->with('orden_servicio')
+            ->findOrFail($validated['presupuesto_id']);
+        $user = $request->user();
+
+        abort_unless(
+            $presupuesto->orden_servicio
+                && (
+                    $user->hasRole('Super Admin')
+                    || $user->modulos_orden()
+                        ->where(
+                            'modulo_orden_id',
+                            $presupuesto->orden_servicio->modulo_orden_id
+                        )
+                        ->exists()
+                ),
+            403
+        );
+
+        $query = trim($validated['query'] ?? '');
+        $options = CategoriasConceptosDisponibles::query()
+            ->where('tipo_presupuesto_id', $presupuesto->tipo_id)
+            ->whereHas('categoria_concepto', function ($builder) use ($query) {
+                $builder
+                    ->where('categoria_id', 7)
+                    ->when(
+                        $query !== '',
+                        fn ($categoryQuery) => $categoryQuery
+                            ->where('descripcion', 'like', "%{$query}%")
+                    );
+            })
+            ->with('categoria_concepto:id,descripcion')
+            ->get()
+            ->sortBy(fn (CategoriasConceptosDisponibles $item) => (
+                $item->categoria_concepto?->descripcion ?? ''
+            ))
+            ->map(fn (CategoriasConceptosDisponibles $item) => [
+                'value' => $item->categoria_concepto_id,
+                'label' => $item->categoria_concepto?->descripcion ?? '',
+            ])
+            ->filter(fn (array $item) => $item['label'] !== '')
+            ->values();
 
         return response()->json(compact('options'));
     }
