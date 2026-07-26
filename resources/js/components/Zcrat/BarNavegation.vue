@@ -72,16 +72,26 @@ const logout = () => {
                     </DropdownLink>
                 </template>
             </Dropdown>
-            <Dropdown :align="IsRow?'right':'left-up' " width="48" v-if="canAny(['ver_presupuestos','ver_recepciones_vehiculares'])">
+            <Dropdown
+                v-if="canAny(['ver_presupuestos', 'ver_recepciones_vehiculares'])"
+                :align="IsRow?'right':'left-up' "
+                width="48"
+            >
                 <template #trigger>
                     <ButtonLink :title="IsRow ? '' : 'Ordenes'"  :active="route().current('cortana.presupuesto.vista')"><font-awesome-icon icon="fa-solid fa-table-list" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Ordenes</span></ButtonLink>
                 </template>
                 
                 <template #content>
-                    <DropdownLink v-if="can('ver_presupuestos')" :href="route('cortana.presupuesto.vista')">
+                    <DropdownLink
+                        v-if="can('ver_presupuestos')"
+                        :href="route('cortana.presupuesto.vista')"
+                    >
                         Presupuestos
                     </DropdownLink>
-                    <DropdownLink v-if="can('ver_recepciones_vehiculares')" :href="route('recepcionesvehiculares.vista')">
+                    <DropdownLink
+                        v-if="can('ver_recepciones_vehiculares')"
+                        :href="route('recepcionesvehiculares.vista')"
+                    >
                     <font-awesome-icon icon="fa-solid fa-truck-pickup" :class="IsRow?'':'sm:text-[1.3rem]'"/> Recepciones Vehiculares
                     </DropdownLink>
                 </template>

@@ -17,6 +17,7 @@ use App\Models\OrdenesServicio;
 use App\Models\SeguridadInspeccionVehicular;
 use App\Models\SuspencionDireccionInspeccionVehicular;
 use App\Models\TrenTransmisionInspeccionVehicular;
+use App\Services\AlcanceRecepcionesVehiculares;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -137,6 +138,14 @@ class InspeccionVehicularController extends Controller
 
     public function read(OrdenesServicio $ordenServicio): JsonResponse
     {
+        abort_unless(
+            AlcanceRecepcionesVehiculares::puedeAccederOrden(
+                request()->user(),
+                $ordenServicio
+            ),
+            403
+        );
+
         $inspeccion = InspeccionVehicular::with(array_keys(self::SECTIONS))
             ->where('orden_servicio_id', $ordenServicio->id)
             ->first();
@@ -162,6 +171,16 @@ class InspeccionVehicularController extends Controller
     public function save(Request $request): JsonResponse
     {
         $validated = $request->validate($this->rules());
+        $ordenServicio = OrdenesServicio::findOrFail(
+            $validated['orden_servicio_id']
+        );
+        abort_unless(
+            AlcanceRecepcionesVehiculares::puedeAccederOrden(
+                $request->user(),
+                $ordenServicio
+            ),
+            403
+        );
 
         [$inspeccion, $created] = DB::transaction(function () use ($validated, $request) {
             $inspeccion = InspeccionVehicular::with(array_keys(self::SECTIONS))

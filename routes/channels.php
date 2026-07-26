@@ -15,7 +15,10 @@ Broadcast::channel('Data.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 Broadcast::channel('ordenes_servicio', function ($user) {
-    return $user->can('ver_ordenes_servicio');
+    return $user->canAny([
+        'ver_presupuestos',
+        'ver_recepciones_vehiculares',
+    ]);
 });
 Broadcast::channel('importaciones.conceptos.{userId}', function ($user, $userId) {
     return (int) $user->id === (int) $userId;

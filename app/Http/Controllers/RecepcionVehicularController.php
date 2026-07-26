@@ -19,6 +19,7 @@ use App\Models\Ubicaciones;
 use App\Models\UsuariosTaller;
 use App\Models\VehiculosConceptosDisponibles;
 use App\Rules\ExistTipo;
+use App\Services\AlcanceRecepcionesVehiculares;
 use App\Services\OrdenServicio\FunctionsOrdenServicio;
 use App\Services\Validations\InventarioYCondicionesEquipo;
 use Carbon\Carbon;
@@ -42,11 +43,9 @@ class RecepcionVehicularController extends Controller
         $itemsPerPage=$request->itemsPerPage ?? 10;
         
         $query=OrdenesServicio::query()->with(['last_seguimiento','vehiculo.modelo.marca','empresa','ubicacion','recepcion_vehicular'])->whereHas('recepcion_vehicular');
-        
-        if(!$user->hasRole('Super Admin')){
-            $user->load('modulos_orden');
-            $modulosvisibles=$user->modulos_orden ? $user->modulos_orden->pluck('modulo_orden_id')->toarray(): [] ;
-            $query->whereIn('modulo_orden_id',$modulosvisibles);
+        AlcanceRecepcionesVehiculares::aplicar($query, $user);
+        if ($request->filled('modulos')) {
+            $query->whereIn('modulo_orden_id', $request->input('modulos', []));
         }
             
         $query=$query->paginate($itemsPerPage,['*'],'page',$currentPage);
@@ -96,7 +95,14 @@ class RecepcionVehicularController extends Controller
                 'responsables.jefe_de_proceso',
                 'responsables.trabajador',
                 'responsables.tecnico',
-            ])->find($request->id);
+            ])->findOrFail($request->id);
+        abort_unless(
+            AlcanceRecepcionesVehiculares::puedeAccederOrden(
+                $request->user(),
+                $ordenservicio
+            ),
+            403
+        );
         
         $responsables=$ordenservicio->responsables;
         $recepcionVehicular=$ordenservicio->recepcion_vehicular;
@@ -527,6 +533,13 @@ class RecepcionVehicularController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
+        abort_unless(
+            AlcanceRecepcionesVehiculares::puedeAccederOrden(
+                $request->user(),
+                OrdenesServicio::findOrFail($request->id)
+            ),
+            403
+        );
         try{
             DB::beginTransaction();
             $ubicacion=Ubicaciones::FirstOrCreate(['nombre'=>
@@ -724,7 +737,16 @@ class RecepcionVehicularController extends Controller
         $request->validate([
             'id'=>['required','exists:recepciones_vehiculares,id']
         ]);
-        $recepcionVehicular=RecepcionesVehiculares::find($request->id);
+        $recepcionVehicular=RecepcionesVehiculares::with('orden_servicio')
+            ->findOrFail($request->id);
+        abort_unless(
+            $recepcionVehicular->orden_servicio
+                && AlcanceRecepcionesVehiculares::puedeAccederOrden(
+                    $request->user(),
+                    $recepcionVehicular->orden_servicio
+                ),
+            403
+        );
         
         $recepcionVehicular->cambiar_archivos=!$recepcionVehicular->cambiar_archivos;
         $recepcionVehicular->save();

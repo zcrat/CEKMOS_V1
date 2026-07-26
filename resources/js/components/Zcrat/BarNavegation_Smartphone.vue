@@ -61,7 +61,13 @@ const logout = () => {
                     </DropdownLink>
                 </template>
             </Dropdown>
-            <Dropdown :align="'left-up'" width="48" classtrigger="w-full" classcontent="w-full" v-if="canAny(['ver_presupuestos','ver_recepciones_vehiculares'])">
+            <Dropdown
+                v-if="canAny(['ver_presupuestos', 'ver_recepciones_vehiculares'])"
+                :align="'left-up'"
+                width="48"
+                classtrigger="w-full"
+                classcontent="w-full"
+            >
                 <template #trigger>
                     <ButtonLink 
                         :active="route().current('cortana.presupuesto.vista') || route().current('recepcionesvehiculares.vista')"
@@ -71,10 +77,16 @@ const logout = () => {
                 </template>
                 
                 <template #content>
-                    <DropdownLink v-if="can('ver_presupuestos')" :href="route('cortana.presupuesto.vista')">
+                    <DropdownLink
+                        v-if="can('ver_presupuestos')"
+                        :href="route('cortana.presupuesto.vista')"
+                    >
                         Presupuestos
                     </DropdownLink>
-                    <DropdownLink v-if="can('ver_recepciones_vehiculares')" :href="route('recepcionesvehiculares.vista')">
+                    <DropdownLink
+                        v-if="can('ver_recepciones_vehiculares')"
+                        :href="route('recepcionesvehiculares.vista')"
+                    >
                         Recepciones Vehiculares
                     </DropdownLink>
                 </template>

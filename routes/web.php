@@ -9,6 +9,7 @@ use App\Http\Controllers\EmpleadosController;
 use App\Http\Controllers\ImportacionConceptosController;
 use App\Http\Controllers\InspeccionVehicularController;
 use App\Http\Controllers\MigrateDataBaseOld;
+use App\Http\Controllers\OrdenesServicioController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\PresupuestosController;
 use App\Http\Controllers\RecepcionVehicularController;
@@ -93,27 +94,46 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::middleware(['permission:ver_presupuestos'])->group(function () {
         Route::get('cortana/presupuestos', [CortanaController::class, 'PresupuestosVista'])->name('cortana.presupuesto.vista');
         Route::get('cortana/get/presusupuestos', [CortanaController::class, 'GetItems'])->name('cortana.presupuesto.items');
-        Route::get('cortana/get/ordenes-servicio', [CortanaController::class, 'GetOrdenesServicio'])->name('cortana.ordenservicio.items');
+        Route::get('cortana/get/ordenes-servicio', [CortanaController::class, 'GetOrdenServicio'])->name('cortana.ordenservicio.items');
         Route::get('presupuesto/get/datos/orden', [PresupuestosController::class, 'GetDataPerOrdenServicio'])->name('presupuesto.get.data_orden');
         Route::post('presupuesto/create', [PresupuestosController::class, 'CreatePresupuesto'])->name('presupuesto.create');
         Route::get('presupuesto/conceptos-disponibles', [PresupuestosController::class, 'conceptosDisponibles'])
             ->name('presupuesto.conceptos.disponibles');
         Route::get('select2/presupuesto/categorias-conceptos', [select2controller::class, 'CategoriasConceptosPorPresupuesto'])
             ->name('select2.presupuesto.categorias-conceptos');
+        Route::get('select/presupuestos/modulos', [selectcontroller::class, 'ModulosPresupuestos'])
+            ->name('select.presupuestos.modulos');
+        Route::get('select2/ordenes-servicio/modulos-cambio', [select2controller::class, 'ModulosCambioOrdenServicio'])
+            ->middleware('permission:cambiar_modulo_presupuestos')
+            ->name('select2.ordenes-servicio.modulos-cambio');
         Route::get('presupuesto/{presupuesto}', [PresupuestosController::class, 'show'])
             ->name('presupuesto.show');
         Route::put('presupuesto/{presupuesto}', [PresupuestosController::class, 'update'])
             ->name('presupuesto.update');
+        Route::patch('presupuesto/{presupuesto}/estatus/next', [PresupuestosController::class, 'avanzarEstatus'])
+            ->name('presupuesto.estatus.next');
+        Route::patch('presupuesto/{presupuesto}/estatus/back', [PresupuestosController::class, 'retrocederEstatus'])
+            ->name('presupuesto.estatus.back');
+        Route::patch('ordenes-servicio/{ordenServicio}/modulo', [OrdenesServicioController::class, 'actualizarModulo'])
+            ->middleware('permission:cambiar_modulo_presupuestos')
+            ->name('ordenes-servicio.modulo.update');
         Route::delete('presupuesto/{presupuesto}', [PresupuestosController::class, 'destroy'])
             ->name('presupuesto.destroy');
         Route::post('presupuesto/{presupuesto}/conceptos', [PresupuestosController::class, 'agregarConceptos'])
             ->name('presupuesto.conceptos.agregar');
+        Route::put('presupuesto/{presupuesto}/conceptos', [PresupuestosController::class, 'actualizarConceptos'])
+            ->name('presupuesto.conceptos.update');
+        Route::post('presupuesto/{presupuesto}/conceptos/crear', [PresupuestosController::class, 'crearConcepto'])
+            ->middleware('permission:crear_catalogo_conceptos')
+            ->name('presupuesto.conceptos.crear');
     });
 
     Route::middleware(['permission:ver_recepciones_vehiculares'])->group(function () {
         Route::get('/recepciones/vehiculares', [RecepcionVehicularController::class, 'view'])->name('recepcionesvehiculares.vista');
         Route::get('/recepciones/vehiculares/read', [RecepcionVehicularController::class, 'Read'])->name('recepcionesvehiculares.read');
         Route::get('/recepciones/vehiculares/read/one', [RecepcionVehicularController::class, 'ReadOne'])->name('recepcionvehicular.read');
+        Route::get('/select/recepciones-vehiculares/modulos', [selectcontroller::class, 'ModulosRecepcionesVehiculares'])
+            ->name('select.recepciones-vehiculares.modulos');
         Route::get('/pdf/recepciones/vehiculares/{id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.cortana.recepcionvehicular');
         Route::get('/pdf/inspeccion/vehicular/{id}', [PdfController::class, 'InspeccionVehicular'])->name('pdf.cortana.inspeccion.vehicular');
         Route::get('/inspeccion/vehicular/{ordenServicio}', [InspeccionVehicularController::class, 'read'])->name('inspeccionvehicular.read');

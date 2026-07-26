@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrdenesServicio;
+use App\Services\AlcanceRecepcionesVehiculares;
 use Carbon\Carbon;
 use Spatie\LaravelPdf\Facades\Pdf;
 use App\Models\RutasArchivo;
@@ -41,6 +42,13 @@ class PdfController extends Controller
         if(!$ordenservicio){
             return  Pdf::html('<h1>Orden de servicio no encontrada</h1>')->format('A4');
         }
+        abort_unless(
+            AlcanceRecepcionesVehiculares::puedeAccederOrden(
+                request()->user(),
+                $ordenservicio
+            ),
+            403
+        );
 
         $recepcionVehicular=$ordenservicio->recepcion_vehicular;
         $interiores=$recepcionVehicular?->interiores;
@@ -215,6 +223,13 @@ class PdfController extends Controller
         if(!$ordenservicio){
             return  Pdf::html('<h1>Orden de servicio no encontrada</h1>')->format('A4');
         }
+        abort_unless(
+            AlcanceRecepcionesVehiculares::puedeAccederOrden(
+                request()->user(),
+                $ordenservicio
+            ),
+            403
+        );
 
         [$inspeccion, $estatusInspeccion] = $this->datosInspeccionVehicular($ordenservicio->id);
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Archivos;
 use App\Models\RutasArchivo;
+use App\Services\AlcanceRecepcionesVehiculares;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +18,17 @@ class ArchivosController extends Controller
         $request->validate(['id'=>['required','exists:archivos,id'],'origen'=>['required','in:recepcionvehicular,presupuesto']]);
         $origen = $request->origen;
         $file=Archivos::find($request->id);
+        if ($origen === 'recepcionvehicular') {
+            $orden = $file?->recepcion_vehicular?->orden_servicio;
+            abort_unless(
+                $orden
+                    && AlcanceRecepcionesVehiculares::puedeAccederOrden(
+                        $request->user(),
+                        $orden
+                    ),
+                403
+            );
+        }
         try{
             DB::beginTransaction();
             if(!$file){
