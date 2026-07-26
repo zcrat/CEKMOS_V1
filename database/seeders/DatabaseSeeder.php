@@ -25,11 +25,11 @@ class DatabaseSeeder extends Seeder
             Motores::class,
             VehiculosConceptos::class,
             VehiculosConceptosDisponibles::class,
-            ConceptosPresupuestosDemoSeeder::class,
             EstadosandMunicipios::class,
             RutasArchivoSeeder::class,
             DatosPrueba::class,
             OrdenesDemoSeeder::class,
+            ConceptosPresupuestosDemoSeeder::class,
         ]);
     }
 }
