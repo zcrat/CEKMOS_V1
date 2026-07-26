@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ModuloOrdenesServicio;
 use App\Models\OrdenesServicio;
 use App\Models\Presupuestos;
 use App\Models\RutasArchivo;
+use App\Services\AlcanceOrdenesServicio;
+use App\Services\FlujoEstatusPresupuesto;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -42,20 +43,8 @@ class CortanaController extends Controller
 
         $currentPage = (int) ($validated['currentPage'] ?? 1);
         $itemsPerPage = (int) ($validated['itemsPerPage'] ?? 10);
-        $visibleModules = $request->user()->hasRole('Super Admin')
-            ? ModuloOrdenesServicio::query()->pluck('id')->all()
-            : $request->user()
-                ->modulos_orden()
-                ->pluck('modulo_orden_id')
-                ->all();
-        $selectedModules = array_values(array_intersect(
-            $validated['modulos'] ?? [],
-            $visibleModules
-        ));
-        $modules = ($validated['modulos'] ?? []) === []
-            ? $visibleModules
-            : $selectedModules;
         $search = trim($validated['search'] ?? '');
+        $user = $request->user();
 
         $query = Presupuestos::query()
             ->select('presupuestos.*')
@@ -63,12 +52,13 @@ class CortanaController extends Controller
             ->leftJoin('empresas as empresa', 'empresa.id', '=', 'orden.empresa_id')
             ->leftJoin('vehiculos as vehiculo', 'vehiculo.id', '=', 'orden.vehiculo_id')
             ->whereNull('orden.deleted_at')
-            ->whereIn('orden.modulo_orden_id', $modules)
             ->with([
                 'orden_servicio.empresa',
+                'orden_servicio.modulo_ordenes_servicio',
                 'orden_servicio.vehiculo',
                 'estatus',
             ]);
+        AlcanceOrdenesServicio::aplicar($query, $user);
 
         if ($search !== '') {
             $query->where(function ($filter) use ($search) {
@@ -84,6 +74,13 @@ class CortanaController extends Controller
 
         if (($validated['estatus'] ?? []) !== []) {
             $query->whereIn('presupuestos.estatus_id', $validated['estatus']);
+        }
+
+        if (($validated['modulos'] ?? []) !== []) {
+            $query->whereIn(
+                'orden.modulo_orden_id',
+                $validated['modulos']
+            );
         }
 
         if (isset($validated['empresa_id'])) {
@@ -111,12 +108,26 @@ class CortanaController extends Controller
             ->paginate($itemsPerPage, ['*'], 'page', $currentPage);
 
         $items = $paginator->getCollection()
-            ->map(function (Presupuestos $presupuesto) {
+            ->map(function (Presupuestos $presupuesto) use ($user) {
                 $order = $presupuesto->orden_servicio;
                 $vehicle = $order?->vehiculo;
+                $statusActions = collect(
+                    FlujoEstatusPresupuesto::acciones(
+                        $presupuesto->estatus?->descripcion
+                    )
+                )
+                    ->filter(
+                        fn (array $action) => $user->can($action['permiso'])
+                    )
+                    ->map(fn (array $action, string $direction) => [
+                        'direccion' => $direction,
+                        'descripcion' => $action['descripcion'],
+                    ])
+                    ->values();
 
                 return [
                     'id' => $presupuesto->id,
+                    'orden_id' => $order?->id,
                     'folio' => $presupuesto->folio,
                     'orden' => $order?->orden_servicio ?? '',
                     'empresa' => $order?->empresa?->nombre ?? '',
@@ -124,7 +135,11 @@ class CortanaController extends Controller
                     'placas' => $vehicle?->placas ?? '',
                     'vin' => $vehicle?->vin ?? '',
                     'creacion' => $presupuesto->created_at?->format('d/m/Y H:i'),
+                    'modulo_id' => $order?->modulo_orden_id,
+                    'modulo' => $order?->modulo_ordenes_servicio?->descripcion ?? '',
+                    'estatus_id' => $presupuesto->estatus_id,
                     'estatus' => $presupuesto->estatus?->descripcion ?? '',
+                    'acciones_estatus' => $statusActions,
                 ];
             })
             ->values();
@@ -158,7 +173,14 @@ class CortanaController extends Controller
             'responsables.jefe_de_proceso',
             'responsables.trabajador',
             'responsables.tecnico',
-        ])->find($request->id);
+        ])->findOrFail($request->id);
+        abort_unless(
+            AlcanceOrdenesServicio::puedeAccederOrden(
+                $request->user(),
+                $ordenservicio
+            ),
+            403
+        );
 
         $responsables = $ordenservicio->responsables;
         $recepcionVehicular = $ordenservicio->recepcion_vehicular;
