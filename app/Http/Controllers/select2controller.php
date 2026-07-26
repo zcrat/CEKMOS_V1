@@ -10,6 +10,7 @@ use App\Models\Marcas;
 use App\Models\Modelos;
 use App\Models\ModuloOrdenesServicio;
 use App\Models\Motores;
+use App\Models\OrdenesServicio;
 use App\Models\Presupuestos;
 use App\Models\RegimenesFiscales;
 use App\Models\Tipos;
@@ -17,6 +18,7 @@ use App\Models\UnidadesSat;
 use App\Models\Vehiculos;
 use App\Models\VehiculosConceptos;
 use App\Models\VehiculosConceptosDisponibles;
+use App\Services\AlcanceOrdenesServicio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -245,6 +247,60 @@ class select2controller extends Controller
         return response()->json(compact('options'));
     }
 
+    public function ModulosCambioOrdenServicio(Request $request)
+    {
+        $validated = $request->validate([
+            'orden_servicio_id' => [
+                'required',
+                'integer',
+                'exists:ordenes_servicio,id',
+            ],
+            'query' => ['nullable', 'string', 'max:255'],
+        ]);
+        $order = OrdenesServicio::findOrFail($validated['orden_servicio_id']);
+        $user = $request->user();
+
+        abort_unless(
+            AlcanceOrdenesServicio::puedeAccederOrden($user, $order),
+            403
+        );
+
+        $visibleModules = $user->can(AlcanceOrdenesServicio::TODOS)
+            ? null
+            : $user->modulos_orden()->pluck('modulo_orden_id');
+        $query = trim($validated['query'] ?? '');
+        $options = ModuloOrdenesServicio::query()
+            ->when(
+                $visibleModules !== null,
+                fn ($builder) => $builder->whereIn('id', $visibleModules)
+            )
+            ->where('id', '!=', $order->modulo_orden_id)
+            ->whereHas(
+                'vehiculos_conceptos',
+                fn ($builder) => $builder->where(
+                    'vehiculo_concepto_id',
+                    $order->vehiculo_concepto_id
+                )
+            )
+            ->when($query !== '', function ($builder) use ($query) {
+                $builder->where(function ($search) use ($query) {
+                    $search
+                        ->where('descripcion', 'like', "%{$query}%")
+                        ->orWhere('clave', 'like', "%{$query}%");
+                });
+            })
+            ->orderByDesc('año')
+            ->orderBy('descripcion')
+            ->limit(50)
+            ->get()
+            ->map(fn (ModuloOrdenesServicio $module) => [
+                'value' => $module->id,
+                'label' => "{$module->descripcion} — {$module->año}",
+            ]);
+
+        return response()->json(compact('options'));
+    }
+
     public function CategoriasConceptosCatalogo(Request $request)
     {
         $query = trim((string) $request->input('query', ''));
@@ -277,16 +333,7 @@ class select2controller extends Controller
         $user = $request->user();
 
         abort_unless(
-            $presupuesto->orden_servicio
-                && (
-                    $user->hasRole('Super Admin')
-                    || $user->modulos_orden()
-                        ->where(
-                            'modulo_orden_id',
-                            $presupuesto->orden_servicio->modulo_orden_id
-                        )
-                        ->exists()
-                ),
+            AlcanceOrdenesServicio::puedeAcceder($user, $presupuesto),
             403
         );
 

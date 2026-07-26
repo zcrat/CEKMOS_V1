@@ -22,10 +22,20 @@ interface ConceptoForm {
     p_mano_obra: number;
 }
 
-const props = defineProps<{
+interface ContextoPresupuesto {
+    modulo: option | null;
+    vehiculo: option | null;
+}
+
+const props = withDefaults(defineProps<{
     show: boolean;
     costoId: number | null;
-}>();
+    presupuestoId?: number | null;
+    contextoPresupuesto?: ContextoPresupuesto | null;
+}>(), {
+    presupuestoId: null,
+    contextoPresupuesto: null,
+});
 
 const emit = defineEmits<{
     (event: 'close'): void;
@@ -54,10 +64,21 @@ const selectedCategoriaSat = ref<option | null>(null);
 const selectedUnidadSat = ref<option | null>(null);
 const selectedVehiculo = ref<option | null>(null);
 
+const isBudgetContext = computed(() => props.presupuestoId !== null && props.costoId === null);
 const total = computed(() => Number(form.p_refaccion || 0) + Number(form.p_mano_obra || 0));
 const vehiculoParams = computed(() => ({
     modulo_id: form.modulo_id,
 }));
+const categoriaEndpoint = computed(() =>
+    isBudgetContext.value
+        ? 'select2.presupuesto.categorias-conceptos'
+        : 'select2.catalogo.categorias-conceptos',
+);
+const categoriaParams = computed(() =>
+    isBudgetContext.value
+        ? { presupuesto_id: props.presupuestoId }
+        : {},
+);
 
 const formatCurrency = (value: number) =>
     new Intl.NumberFormat('es-MX', {
@@ -73,6 +94,17 @@ const resetForm = () => {
     selectedUnidadSat.value = null;
     selectedVehiculo.value = null;
     errors.value = {};
+
+    if (isBudgetContext.value && props.contextoPresupuesto) {
+        selectedModulo.value = props.contextoPresupuesto.modulo;
+        selectedVehiculo.value = props.contextoPresupuesto.vehiculo;
+        form.modulo_id = props.contextoPresupuesto.modulo
+            ? Number(props.contextoPresupuesto.modulo.value)
+            : null;
+        form.vehiculo_id = props.contextoPresupuesto.vehiculo
+            ? Number(props.contextoPresupuesto.vehiculo.value)
+            : null;
+    }
 };
 
 const clearError = (field: string) => {
@@ -145,7 +177,10 @@ const save = async () => {
     errors.value = {};
 
     try {
-        if (props.costoId === null) {
+        if (isBudgetContext.value && props.presupuestoId !== null) {
+            await axios.post(route('presupuesto.conceptos.crear', props.presupuestoId), form);
+            MyBasicToast.success('Concepto creado y agregado al presupuesto');
+        } else if (props.costoId === null) {
             await axios.post(route('catalogos.conceptos.store'), form);
             MyBasicToast.success('Concepto creado correctamente');
         } else {
@@ -190,8 +225,10 @@ const fieldError = (field: string) => errors.value[field]?.[0];
         :show="show"
         :loading="loading"
         textLoading="Espera a que termine la operación"
-        :modaltitle="costoId === null ? 'Nuevo concepto' : 'Modificar concepto'"
+        :modaltitle="isBudgetContext ? 'Nuevo concepto para presupuesto' : costoId === null ? 'Nuevo concepto' : 'Modificar concepto'"
+        :modaldescription="isBudgetContext ? 'El módulo y el vehículo están definidos por la orden del presupuesto' : undefined"
         position="center"
+        :z="isBudgetContext ? 'z-[999]' : 'z-[50]'"
         :buttonconfirm="buttonConfirm"
         @close="emit('close')"
     >
@@ -218,9 +255,10 @@ const fieldError = (field: string) => errors.value[field]?.[0];
 
             <ZDRemoteSelect
                 v-model="selectedCategoria"
-                endpoint="select2.catalogo.categorias-conceptos"
+                :endpoint="categoriaEndpoint"
                 label="Categoría"
                 placeholder="Buscar categoría"
+                :params="categoriaParams"
                 :cacheoptions="false"
                 :errors="errors.tipo_id"
                 :DeleteErrors="() => clearError('tipo_id')"
@@ -232,6 +270,7 @@ const fieldError = (field: string) => errors.value[field]?.[0];
                 label="Módulo"
                 placeholder="Buscar módulo"
                 :cacheoptions="false"
+                :disabled="isBudgetContext"
                 :errors="errors.modulo_id"
                 :DeleteErrors="() => clearError('modulo_id')"
             />
@@ -263,7 +302,7 @@ const fieldError = (field: string) => errors.value[field]?.[0];
                 placeholder="Buscar vehículo"
                 classDiv="sm:col-span-2"
                 :params="vehiculoParams"
-                :disabled="form.modulo_id === null"
+                :disabled="isBudgetContext || form.modulo_id === null"
                 :cacheoptions="false"
                 :errors="errors.vehiculo_id"
                 :DeleteErrors="() => clearError('vehiculo_id')"

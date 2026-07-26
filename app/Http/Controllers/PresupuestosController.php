@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\CategoriasConceptosDisponibles;
 use App\Models\ConceptosPerPresupuesto;
 use App\Models\ConceptosPresupuestos;
+use App\Models\CostosConceptosPresupuestos;
 use App\Models\DatosEntrada;
+use App\Models\Estatus;
 use App\Models\Marcas;
 use App\Models\Modelos;
 use App\Models\ModuloOrdenesServicio;
@@ -17,13 +19,17 @@ use App\Models\ResponsablesOrdenServicio;
 use App\Models\Ubicaciones;
 use App\Models\UsuariosTaller;
 use App\Models\Vehiculos;
+use App\Models\VehiculosConceptosDisponibles;
 use App\Rules\ExistTipo;
+use App\Services\AlcanceOrdenesServicio;
+use App\Services\FlujoEstatusPresupuesto;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class PresupuestosController extends Controller
 {
@@ -48,7 +54,7 @@ class PresupuestosController extends Controller
                     'recepcion_vehicular',
                 ])->first();
             if ($data) {
-                if (! in_array($data->modulo_orden_id, $user->modulos_orden->pluck('modulo_orden_id')->toarray())) {
+                if (! AlcanceOrdenesServicio::puedeAccederOrden($user, $data)) {
                     return response()->json(null);
                 }
                 $presupuesto = [
@@ -162,6 +168,13 @@ class PresupuestosController extends Controller
         }
 
         $ordenservicio = OrdenesServicio::where('orden_servicio', $orden)->first();
+        if (
+            $ordenservicio
+            && ! AlcanceOrdenesServicio::puedeAccederOrden($user, $ordenservicio)
+        ) {
+            abort(403);
+        }
+
         if (! $ordenservicio) {
             $marca = Marcas::firstOrCreate([
                 'descripcion' => $this->normalizeDescription($request->marca),
@@ -315,6 +328,7 @@ class PresupuestosController extends Controller
             'conceptos_presupuesto.concepto_presupuesto.tipo',
         ]);
         $order = $presupuesto->orden_servicio;
+        $canViewSale = $request->user()->can('ver_venta_presupuestos');
 
         return response()->json([
             'presupuesto' => [
@@ -326,7 +340,9 @@ class PresupuestosController extends Controller
                 'observaciones' => $presupuesto->observaciones,
                 'descripcion_mo' => $presupuesto->descripcion_mo,
                 'orden' => $order?->orden_servicio ?? '',
+                'modulo_id' => $order?->modulo_orden_id,
                 'modulo' => $order?->modulo_ordenes_servicio?->descripcion ?? '',
+                'vehiculo_concepto_id' => $order?->vehiculo_concepto_id,
                 'vehiculo' => $order?->vehiculo_concepto?->descripcion ?? '',
                 'empresa' => $order?->empresa?->nombre ?? '',
                 'unidad' => trim(
@@ -342,7 +358,8 @@ class PresupuestosController extends Controller
                     'categoria' => $item->concepto_presupuesto?->tipo?->descripcion ?? '',
                     'cantidad' => $item->cantidad,
                     'costo' => $item->costo,
-                    'venta' => $item->venta,
+                    'venta' => $canViewSale ? $item->venta : null,
+                    'subtotal' => (float) $item->cantidad * (float) $item->venta,
                 ])
                 ->values(),
         ]);
@@ -364,6 +381,20 @@ class PresupuestosController extends Controller
         $presupuesto->update($validated);
 
         return response()->json(['message' => 'Presupuesto actualizado correctamente.']);
+    }
+
+    public function avanzarEstatus(
+        Request $request,
+        Presupuestos $presupuesto
+    ): JsonResponse {
+        return $this->cambiarEstatus($request, $presupuesto, 'next');
+    }
+
+    public function retrocederEstatus(
+        Request $request,
+        Presupuestos $presupuesto
+    ): JsonResponse {
+        return $this->cambiarEstatus($request, $presupuesto, 'back');
     }
 
     public function destroy(Request $request, Presupuestos $presupuesto): JsonResponse
@@ -552,20 +583,228 @@ class PresupuestosController extends Controller
         ]);
     }
 
+    public function crearConcepto(
+        Request $request,
+        Presupuestos $presupuesto
+    ): JsonResponse {
+        $this->ensureVisible($request, $presupuesto);
+        $presupuesto->loadMissing('orden_servicio');
+        $order = $presupuesto->orden_servicio;
+
+        abort_unless($order?->modulo_orden_id && $order?->vehiculo_concepto_id, 422);
+
+        $validated = $request->validate(
+            [
+                'numero' => ['required', 'string', 'max:100'],
+                'descripcion' => ['required', 'string', 'max:5000'],
+                'garantia_dias' => ['nullable', 'integer', 'min:0', 'max:3650'],
+                'tipo_id' => [
+                    'required',
+                    'integer',
+                    Rule::exists(
+                        'categorias_conceptos_disponibles',
+                        'categoria_concepto_id'
+                    )->where('tipo_presupuesto_id', $presupuesto->tipo_id),
+                ],
+                'categoria_sat_id' => ['required', 'integer', 'exists:categorias_sat,id'],
+                'unidad_sat_id' => ['required', 'integer', 'exists:unidades_sat,id'],
+                'p_refaccion' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+                'p_mano_obra' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+                'p_total' => ['nullable'],
+            ],
+            [],
+            [
+                'numero' => 'número',
+                'descripcion' => 'descripción',
+                'garantia_dias' => 'garantía en días',
+                'tipo_id' => 'categoría',
+                'categoria_sat_id' => 'categoría SAT',
+                'unidad_sat_id' => 'unidad SAT',
+                'p_refaccion' => 'precio de refacción',
+                'p_mano_obra' => 'precio de mano de obra',
+            ]
+        );
+
+        $created = DB::transaction(function () use ($validated, $order, $presupuesto, $request) {
+            $availability = VehiculosConceptosDisponibles::withTrashed()
+                ->firstOrNew([
+                    'vehiculo_concepto_id' => $order->vehiculo_concepto_id,
+                    'modulo_orden_id' => $order->modulo_orden_id,
+                ]);
+            $availability->deleted_at = null;
+            $availability->save();
+
+            $concepto = ConceptosPresupuestos::create([
+                'num' => $validated['numero'],
+                'descripcion' => $validated['descripcion'],
+                'garantia_dias' => $validated['garantia_dias'] ?? null,
+                'fijo' => false,
+                'tipo_id' => $validated['tipo_id'],
+                'modulo_orden_servicio_id' => $order->modulo_orden_id,
+                'categoria_sat_id' => $validated['categoria_sat_id'],
+                'unidad_sat_id' => $validated['unidad_sat_id'],
+            ]);
+            $total = $validated['p_refaccion'] + $validated['p_mano_obra'];
+
+            $cost = CostosConceptosPresupuestos::create([
+                'concepto_presupuesto_id' => $concepto->id,
+                'vehiculo_concepto_id' => $order->vehiculo_concepto_id,
+                'usuario_id' => $request->user()->id,
+                'p_refaccion' => $validated['p_refaccion'],
+                'p_mano_obra' => $validated['p_mano_obra'],
+                'p_total' => $total,
+            ]);
+
+            $item = ConceptosPerPresupuesto::create([
+                'cantidad' => 1,
+                'costo' => $total,
+                'venta' => $total,
+                'presupuesto_id' => $presupuesto->id,
+                'concepto_presupuesto_id' => $concepto->id,
+                'user_id' => $request->user()->id,
+            ]);
+
+            return [
+                'concepto_id' => $concepto->id,
+                'costo_id' => $cost->id,
+                'concepto_presupuesto_id' => $item->id,
+            ];
+        });
+
+        return response()->json([
+            'message' => 'Concepto creado y agregado al presupuesto correctamente.',
+            ...$created,
+        ], 201);
+    }
+
+    public function actualizarConceptos(
+        Request $request,
+        Presupuestos $presupuesto
+    ): JsonResponse {
+        $this->ensureVisible($request, $presupuesto);
+        $canViewSale = $request->user()->can('ver_venta_presupuestos');
+        $validated = $request->validate([
+            'conceptos' => ['required', 'array', 'min:1'],
+            'conceptos.*.id' => [
+                'required',
+                'integer',
+                'distinct',
+                'exists:conceptos_per_presupuestos,id',
+            ],
+            'conceptos.*.cantidad' => ['required', 'integer', 'min:1', 'max:99999999'],
+            'conceptos.*.costo' => [
+                'required',
+                'numeric',
+                'min:0',
+                'max:99999999.50',
+                'multiple_of:0.5',
+            ],
+            'conceptos.*.venta' => $canViewSale
+                ? [
+                    'required',
+                    'numeric',
+                    'min:0',
+                    'max:99999999.50',
+                    'multiple_of:0.5',
+                ]
+                : ['prohibited'],
+        ]);
+        $items = ConceptosPerPresupuesto::query()
+            ->where('presupuesto_id', $presupuesto->id)
+            ->whereIn('id', collect($validated['conceptos'])->pluck('id'))
+            ->get()
+            ->keyBy('id');
+
+        if ($items->count() !== count($validated['conceptos'])) {
+            return response()->json([
+                'message' => 'Uno o más conceptos no pertenecen a este presupuesto.',
+            ], 422);
+        }
+
+        DB::transaction(function () use ($validated, $items) {
+            foreach ($validated['conceptos'] as $values) {
+                $update = [
+                    'cantidad' => $values['cantidad'],
+                    'costo' => $values['costo'],
+                ];
+
+                if (array_key_exists('venta', $values)) {
+                    $update['venta'] = $values['venta'];
+                }
+
+                $items[$values['id']]->update($update);
+            }
+        });
+
+        return response()->json([
+            'message' => 'Cantidades y precios del presupuesto actualizados correctamente.',
+            'actualizados' => count($validated['conceptos']),
+        ]);
+    }
+
     private function ensureVisible(Request $request, Presupuestos $presupuesto): void
     {
-        $presupuesto->loadMissing('orden_servicio');
         abort_unless(
-            $presupuesto->orden_servicio
-                && (
-                    $request->user()->hasRole('Super Admin')
-                    || $request->user()
-                        ->modulos_orden()
-                        ->where('modulo_orden_id', $presupuesto->orden_servicio->modulo_orden_id)
-                        ->exists()
-                ),
+            AlcanceOrdenesServicio::puedeAcceder(
+                $request->user(),
+                $presupuesto
+            ),
             403
         );
+    }
+
+    private function cambiarEstatus(
+        Request $request,
+        Presupuestos $presupuesto,
+        string $direction
+    ): JsonResponse {
+        return DB::transaction(function () use ($request, $presupuesto, $direction) {
+            $current = Presupuestos::query()
+                ->lockForUpdate()
+                ->findOrFail($presupuesto->id);
+            $current->loadMissing(['orden_servicio', 'estatus']);
+            $this->ensureVisible($request, $current);
+
+            $action = FlujoEstatusPresupuesto::accion(
+                $current->estatus?->descripcion,
+                $direction
+            );
+
+            if (! $action) {
+                throw ValidationException::withMessages([
+                    'estatus' => 'El presupuesto no permite esta transición desde su estado actual.',
+                ]);
+            }
+
+            abort_unless(
+                $request->user()->can($action['permiso']),
+                403,
+                'No tienes permiso para realizar esta acción del presupuesto.'
+            );
+
+            $target = Estatus::query()
+                ->where('categoria_id', 2)
+                ->where('descripcion', $action['destino'])
+                ->first();
+
+            if (! $target) {
+                throw ValidationException::withMessages([
+                    'estatus' => 'No se encontró el estado de destino configurado.',
+                ]);
+            }
+
+            $current->update([
+                'estatus_id' => $target->id,
+            ]);
+
+            return response()->json([
+                'message' => 'Estado actualizado a '.$target->descripcion.'.',
+                'estatus' => [
+                    'value' => $target->id,
+                    'label' => $target->descripcion,
+                ],
+            ]);
+        });
     }
 
     private function normalizeDescription(string $description): string

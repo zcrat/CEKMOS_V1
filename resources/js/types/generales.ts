@@ -19,6 +19,7 @@ export interface responseBasic{
 }
 export interface presupuestos{
   id:number;
+  orden_id:number;
   folio:string;
   orden:string;
   empresa:string;
@@ -26,7 +27,15 @@ export interface presupuestos{
   placas:string;
   vin:string;
   creacion:string;
+  modulo_id:number;
+  modulo:string;
+  estatus_id:number;
   estatus:string;
+  acciones_estatus:AccionEstatusPresupuesto[];
+}
+export interface AccionEstatusPresupuesto {
+  direccion:'next'|'back';
+  descripcion:string;
 }
 export interface RecepcionesVehiculares{
   id:number;
