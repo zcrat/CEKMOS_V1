@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DatosEntrada extends Model
 {
     public $timestamps = false;
+
     protected $table = 'datos_entradas';
 
     protected $fillable = [
@@ -20,7 +21,7 @@ class DatosEntrada extends Model
     protected $casts = [
         'fecha' => 'datetime',
         'estimacion' => 'datetime',
-        'kilometraje' => 'decimal:2',
+        'kilometraje' => 'integer',
     ];
 
     public function nivel_combustible()
@@ -32,5 +33,4 @@ class DatosEntrada extends Model
     {
         return $this->belongsTo(OrdenesServicio::class, 'orden_servicio_id');
     }
-
 }

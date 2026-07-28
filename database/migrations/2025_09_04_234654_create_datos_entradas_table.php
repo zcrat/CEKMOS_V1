@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->dateTime('fecha');
             $table->dateTime('estimacion');
-            $table->decimal('kilometraje',10,2);
+            $table->unsignedInteger('kilometraje');
             $table->foreignId('gasolina')->constrained('niveles_combustible');
             $table->foreignId('orden_servicio_id')->constrained('ordenes_servicio');
         });

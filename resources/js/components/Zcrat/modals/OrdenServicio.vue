@@ -391,7 +391,7 @@
         label="Kilometraje" 
         type="number" 
         v-model="DetallesGenerales.kilometraje" 
-        placeholder="ej. 392.31"
+        placeholder="ej. 392"
         :errors="ValidationErrors?.['kilometraje']" 
         :DeleteErrors="()=>{delete ValidationErrors?.['kilometraje']}"
       />
