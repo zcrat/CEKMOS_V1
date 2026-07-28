@@ -76,7 +76,7 @@ useEcho(
                 </div>
                 <div class="flex gap-2 items-end justify-between sm:justify-start">
                     <MultiOptionFilter v-model:selectedIds="estatus" api="select.status" :params="statusParams" label="Estatus"/>
-                    <MultiOptionFilter v-model:selectedIds="modulos" api="select.recepciones-vehiculares.modulos" label="Modulos"/>
+                    <MultiOptionFilter v-model:selectedIds="modulos" api="select.modulos.disponibles.usuario" label="Modulos"/>
                     <Datapicker />
                 </div>
             </div>

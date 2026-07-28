@@ -114,7 +114,6 @@ onMounted(()=>{
   GetOptions()
 })
 watch(query, debouncedGetOptions)
-
 watch(isOpen, (open) => {
   if (!open) { 
     query.value = ''

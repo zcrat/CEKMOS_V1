@@ -78,13 +78,13 @@ const logout = () => {
                 width="48"
             >
                 <template #trigger>
-                    <ButtonLink :title="IsRow ? '' : 'Ordenes'"  :active="route().current('cortana.presupuesto.vista')"><font-awesome-icon icon="fa-solid fa-table-list" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Ordenes</span></ButtonLink>
+                    <ButtonLink :title="IsRow ? '' : 'Ordenes'"  :active="route().current('presupuesto.vista')"><font-awesome-icon icon="fa-solid fa-table-list" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Ordenes</span></ButtonLink>
                 </template>
                 
                 <template #content>
                     <DropdownLink
                         v-if="can('ver_presupuestos')"
-                        :href="route('cortana.presupuesto.vista')"
+                        :href="route('presupuesto.vista')"
                     >
                         Presupuestos
                     </DropdownLink>

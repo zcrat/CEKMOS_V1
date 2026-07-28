@@ -1,18 +1,15 @@
 <!-- ModalExample.vue -->
 <script setup lang="ts">
 
-import InputBasic from '../Inputs/form/InputBasic.vue'
 import BaseModal from '@/components/Zcrat/modals/BaseModal.vue'
 import { ref,reactive,computed,watch} from 'vue' 
-import {type Vehiculo as VehiculoProps, type VehiculoForm, type option} from '@/types/generales'
+import {type Vehiculo as VehiculoProps, type VehiculoForm} from '@/types/generales'
 import {type buttonconfirmed} from '@/types/modals'
-import TiposVehiculos from '../Forms/TiposVehiculos.vue'
 import axios from 'axios';
 import MyBasicToast from '@/utils/ToastNotificationBasic'
 import Loading from '../Elements/Loading.vue'
-import ZDRemoteSelect from '@/components/Zcrat/Elements/ZDRemoteSelect.vue'
+import VehiculoFields from '@/components/Zcrat/Forms/VehiculoFields.vue'
 
-type CatalogType = 'marca' | 'motor' | 'modelo'
 const props = defineProps<{
   show: boolean
   id?:number|string
@@ -33,14 +30,6 @@ const Vehiculo = reactive<VehiculoForm>({
   motor:null,
 });
 const loading = ref<string|null>(null);
-const hasMarca = computed(() => Vehiculo.marca !== null);
-const hasModelo = computed(() => Vehiculo.modelo !== null);
-const catalogType = ref<CatalogType>('marca')
-const catalogShow = ref(false)
-const catalogDescription = ref('')
-const catalogErrors = ref<string[]>()
-const catalogLoading = ref(false)
-const catalogTitle = computed(() => catalogType.value === 'marca' ? 'Nueva marca' : `Nuevo ${catalogType.value}`)
 const buttonconfirm=computed<buttonconfirmed>(()=>{ 
   return {
     text:'Guardar',
@@ -48,14 +37,6 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
     onClick:Save,
     disabled:(Vehiculo.placas == '' || Vehiculo.economico == '' || Vehiculo.vin == '' || Vehiculo.año == ''|| Vehiculo.tipo_id == null || Vehiculo.color == ''|| Vehiculo.modelo == null || Vehiculo.marca == null || Vehiculo.motor == null )
 }})
-
-const catalogButtonConfirm=computed<buttonconfirmed>(()=>({
-  text:'Guardar',
-  classname:'bg-blue-600 text-white',
-  onClick:SaveCatalog,
-  disabled:catalogDescription.value.trim() === '' || catalogLoading.value,
-}))
-
 
 watch(()=>props,()=>{
   if(props.id && props.show){
@@ -73,53 +54,6 @@ watch(()=>props,()=>{
     Vehiculo.error=undefined;
   }
 },{deep:true})
-
-watch(() => Vehiculo.marca?.value, (marca, previousMarca) => {
-  if (previousMarca !== undefined && marca !== previousMarca) {
-    Vehiculo.modelo=null;
-    Vehiculo.motor=null;
-  }
-})
-
-watch(() => Vehiculo.modelo?.value, (modelo, previousModelo) => {
-  if (previousModelo !== undefined && modelo !== previousModelo) {
-    Vehiculo.motor=null;
-  }
-})
-
-const OpenCatalog = (type:CatalogType) => {
-  catalogType.value=type
-  catalogDescription.value=''
-  catalogErrors.value=undefined
-  catalogShow.value=true
-}
-
-async function SaveCatalog() {
-  if(catalogType.value === 'modelo') {
-    const descripcion=catalogDescription.value.trim().toLocaleLowerCase('es-MX')
-    Vehiculo.modelo={value:descripcion,label:descripcion}
-    catalogShow.value=false
-    return
-  }
-
-  try {
-    catalogLoading.value=true
-    catalogErrors.value=undefined
-    const response=await axios.post(route('vehiculo.catalogo.create'),{
-      tipo:catalogType.value,
-      descripcion:catalogDescription.value,
-    })
-    const option:option=response.data.option
-    if(catalogType.value === 'marca') Vehiculo.marca=option
-    if(catalogType.value === 'motor') Vehiculo.motor=option
-    catalogShow.value=false
-  } catch (error:any) {
-    catalogErrors.value=error.response?.data?.errors?.descripcion
-      ?? [error.response?.data?.message ?? 'No fue posible guardar el catálogo']
-  } finally {
-    catalogLoading.value=false
-  }
-}
 
 const Save = async () => {
   try {
@@ -183,37 +117,19 @@ const Read = async () => {
   :buttonconfirm="buttonconfirm" 
   :loading="loading != null"
   >
-    <div class="grid sm:grid-cols-2  lg:grid-cols-4 gap-2" v-if="loading == null">
-        <InputBasic id="Economico" label="Economico" type="text" placeholder="ej. 254335" v-model="Vehiculo.economico" :errors="Vehiculo.error?.economico"/>
-        <InputBasic id="Placas" label="Placas" type="text" placeholder="ej. PHU234T" v-model="Vehiculo.placas" :errors="Vehiculo.error?.placas"/>
-        <InputBasic id="Vin" label="Vin" type="text" v-model="Vehiculo.vin" placeholder="Ej.JJSOE18P388988750 " :errors="Vehiculo.error?.vin"/>
-        <InputBasic id="Año" label="Año" type="number" v-model="Vehiculo.año"  placeholder="ej. 2024" :errors="Vehiculo.error?.año"/>
-        <InputBasic id="Color" label="Color" type="text" v-model="Vehiculo.color" classname="uppercase" placeholder="ej. ROJO" :errors="Vehiculo.error?.color"/>
-        <ZDRemoteSelect label="Marca" endpoint="select2.catalogo.marcas" v-model="Vehiculo.marca" :buttonNew="()=>OpenCatalog('marca')" :canNew="true" :cacheoptions="false" placeholder="Seleccionar marca" :errors="Vehiculo.error?.marca_id"/>
-        <ZDRemoteSelect label="Modelo" endpoint="select2.catalogo.modelos" v-model="Vehiculo.modelo" :buttonNew="()=>OpenCatalog('modelo')" :canNew="true" :cacheoptions="false" :disabled="!hasMarca" :params="{ marca_id: Vehiculo.marca?.value }" placeholder="Seleccionar modelo" :errors="Vehiculo.error?.modelo"/>
-        <ZDRemoteSelect label="Motor" endpoint="select2.catalogo.motores" v-model="Vehiculo.motor" :buttonNew="()=>OpenCatalog('motor')" :canNew="true" :cacheoptions="false" :disabled="!hasModelo" placeholder="Seleccionar motor" :errors="Vehiculo.error?.motor_id"/>
-        <TiposVehiculos label="Tipo De Vehiculo" id="tipovehiculo" v-model="Vehiculo.tipo_id" />
-      </div>
+    <VehiculoFields
+      v-if="loading == null"
+      v-model:economico="Vehiculo.economico"
+      v-model:placas="Vehiculo.placas"
+      v-model:vin="Vehiculo.vin"
+      v-model:anio="Vehiculo.año"
+      v-model:color="Vehiculo.color"
+      v-model:tipoId="Vehiculo.tipo_id"
+      v-model:marca="Vehiculo.marca"
+      v-model:modelo="Vehiculo.modelo"
+      v-model:motor="Vehiculo.motor"
+      :errors="Vehiculo.error"
+    />
       <Loading  :text="loading" v-else/>
-  </BaseModal>
-  <BaseModal
-    :show="catalogShow"
-    :modaltitle="catalogTitle"
-    position="center"
-    z="z-[999]"
-    :loading="catalogLoading"
-    :buttonconfirm="catalogButtonConfirm"
-    @close="catalogShow=false"
-  >
-    <div class="w-80 pb-2">
-      <InputBasic
-        id="CatalogDescription"
-        label="Descripción"
-        type="text"
-        v-model="catalogDescription"
-        placeholder="Descripción del nuevo registro"
-        :errors="catalogErrors"
-      />
-    </div>
   </BaseModal>
 </template>

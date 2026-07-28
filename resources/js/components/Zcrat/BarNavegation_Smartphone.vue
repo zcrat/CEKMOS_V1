@@ -70,7 +70,7 @@ const logout = () => {
             >
                 <template #trigger>
                     <ButtonLink 
-                        :active="route().current('cortana.presupuesto.vista') || route().current('recepcionesvehiculares.vista')"
+                        :active="route().current('presupuesto.vista') || route().current('recepcionesvehiculares.vista')"
                         class="ms-2 gap-x-1 w-full text-white">
                         <font-awesome-icon icon="fa-solid fa-table-list" />
                         <span>&nbsp;Ordenes</span></ButtonLink>
@@ -79,7 +79,7 @@ const logout = () => {
                 <template #content>
                     <DropdownLink
                         v-if="can('ver_presupuestos')"
-                        :href="route('cortana.presupuesto.vista')"
+                        :href="route('presupuesto.vista')"
                     >
                         Presupuestos
                     </DropdownLink>

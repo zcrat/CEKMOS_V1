@@ -4,9 +4,13 @@
     import {type option} from '@/types/generales';
     import axios from 'axios' 
 
-    defineProps<{
+    withDefaults(defineProps<{
         disabled?:boolean
-    }>()
+        label?:string
+        errors?:string[]
+    }>(), {
+        label:'Tipo De Vehiculo'
+    })
     const tiposvehiculos=ref<option[]>([]);
     const SelectValue=defineModel<number | null>();
 
@@ -24,5 +28,5 @@
 
 </script>
 <template>
-     <Select label="Tipo De Vehiculo" id="tipovehiculo" :options="tiposvehiculos" v-model="SelectValue" :disabled="disabled"></Select>
+     <Select :label="label" id="tipovehiculo" :options="tiposvehiculos" v-model="SelectValue" :disabled="disabled" :errors="errors"></Select>
 </template>

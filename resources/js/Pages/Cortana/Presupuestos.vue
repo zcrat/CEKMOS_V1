@@ -8,8 +8,7 @@ import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import Button from '@/components/Zcrat/Inputs/Button.vue';
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import CambiarModuloOrdenServicioModal from '@/components/Zcrat/modals/CambiarModuloOrdenServicioModal.vue';
-import Nuevo from '@/components/Zcrat/modals/CreatePresupuesto.vue';
-import EditarPresupuestoModal from '@/components/Zcrat/modals/EditarPresupuestoModal.vue';
+import PresupuestoModal from '@/components/Zcrat/modals/PresupuestoModal.vue';
 import { useAuth } from '@/composables/useAuth';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { AccionEstatusPresupuesto, option, presupuestos } from '@/types/generales';
@@ -197,10 +196,10 @@ const changeStatus = async (
     if (!confirmed) return;
 
     try {
-        const routeName = action.direccion === 'next'
-            ? 'presupuesto.estatus.next'
-            : 'presupuesto.estatus.back';
-        const response = await axios.patch(route(routeName, row.id));
+        const response = await axios.patch(
+            route('presupuesto.estatus.update', row.id),
+            { tipo_accion: action.direccion },
+        );
         MyBasicToast.success(response.data.message);
         refreshItems();
     } catch (error) {
@@ -229,7 +228,7 @@ const changeStatus = async (
                     <Search v-model="search" Classdiv="w-full sm:w-[30rem]" placeholder="Buscar por folio, placas, económico u orden de servicio" />
                     <empresasselect v-model="empresa" :can-new="false" />
                     <MultiOptionFilter v-model:selectedIds="estatus" api="select.status" :params="{ categoria_id: 2 }" label="Estatus" />
-                    <MultiOptionFilter v-model:selectedIds="modulos" api="select.presupuestos.modulos" label="Módulos" />
+                    <MultiOptionFilter v-model:selectedIds="modulos" api="select.modulos.disponibles.usuario" label="Módulos" />
                     <Datapicker v-model="fechas" label="Fecha de creación" />
                 </div>
 
@@ -322,8 +321,17 @@ const changeStatus = async (
         </template>
     </AppLayout>
 
-    <Nuevo v-model:show="showCreate" @close="showCreate = false" />
-    <EditarPresupuestoModal :show="showEdit" :presupuesto-id="selectedPresupuestoId" @close="showEdit = false" @saved="refreshItems" />
+    <PresupuestoModal
+        :show="showCreate"
+        @close="showCreate = false"
+        @saved="refreshItems"
+    />
+    <PresupuestoModal
+        :show="showEdit"
+        :presupuesto-id="selectedPresupuestoId"
+        @close="showEdit = false"
+        @saved="refreshItems"
+    />
     <CambiarModuloOrdenServicioModal
         :show="showModule"
         :orden-servicio-id="selectedOrdenServicioId"

@@ -39,7 +39,7 @@ export interface AccionEstatusPresupuesto {
 }
 export interface RecepcionesVehiculares{
   id:number;
-  rv_id:number 
+  rv_id:number
   orden:string;
   seguimiento:string;
   ubicacion:string;
@@ -134,12 +134,22 @@ export interface ResponsablesNombres {
   trabajador: string,
   tecnico: string,
 }
+export interface ConceptoPresupuestoAsignado {
+  id: number,
+  concepto_id: number,
+  descripcion: string,
+  categoria: string,
+  cantidad: string | number,
+  costo: string | number,
+  venta: string | number | null,
+  subtotal: string | number,
+}
 export interface NuevoPresupuesto {
   orden_servicio: string,
   folio: string,
   orden_seguimiento: string,
   ubicacion: string,
-  telefono: number | null,
+  telefono: string | null,
   empresa_id: number|null,
   cliente_id:number|null,
   gasolina: number | string,
@@ -158,6 +168,10 @@ export interface NuevoPresupuesto {
   economico: string,
   placas: string,
   vin: string,
+  color: string,
+  vehiculo_tipo_id: number|null,
+  marca_id: number|string|null,
+  motor_id: number|string|null,
   marca: string,
   modelo: string,
   motor: string,
@@ -202,6 +216,7 @@ export interface NuevoPresupuesto {
     economico?:string[],
     año?:string[],
     tipo_id?:string[],
+    vehiculo_tipo_id?:string[],
     color?:string[],
     modelo?:string[],
     marca?:string[],
@@ -217,6 +232,7 @@ export interface NuevoPresupuesto {
     empresa: option;
     cliente: option;
     vehiculo_concepto: option;
+    vehiculo: VehiculoForm;
  }
   export interface PaginationProps {
     loading: Ref<boolean>,
