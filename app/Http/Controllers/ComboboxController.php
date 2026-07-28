@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\OrdenesServicio;
 use App\Models\Ubicaciones;
 use App\Models\usuariosTaller;
 use App\Models\Vehiculos;
@@ -12,12 +11,6 @@ use App\Models\Motores;
 
 class ComboboxController extends Controller
 {
-    public function GetOrdenesServicio(Request $request){
-        $search=$request->search??'';
-        $user=$request->user()->load('modulos_orden');
-        $ordenes=OrdenesServicio::where('orden_servicio','LIKE','%'.$search.'%')->whereIn('modulo_orden_id',$user->modulos_orden->pluck('modulo_orden_id'))->pluck('orden_servicio');
-        return response()->json(['options'=>$ordenes]);
-    }
     public function GetUbicaciones(Request $request){
         $search=$request->search??'';
         $ubicaciones=Ubicaciones::where('nombre','LIKE','%'.$search.'%')->orWhere('descripcion','LIKE','%'.$search.'%')->pluck('nombre')->unique()->values()->map(function($item){

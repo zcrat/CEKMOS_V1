@@ -24,6 +24,55 @@ use Illuminate\Support\Facades\Validator;
 
 class select2controller extends Controller
 {
+    public function OrdenesServicioDisponibles(Request $request)
+    {
+        $validated = $request->validate([
+            'query' => ['nullable', 'string', 'max:100'],
+        ]);
+        $search = trim($validated['query'] ?? '');
+        $orders = OrdenesServicio::query()->with(['empresa', 'vehiculo']);
+
+        AlcanceOrdenesServicio::aplicar(
+            $orders,
+            $request->user(),
+            'ordenes_servicio'
+        );
+
+        if ($search !== '') {
+            $like = "%{$search}%";
+            $orders->where(function ($query) use ($like) {
+                $query
+                    ->where('orden_servicio', 'LIKE', $like)
+                    ->orWhere('orden_seguimiento', 'LIKE', $like)
+                    ->orWhereHas('empresa', fn ($empresa) => $empresa
+                        ->where('nombre', 'LIKE', $like))
+                    ->orWhereHas('vehiculo', fn ($vehiculo) => $vehiculo
+                        ->where('economico', 'LIKE', $like)
+                        ->orWhere('placas', 'LIKE', $like));
+            });
+        }
+
+        $options = $orders
+            ->latest('id')
+            ->take(20)
+            ->get()
+            ->map(function (OrdenesServicio $order) {
+                $details = collect([
+                    $order->empresa?->nombre,
+                    $order->vehiculo
+                        ? trim(($order->vehiculo->economico ?? '').' '.($order->vehiculo->placas ?? ''))
+                        : null,
+                ])->filter()->implode(' · ');
+
+                return [
+                    'value' => $order->orden_servicio,
+                    'label' => $order->orden_servicio.($details !== '' ? ' · '.$details : ''),
+                ];
+            });
+
+        return response()->json(compact('options'));
+    }
+
     public function Empresas(Request $request)
     {
         $options = Empresas::query();

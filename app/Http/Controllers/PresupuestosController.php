@@ -3,15 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\CategoriasConceptosDisponibles;
+use App\Models\Colores;
 use App\Models\ConceptosPerPresupuesto;
 use App\Models\ConceptosPresupuestos;
 use App\Models\CostosConceptosPresupuestos;
 use App\Models\DatosEntrada;
 use App\Models\Estatus;
-use App\Models\Marcas;
 use App\Models\Modelos;
 use App\Models\ModuloOrdenesServicio;
-use App\Models\Motores;
 use App\Models\OrdenesServicio;
 use App\Models\Presupuestos;
 use App\Models\RecepcionesVehiculares;
@@ -21,8 +20,11 @@ use App\Models\UsuariosTaller;
 use App\Models\Vehiculos;
 use App\Models\VehiculosConceptosDisponibles;
 use App\Rules\ExistTipo;
+use App\Rules\TipoCategoriaRule;
 use App\Services\AlcanceOrdenesServicio;
 use App\Services\FlujoEstatusPresupuesto;
+use App\Services\OrdenServicio\FunctionsOrdenServicio;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,10 +32,148 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class PresupuestosController extends Controller
 {
-    public function GetDataPerOrdenServicio(Request $request)
+    public function view(Request $request)
+    {
+        return Inertia::render('Cortana/Presupuestos');
+    }
+
+    public function read(Request $request)
+    {
+        $validated = $request->validate([
+            'currentPage' => ['nullable', 'integer', 'min:1'],
+            'itemsPerPage' => ['nullable', 'integer', 'min:1', 'max:200'],
+            'search' => ['nullable', 'string', 'max:255'],
+            'estatus' => ['nullable', 'array'],
+            'estatus.*' => [
+                'integer',
+                Rule::exists('estatus', 'id')->where('categoria_id', 2),
+            ],
+            'modulos' => ['nullable', 'array'],
+            'modulos.*' => ['integer', 'exists:modulo_ordenes_servicios,id'],
+            'empresa_id' => ['nullable', 'integer', 'exists:empresas,id'],
+            'fechas' => ['nullable', 'array', 'size:2'],
+            'fechas.*' => ['date'],
+            'orderBy.key' => ['nullable', Rule::in(['folio', 'orden', 'empresa', 'creacion'])],
+            'orderBy.order' => ['nullable', Rule::in(['asc', 'desc'])],
+        ]);
+
+        $currentPage = (int) ($validated['currentPage'] ?? 1);
+        $itemsPerPage = (int) ($validated['itemsPerPage'] ?? 10);
+        $search = trim($validated['search'] ?? '');
+        $user = $request->user();
+
+        $query = Presupuestos::query()
+            ->select('presupuestos.*')
+            ->join('ordenes_servicio as orden', 'orden.id', '=', 'presupuestos.orden_servicio_id')
+            ->leftJoin('empresas as empresa', 'empresa.id', '=', 'orden.empresa_id')
+            ->leftJoin('vehiculos as vehiculo', 'vehiculo.id', '=', 'orden.vehiculo_id')
+            ->whereNull('orden.deleted_at')
+            ->with([
+                'orden_servicio.empresa',
+                'orden_servicio.modulo_ordenes_servicio',
+                'orden_servicio.vehiculo',
+                'estatus',
+            ]);
+        AlcanceOrdenesServicio::aplicar($query, $user);
+
+        if ($search !== '') {
+            $query->where(function ($filter) use ($search) {
+                $filter
+                    ->where('presupuestos.folio', 'like', "%{$search}%")
+                    ->orWhere('orden.orden_servicio', 'like', "%{$search}%")
+                    ->orWhere('orden.orden_seguimiento', 'like', "%{$search}%")
+                    ->orWhere('vehiculo.economico', 'like', "%{$search}%")
+                    ->orWhere('vehiculo.placas', 'like', "%{$search}%")
+                    ->orWhere('vehiculo.vin', 'like', "%{$search}%");
+            });
+        }
+
+        if (($validated['estatus'] ?? []) !== []) {
+            $query->whereIn('presupuestos.estatus_id', $validated['estatus']);
+        }
+
+        if (($validated['modulos'] ?? []) !== []) {
+            $query->whereIn(
+                'orden.modulo_orden_id',
+                $validated['modulos']
+            );
+        }
+
+        if (isset($validated['empresa_id'])) {
+            $query->where('orden.empresa_id', $validated['empresa_id']);
+        }
+
+        if (isset($validated['fechas'])) {
+            $query->whereBetween('presupuestos.created_at', [
+                Carbon::parse($validated['fechas'][0])->startOfDay(),
+                Carbon::parse($validated['fechas'][1])->endOfDay(),
+            ]);
+        }
+
+        $orderColumns = [
+            'folio' => 'presupuestos.folio',
+            'orden' => 'orden.orden_servicio',
+            'empresa' => 'empresa.nombre',
+            'creacion' => 'presupuestos.created_at',
+        ];
+        $orderKey = $validated['orderBy']['key'] ?? 'creacion';
+        $orderDirection = $validated['orderBy']['order'] ?? 'desc';
+
+        $paginator = $query
+            ->orderBy($orderColumns[$orderKey], $orderDirection)
+            ->paginate($itemsPerPage, ['*'], 'page', $currentPage);
+
+        $items = $paginator->getCollection()
+            ->map(function (Presupuestos $presupuesto) use ($user) {
+                $order = $presupuesto->orden_servicio;
+                $vehicle = $order?->vehiculo;
+                $statusActions = collect(
+                    FlujoEstatusPresupuesto::acciones(
+                        $presupuesto->estatus?->descripcion
+                    )
+                )
+                    ->filter(
+                        fn (array $action) => $user->can($action['permiso'])
+                    )
+                    ->map(fn (array $action, string $direction) => [
+                        'direccion' => $direction,
+                        'descripcion' => $action['descripcion'],
+                    ])
+                    ->values();
+
+                return [
+                    'id' => $presupuesto->id,
+                    'orden_id' => $order?->id,
+                    'folio' => $presupuesto->folio,
+                    'orden' => $order?->orden_servicio ?? '',
+                    'empresa' => $order?->empresa?->nombre ?? '',
+                    'economico' => $vehicle?->economico ?? '',
+                    'placas' => $vehicle?->placas ?? '',
+                    'vin' => $vehicle?->vin ?? '',
+                    'creacion' => $presupuesto->created_at?->format('d/m/Y H:i'),
+                    'modulo_id' => $order?->modulo_orden_id,
+                    'modulo' => $order?->modulo_ordenes_servicio?->descripcion ?? '',
+                    'estatus_id' => $presupuesto->estatus_id,
+                    'estatus' => $presupuesto->estatus?->descripcion ?? '',
+                    'acciones_estatus' => $statusActions,
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'currentPage' => $paginator->currentPage(),
+            'itemsPerPage' => $paginator->perPage(),
+            'totalPages' => $paginator->lastPage(),
+            'totalItems' => $paginator->total(),
+            'items' => $items,
+        ]);
+    }
+
+    public function data(Request $request)
     {
         $user = Auth::user()->load('modulos_orden');
         if ($request->filled('orden_servicio')) {
@@ -47,6 +187,7 @@ class PresupuestosController extends Controller
                     'responsables.tecnico',
                     'vehiculo.modelo.marca',
                     'vehiculo.modelo.motor',
+                    'vehiculo.color',
                     'vehiculo_concepto',
                     'empresa',
                     'cliente',
@@ -66,7 +207,7 @@ class PresupuestosController extends Controller
                     'empresa_id' => $data->empresa_id,
                     'cliente_id' => $data->cliente_id,
                     'gasolina' => $data->entrada->gasolina,
-                    'kilometraje' => $data->entrada->kilomentraje,
+                    'kilometraje' => $data->entrada->kilometraje,
                     'estimacion' => $data->entrada->estimacion->format('Y-m-d\TH:i'),
                     'administrador' => $data->responsables->administrador_transporte->nombre,
                     'jefe' => $data->responsables->jefe_de_proceso->nombre,
@@ -76,7 +217,9 @@ class PresupuestosController extends Controller
                     'indicaciones_cliente' => $data->recepcion_vehicular->indicaciones_cliente ?? '',
                     'garantia' => 'LO ESTIPULADO EN EL CONTRATO',
                     'observaciones' => 'DE ACUERDO A LO DIFICIL DE LA FALLA PARA SU REPARACION',
-                    'tipo_id' => 3,
+                    'tipo_id' => $data->presupuestos()
+                        ->latest('id')
+                        ->value('tipo_id') ?? 7,
                     'vehiculo_concepto_id' => $data->vehiculo_concepto_id,
                     'economico' => $data->vehiculo->economico,
                     'placas' => $data->vehiculo->placas,
@@ -94,6 +237,28 @@ class PresupuestosController extends Controller
                     'empresa' => ['value' => $data->empresa->id, 'label' => $data->empresa->nombre],
                     'cliente' => ['value' => $data->cliente->id, 'label' => $data->cliente->nombre],
                     'vehiculo_concepto' => ['value' => $data->vehiculo_concepto->id, 'label' => $data->vehiculo_concepto->descripcion],
+                    'vehiculo' => [
+                        'economico' => $data->vehiculo->economico,
+                        'placas' => $data->vehiculo->placas,
+                        'vin' => $data->vehiculo->vin,
+                        'año' => (string) $data->vehiculo->año,
+                        'tipo_id' => $data->vehiculo->tipo_id !== null
+                            ? (int) $data->vehiculo->tipo_id
+                            : null,
+                        'color' => $data->vehiculo->color?->descripcion ?? '',
+                        'marca' => [
+                            'value' => $data->vehiculo->modelo->marca->id,
+                            'label' => $data->vehiculo->modelo->marca->descripcion,
+                        ],
+                        'modelo' => [
+                            'value' => $data->vehiculo->modelo->descripcion,
+                            'label' => $data->vehiculo->modelo->descripcion,
+                        ],
+                        'motor' => [
+                            'value' => $data->vehiculo->modelo->motor->id,
+                            'label' => $data->vehiculo->modelo->motor->descripcion,
+                        ],
+                    ],
                 ]);
             }
 
@@ -101,7 +266,7 @@ class PresupuestosController extends Controller
         }
     }
 
-    public function CreatePresupuesto(Request $request)
+    public function create(Request $request)
     {
         $user = Auth::user()->load('modulos_orden');
         $validator = Validator::make($request, [
@@ -128,9 +293,11 @@ class PresupuestosController extends Controller
             'economico' => ['required', 'string', 'max:20'],
             'placas' => ['required', 'string', 'max:20'],
             'vin' => ['required', 'string', 'max:50'],
-            'marca' => ['required', 'string', 'max:50'],
+            'color' => ['required', 'string', 'max:100'],
+            'vehiculo_tipo_id' => ['required', new TipoCategoriaRule(3)],
+            'marca_id' => ['required', 'exists:marcas,id'],
+            'motor_id' => ['required', 'exists:motores,id'],
             'modelo' => ['required', 'string', 'max:50'],
-            'motor' => ['required', 'string', 'max:100'],
             'año' => ['required', 'integer', 'min:1900', 'max:2100'],
             // 'vigencia'=>['nullable','date'],
             'modulo_orden' => ['required', 'integer', 'exists:modulo_ordenes_servicios,id'],
@@ -138,7 +305,11 @@ class PresupuestosController extends Controller
 
         $validator->after(function ($validator) use ($request, $user) {
             $modulosPermitidos = $user->modulos_orden->pluck('modulo_orden_id')->toArray();
-            if ($request->filled('modulo_orden') && ! in_array($request->modulo_orden, $modulosPermitidos)) {
+            if (
+                $request->filled('modulo_orden')
+                && ! in_array($request->modulo_orden, $modulosPermitidos)
+                && ! $user->hasRole('Super Admin')
+            ) {
                 $validator->errors()->add('modulo_orden', 'El usuario no tiene permiso para este módulo de orden.');
             }
             if (! Vehiculos::where('economico', $request->economico)->orWhere('placas', $request->placas)->exists()) {
@@ -176,19 +347,13 @@ class PresupuestosController extends Controller
         }
 
         if (! $ordenservicio) {
-            $marca = Marcas::firstOrCreate([
-                'descripcion' => $this->normalizeDescription($request->marca),
+            $color = Colores::firstOrCreate([
+                'descripcion' => $this->normalizeDescription($request->color),
             ]);
-            $motor = Motores::withTrashed()->firstOrCreate([
-                'descripcion' => $this->normalizeDescription($request->motor),
-            ]);
-            if ($motor->trashed()) {
-                $motor->restore();
-            }
             $modelo = Modelos::withTrashed()->firstOrCreate([
                 'descripcion' => $this->normalizeDescription($request->modelo),
-                'marca_id' => $marca->id,
-                'motor_id' => $motor->id,
+                'marca_id' => $request->marca_id,
+                'motor_id' => $request->motor_id,
             ]);
             if ($modelo->trashed()) {
                 $modelo->restore();
@@ -200,8 +365,8 @@ class PresupuestosController extends Controller
                 'año' => $request->año,
                 'vin' => $request->vin,
                 'modelo_id' => $modelo->id,
-                'tipo_id' => 1,
-                'color_id' => 1,
+                'tipo_id' => $request->vehiculo_tipo_id,
+                'color_id' => $color->id,
             ]);
             $ubicacion = Ubicaciones::firstorCreate([
                 'nombre' => strtoupper(trim($request->ubicacion)),
@@ -226,17 +391,19 @@ class PresupuestosController extends Controller
             // Crear datos de entrada
             $entrada = new DatosEntrada;
             $entrada->orden_servicio_id = $ordenservicio->id;
+            $entrada->fecha = Carbon::now();
             $entrada->gasolina = $request->gasolina;
-            $entrada->kilomentraje = $request->kilometraje;
+            $entrada->kilometraje = $request->kilometraje;
             $entrada->estimacion = $request->estimacion;
             $entrada->save();
 
             $responsables = new ResponsablesOrdenServicio;
             $responsables->orden_servicio_id = $ordenservicio->id;
             $responsables->administrador_transporte_id = UsuariosTaller::firstOrCreate(['nombre' => $request->administrador, 'tipo_id' => 1])->id;
-            $responsables->jefe_de_proceso_id = UsuariosTaller::firstOrCreate(['nombre' => $request->jefe, 'tipo_id' => 1])->id;
-            $responsables->trabajador_id = UsuariosTaller::firstOrCreate(['nombre' => $request->trabajador, 'tipo_id' => 1])->id;
-            $responsables->tecnico_id = UsuariosTaller::firstOrCreate(['nombre' => $request->tecnico, 'tipo_id' => 1])->id;
+            $responsables->jefe_de_proceso_id = UsuariosTaller::firstOrCreate(['nombre' => $request->jefe, 'tipo_id' => 2])->id;
+            $responsables->trabajador_id = UsuariosTaller::firstOrCreate(['nombre' => $request->trabajador, 'tipo_id' => 3])->id;
+            $responsables->tecnico_id = UsuariosTaller::firstOrCreate(['nombre' => $request->tecnico, 'tipo_id' => 4])->id;
+            $responsables->save();
 
             $ExterioresEquipo = new \App\Models\ExterioresRV;
             $EquipoInventario = new \App\Models\InventarioRV;
@@ -314,7 +481,34 @@ class PresupuestosController extends Controller
 
         }
 
-        return response()->json(['message' => 'Presupuesto creado exitosamente', 'orden_servicio' => $ordenservicio->orden_servicio], 201);
+        $initialStatus = Estatus::query()
+            ->where('categoria_id', 2)
+            ->where('descripcion', 'Pendiente De Enviar')
+            ->firstOrFail();
+        $folio = $request->filled('folio')
+            ? $request->folio
+            : (new FunctionsOrdenServicio)->GetFolio(
+                (string) $ordenservicio->id,
+                $ordenservicio->orden_servicio,
+                (int) $request->tipo_id
+            );
+        $presupuesto = Presupuestos::create([
+            'orden_servicio_id' => $ordenservicio->id,
+            'observaciones' => $request->observaciones,
+            'descripcion_mo' => $request->descripcion_mo,
+            'garantia' => $request->garantia,
+            'folio' => $folio,
+            'vigencia' => null,
+            'factura_id' => null,
+            'tipo_id' => $request->tipo_id,
+            'estatus_id' => $initialStatus->id,
+        ]);
+
+        return response()->json([
+            'message' => 'Presupuesto creado exitosamente',
+            'id' => $presupuesto->id,
+            'orden_servicio' => $ordenservicio->orden_servicio,
+        ], 201);
     }
 
     public function show(Request $request, Presupuestos $presupuesto): JsonResponse
@@ -324,31 +518,121 @@ class PresupuestosController extends Controller
             'orden_servicio.modulo_ordenes_servicio',
             'orden_servicio.vehiculo_concepto',
             'orden_servicio.empresa',
-            'orden_servicio.vehiculo',
+            'orden_servicio.cliente',
+            'orden_servicio.ubicacion',
+            'orden_servicio.entrada',
+            'orden_servicio.responsables.administrador_transporte',
+            'orden_servicio.responsables.jefe_de_proceso',
+            'orden_servicio.responsables.trabajador',
+            'orden_servicio.responsables.tecnico',
+            'orden_servicio.recepcion_vehicular',
+            'orden_servicio.vehiculo.color',
+            'orden_servicio.vehiculo.modelo.marca',
+            'orden_servicio.vehiculo.modelo.motor',
             'conceptos_presupuesto.concepto_presupuesto.tipo',
         ]);
         $order = $presupuesto->orden_servicio;
+        $vehicle = $order?->vehiculo;
+        $model = $vehicle?->modelo;
         $canViewSale = $request->user()->can('ver_venta_presupuestos');
 
         return response()->json([
             'presupuesto' => [
                 'id' => $presupuesto->id,
+                'orden_servicio' => $order?->orden_servicio ?? '',
                 'folio' => $presupuesto->folio,
-                'tipo_id' => $presupuesto->tipo_id,
-                'vigencia' => $presupuesto->vigencia?->format('Y-m-d'),
+                'orden_seguimiento' => $order?->orden_seguimiento ?? '',
+                'ubicacion' => $order?->ubicacion?->nombre ?? '',
+                'telefono' => $order?->telefono,
+                'empresa_id' => $order?->empresa_id,
+                'cliente_id' => $order?->cliente_id,
+                'gasolina' => $order?->entrada?->gasolina ?? '',
+                'kilometraje' => $order?->entrada?->kilometraje,
+                'estimacion' => $order?->entrada?->estimacion?->toIso8601String(),
+                'administrador' => $order?->responsables?->administrador_transporte?->nombre ?? '',
+                'jefe' => $order?->responsables?->jefe_de_proceso?->nombre ?? '',
+                'trabajador' => $order?->responsables?->trabajador?->nombre ?? '',
+                'tecnico' => $order?->responsables?->tecnico?->nombre ?? '',
+                'descripcion_mo' => $presupuesto->descripcion_mo,
+                'indicaciones_cliente' => $order?->recepcion_vehicular?->indicaciones_cliente ?? '',
                 'garantia' => $presupuesto->garantia,
                 'observaciones' => $presupuesto->observaciones,
-                'descripcion_mo' => $presupuesto->descripcion_mo,
-                'orden' => $order?->orden_servicio ?? '',
-                'modulo_id' => $order?->modulo_orden_id,
-                'modulo' => $order?->modulo_ordenes_servicio?->descripcion ?? '',
+                'tipo_id' => $presupuesto->tipo_id,
+                'vigencia' => $presupuesto->vigencia?->format('Y-m-d'),
                 'vehiculo_concepto_id' => $order?->vehiculo_concepto_id,
-                'vehiculo' => $order?->vehiculo_concepto?->descripcion ?? '',
-                'empresa' => $order?->empresa?->nombre ?? '',
-                'unidad' => trim(
-                    ($order?->vehiculo?->economico ?? '').' · '.($order?->vehiculo?->placas ?? ''),
-                    ' ·'
-                ),
+                'economico' => $vehicle?->economico ?? '',
+                'placas' => $vehicle?->placas ?? '',
+                'vin' => $vehicle?->vin ?? '',
+                'color' => $vehicle?->color?->descripcion ?? '',
+                'vehiculo_tipo_id' => $vehicle?->tipo_id !== null
+                    ? (int) $vehicle->tipo_id
+                    : null,
+                'marca_id' => $model?->marca_id,
+                'motor_id' => $model?->motor_id,
+                'marca' => $model?->marca?->descripcion ?? '',
+                'modelo' => $model?->descripcion ?? '',
+                'motor' => $model?->motor?->descripcion ?? '',
+                'año' => $vehicle?->año,
+                'modulo_orden' => $order?->modulo_orden_id ?? '',
+            ],
+            'orden_servicio' => $order
+                ? [
+                    'value' => $order->orden_servicio,
+                    'label' => $order->orden_servicio,
+                ]
+                : null,
+            'empresa' => $order?->empresa
+                ? [
+                    'value' => $order->empresa->id,
+                    'label' => $order->empresa->nombre,
+                ]
+                : null,
+            'cliente' => $order?->cliente
+                ? [
+                    'value' => $order->cliente->id,
+                    'label' => $order->cliente->nombre,
+                ]
+                : null,
+            'vehiculo_concepto' => $order?->vehiculo_concepto
+                ? [
+                    'value' => $order->vehiculo_concepto->id,
+                    'label' => $order->vehiculo_concepto->descripcion,
+                ]
+                : null,
+            'modulo' => $order?->modulo_ordenes_servicio
+                ? [
+                    'value' => $order->modulo_ordenes_servicio->id,
+                    'label' => $order->modulo_ordenes_servicio->descripcion,
+                ]
+                : null,
+            'vehiculo' => [
+                'id' => $vehicle?->id,
+                'economico' => $vehicle?->economico ?? '',
+                'placas' => $vehicle?->placas ?? '',
+                'vin' => $vehicle?->vin ?? '',
+                'año' => (string) ($vehicle?->año ?? ''),
+                'tipo_id' => $vehicle?->tipo_id !== null
+                    ? (int) $vehicle->tipo_id
+                    : null,
+                'color' => $vehicle?->color?->descripcion ?? '',
+                'marca' => $model?->marca
+                    ? [
+                        'value' => $model->marca->id,
+                        'label' => $model->marca->descripcion,
+                    ]
+                    : null,
+                'modelo' => $model
+                    ? [
+                        'value' => $model->descripcion,
+                        'label' => $model->descripcion,
+                    ]
+                    : null,
+                'motor' => $model?->motor
+                    ? [
+                        'value' => $model->motor->id,
+                        'label' => $model->motor->descripcion,
+                    ]
+                    : null,
             ],
             'conceptos' => $presupuesto->conceptos_presupuesto
                 ->map(fn (ConceptosPerPresupuesto $item) => [
@@ -370,31 +654,175 @@ class PresupuestosController extends Controller
         Presupuestos $presupuesto
     ): JsonResponse {
         $this->ensureVisible($request, $presupuesto);
+        $presupuesto->loadMissing('orden_servicio.vehiculo');
+        $order = $presupuesto->orden_servicio;
+        $vehicle = $order?->vehiculo;
+
+        abort_unless($order && $vehicle, 422, 'El presupuesto no tiene una orden y vehículo válidos.');
+
+        // Estimación, tipo de presupuesto y módulo son inmutables desde esta edición.
+        // Al no validarlos ni incluirlos en las actualizaciones, cualquier valor enviado se ignora.
         $validated = $request->validate([
-            'folio' => ['required', 'string', 'max:50'],
+            'folio' => ['nullable', 'string', 'max:50'],
+            'orden_seguimiento' => [
+                'nullable',
+                'string',
+                'max:20',
+                Rule::unique('ordenes_servicio', 'orden_seguimiento')->ignore($order->id),
+            ],
+            'ubicacion' => ['required', 'string', 'max:100'],
+            'telefono' => ['required', 'string', 'max:20'],
+            'empresa_id' => ['required', 'integer', 'exists:empresas,id'],
+            'cliente_id' => [
+                'required',
+                'integer',
+                Rule::exists('clientes', 'id')
+                    ->where('empresa_id', $request->input('empresa_id')),
+            ],
+            'gasolina' => ['required', 'integer', 'exists:niveles_combustible,id'],
+            'kilometraje' => ['required', 'integer', 'min:0'],
+            'administrador' => ['required', 'string', 'max:100'],
+            'jefe' => ['required', 'string', 'max:100'],
+            'trabajador' => ['required', 'string', 'max:100'],
+            'tecnico' => ['required', 'string', 'max:100'],
+            'indicaciones_cliente' => ['required', 'string'],
+            'vehiculo_concepto_id' => [
+                'required',
+                'integer',
+                Rule::exists('vehiculos_conceptos_disponibles', 'vehiculo_concepto_id')
+                    ->where('modulo_orden_id', $order->modulo_orden_id)
+                    ->whereNull('deleted_at'),
+            ],
+            'economico' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('vehiculos', 'economico')->ignore($vehicle->id),
+            ],
+            'placas' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('vehiculos', 'placas')->ignore($vehicle->id),
+            ],
+            'vin' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('vehiculos', 'vin')->ignore($vehicle->id),
+            ],
+            'color' => ['required', 'string', 'max:100'],
+            'vehiculo_tipo_id' => ['required', new TipoCategoriaRule(3)],
+            'marca_id' => ['required', 'integer', 'exists:marcas,id'],
+            'motor_id' => ['required', 'integer', 'exists:motores,id'],
+            'modelo' => ['required', 'string', 'max:100'],
+            'año' => [
+                'required',
+                'integer',
+                'min:1899',
+                'max:'.(date('Y') + 1),
+            ],
             'vigencia' => ['nullable', 'date'],
             'garantia' => ['required', 'string'],
             'observaciones' => ['required', 'string'],
             'descripcion_mo' => ['required', 'string'],
         ]);
 
-        $presupuesto->update($validated);
+        DB::transaction(function () use ($validated, $presupuesto, $order, $vehicle) {
+            $color = Colores::firstOrCreate([
+                'descripcion' => $this->normalizeDescription($validated['color']),
+            ]);
+            $model = Modelos::withTrashed()->firstOrCreate([
+                'descripcion' => $this->normalizeDescription($validated['modelo']),
+                'marca_id' => $validated['marca_id'],
+                'motor_id' => $validated['motor_id'],
+            ]);
+            if ($model->trashed()) {
+                $model->restore();
+            }
+
+            $vehicle->update([
+                'economico' => $validated['economico'],
+                'placas' => $validated['placas'],
+                'vin' => $validated['vin'],
+                'año' => $validated['año'],
+                'tipo_id' => $validated['vehiculo_tipo_id'],
+                'color_id' => $color->id,
+                'modelo_id' => $model->id,
+            ]);
+
+            $location = Ubicaciones::firstOrCreate([
+                'nombre' => strtoupper(trim($validated['ubicacion'])),
+            ]);
+            $order->update([
+                'orden_seguimiento' => $validated['orden_seguimiento']
+                    ?: $order->orden_servicio,
+                'ubicacion_id' => $location->id,
+                'telefono' => $validated['telefono'],
+                'empresa_id' => $validated['empresa_id'],
+                'cliente_id' => $validated['cliente_id'],
+                'vehiculo_concepto_id' => $validated['vehiculo_concepto_id'],
+                'fallas_reportadas' => $validated['descripcion_mo'],
+                'notas_retraso' => $validated['observaciones'],
+            ]);
+
+            $order->entrada?->update([
+                'gasolina' => $validated['gasolina'],
+                'kilometraje' => $validated['kilometraje'],
+            ]);
+
+            ResponsablesOrdenServicio::updateOrCreate(
+                ['orden_servicio_id' => $order->id],
+                [
+                    'administrador_transporte_id' => UsuariosTaller::firstOrCreate([
+                        'nombre' => $this->normalizeDescription($validated['administrador']),
+                        'tipo_id' => 1,
+                    ])->id,
+                    'jefe_de_proceso_id' => UsuariosTaller::firstOrCreate([
+                        'nombre' => $this->normalizeDescription($validated['jefe']),
+                        'tipo_id' => 2,
+                    ])->id,
+                    'trabajador_id' => UsuariosTaller::firstOrCreate([
+                        'nombre' => $this->normalizeDescription($validated['trabajador']),
+                        'tipo_id' => 3,
+                    ])->id,
+                    'tecnico_id' => UsuariosTaller::firstOrCreate([
+                        'nombre' => $this->normalizeDescription($validated['tecnico']),
+                        'tipo_id' => 4,
+                    ])->id,
+                ]
+            );
+
+            RecepcionesVehiculares::updateOrCreate(
+                ['orden_servicio_id' => $order->id],
+                ['indicaciones_cliente' => $validated['indicaciones_cliente']]
+            );
+
+            $presupuesto->update([
+                'folio' => $validated['folio'],
+                'vigencia' => $validated['vigencia'],
+                'garantia' => $validated['garantia'],
+                'observaciones' => $validated['observaciones'],
+                'descripcion_mo' => $validated['descripcion_mo'],
+            ]);
+        });
 
         return response()->json(['message' => 'Presupuesto actualizado correctamente.']);
     }
 
-    public function avanzarEstatus(
+    public function ActualizarEstatus(
         Request $request,
         Presupuestos $presupuesto
     ): JsonResponse {
-        return $this->cambiarEstatus($request, $presupuesto, 'next');
-    }
+        $validated = $request->validate([
+            'tipo_accion' => ['required', Rule::in(['next', 'back'])],
+        ]);
 
-    public function retrocederEstatus(
-        Request $request,
-        Presupuestos $presupuesto
-    ): JsonResponse {
-        return $this->cambiarEstatus($request, $presupuesto, 'back');
+        return $this->cambiarEstatus(
+            $request,
+            $presupuesto,
+            $validated['tipo_accion']
+        );
     }
 
     public function destroy(Request $request, Presupuestos $presupuesto): JsonResponse
