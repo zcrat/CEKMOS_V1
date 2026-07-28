@@ -31,7 +31,7 @@ import Loading from '../Elements/Loading.vue';
 <!-- Vue -->
 
 <template>
-  <BaseModal modaltitle="PDF de recepción vehicular"
+  <BaseModal modal-title="PDF de recepción vehicular"
   :position="'center'"
   :show="show" 
   @close="updateVisibility" 

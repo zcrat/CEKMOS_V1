@@ -6,7 +6,7 @@ import InspectionPanel from '@/components/Zcrat/modals/partes/inspeccion/Inspect
 import InspectionPoint from '@/components/Zcrat/modals/partes/inspeccion/InspectionPoint.vue'
 import InspectionSection from '@/components/Zcrat/modals/partes/inspeccion/InspectionSection.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
-import type { buttonconfirmed } from '@/types/modals'
+import type { ConfirmButton } from '@/types/modals'
 import {
   createInspeccionVehicularForm,
   inspectionStatuses,
@@ -40,10 +40,10 @@ const pdfUrl = computed(() => orderId.value === null
 
 const isIncomplete = computed(() => inspectionStatuses(form).some((status) => status === null))
 
-const buttonconfirm = computed<buttonconfirmed | undefined>(() => viewMode.value === 'form'
+const confirmButton = computed<ConfirmButton | undefined>(() => viewMode.value === 'form'
   ? {
       text: exists.value ? 'Guardar cambios' : 'Crear inspección',
-      classname: 'bg-blue-600 text-white',
+      className: 'bg-blue-600 text-white',
       disabled: loading.value || orderId.value === null || isIncomplete.value,
       onClick: save,
     }
@@ -141,11 +141,11 @@ defineExpose({ Open: open })
   <BaseModal
     :show="show"
     :loading="loading"
-    text-loading="Espera a que termine la operación."
-    :modaltitle="title"
-    modaldescription="Captura los resultados de la inspección multipunto."
-    :buttonconfirm="buttonconfirm"
-    z="z-[999]"
+    loading-message="Espera a que termine la operación."
+    :modal-title="title"
+    modal-description="Captura los resultados de la inspección multipunto."
+    :confirm-button="confirmButton"
+    z-index-class="z-[999]"
     @close="close"
   >
     <div class="w-[min(1180px,92vw)] space-y-3">

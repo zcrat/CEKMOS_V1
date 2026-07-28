@@ -3,7 +3,7 @@
 import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
 import Inputbasic from '@/components/Zcrat/Inputs/form/InputBasic.vue'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
-import {buttonconfirmed} from '@/types/modals'
+import type { ConfirmButton } from '@/types/modals'
 import { reactive, computed, watchEffect } from 'vue' 
 
 interface NewEmployee {
@@ -55,9 +55,9 @@ const functionexample = async ()=>{
   MyBasicToast.success('Empleado registrado exitosamente')
   updateVisibility(false)
 }
-const buttonconfirm = computed((): buttonconfirmed => ({
+const confirmButton = computed((): ConfirmButton => ({
   text: 'aceptar',
-  classname: 'bg-[--btnprimary] text-white',
+  className: 'bg-[--btnprimary] text-white',
   onClick: functionexample,
   disabled: !isFormValid.value, // o !isFormValid.value si cambias nombre
 }))
@@ -65,7 +65,7 @@ const buttonconfirm = computed((): buttonconfirmed => ({
 </script>
 
 <template>
-  <BaseModal modaltitle="Registrar Nuevo Empleado" :show="props.show" @close="()=>updateVisibility" :buttonconfirm="buttonconfirm">
+  <BaseModal modal-title="Registrar Nuevo Empleado" :show="props.show" @close="()=>updateVisibility" :confirm-button="confirmButton">
     <form action="">
       <div class="flex flex-col sm:flex-row gap-1 sm:w-[40rem]">
         <Inputbasic label="Nombre(s)" id="nombre" type="text" v-model="newEmployee.nombre" icon="fa-solid fa-user" classdiv="flex-grow"/> 

@@ -5,7 +5,7 @@
   import { ref, watch ,reactive, onMounted,computed, nextTick} from 'vue' 
   import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
   import {ArrayAsociativo, type option} from '@/types/generales'
-  import {type buttonconfirmed} from '@/types/modals'
+  import { type ConfirmButton } from '@/types/modals'
   import Combobox from '@/components/Zcrat/Elements/ZdCombobox.vue'
   import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
   import Select from '@/components/Zcrat/Elements/Select.vue';
@@ -52,10 +52,10 @@
   const ImageFirmaEntrada = ref<InstanceType<typeof ZDCanvas> | null>(null);
   const ImagenesCargadas=ref<ImagenUpload[]>([])
   const Archivos = reactive<{carro:ImagenUpload|null,firma:ImagenUpload|null}>({carro:null,firma:null})
-  const buttonconfirm=computed<buttonconfirmed>(()=>{ 
+  const confirmButton=computed<ConfirmButton>(()=>{
     return {
       text: DetallesGenerales.id ? 'Guardar Cambios' :'Crear Orden De Servicio',
-      classname:'bg-blue-600 text-white',
+      className:'bg-blue-600 text-white',
       onClick:Save,
       disabled:(
         !DetallesGenerales.ubicacion ||
@@ -259,13 +259,13 @@
     :id="DetallesGenerales.vehiculo?.value"
     :returnSave="(val)=>{DetallesGenerales.vehiculo={value:val.id??'0',label:(val.economico+'-'+val.placas)}}"
   />
-  <BaseModal modaltitle="Nueva Orden De Servicio" 
+  <BaseModal modal-title="Nueva Orden De Servicio"
   :position="'center'"
   :show="show && OpenModal === null" 
   @close="updateVisibility" 
-  :buttonconfirm="buttonconfirm"
-  :loading="loading"
-  :textLoading="DetallesGenerales.id ? 'Espere a que termine de actualizar' : 'Espere a que termine de Crear'"
+  :confirm-button="confirmButton"
+  :saving="loading"
+  :saving-message="DetallesGenerales.id ? 'Espere a que termine de actualizar' : 'Espere a que termine de Crear'"
   >
    <template v-if="loading">
     <Loading  text="Espere Un Momento"/>

@@ -4,7 +4,7 @@ import InputBasic from '@/components/Zcrat/Inputs/form/InputBasic.vue';
 import Textarea from '@/components/Zcrat/Inputs/form/Textarea.vue';
 import BaseModal from '@/components/Zcrat/modals/BaseModal.vue';
 import type { option } from '@/types/generales';
-import type { buttonconfirmed } from '@/types/modals';
+import type { ConfirmButton } from '@/types/modals';
 import MyBasicToast from '@/utils/ToastNotificationBasic';
 import axios from 'axios';
 import { computed, reactive, ref, watch } from 'vue';
@@ -202,9 +202,9 @@ const save = async () => {
     }
 };
 
-const buttonConfirm = computed<buttonconfirmed>(() => ({
+const confirmButton = computed<ConfirmButton>(() => ({
     text: props.costoId === null ? 'Crear concepto' : 'Guardar cambios',
-    classname: 'bg-blue-700 text-white',
+    className: 'bg-blue-700 text-white',
     disabled:
         loading.value ||
         !form.numero ||
@@ -223,13 +223,13 @@ const fieldError = (field: string) => errors.value[field]?.[0];
 <template>
     <BaseModal
         :show="show"
-        :loading="loading"
-        textLoading="Espera a que termine la operación"
-        :modaltitle="isBudgetContext ? 'Nuevo concepto para presupuesto' : costoId === null ? 'Nuevo concepto' : 'Modificar concepto'"
-        :modaldescription="isBudgetContext ? 'El módulo y el vehículo están definidos por la orden del presupuesto' : undefined"
+        :saving="loading"
+        saving-message="Espera a que termine la operación"
+        :modal-title="isBudgetContext ? 'Nuevo concepto para presupuesto' : costoId === null ? 'Nuevo concepto' : 'Modificar concepto'"
+        :modal-description="isBudgetContext ? 'El módulo y el vehículo están definidos por la orden del presupuesto' : undefined"
         position="center"
-        :z="isBudgetContext ? 'z-[999]' : 'z-[50]'"
-        :buttonconfirm="buttonConfirm"
+        :z-index-class="isBudgetContext ? 'z-[999]' : 'z-[50]'"
+        :confirm-button="confirmButton"
         @close="emit('close')"
     >
         <div class="grid w-[min(92vw,70rem)] grid-cols-1 gap-3 py-2 sm:grid-cols-2 lg:grid-cols-4">

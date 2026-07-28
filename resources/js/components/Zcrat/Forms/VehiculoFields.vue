@@ -3,7 +3,7 @@ import ZDRemoteSelect from '@/components/Zcrat/Elements/ZDRemoteSelect.vue';
 import BaseModal from '@/components/Zcrat/modals/BaseModal.vue';
 import InputBasic from '@/components/Zcrat/Inputs/form/InputBasic.vue';
 import type { option, VehiculoForm } from '@/types/generales';
-import type { buttonconfirmed } from '@/types/modals';
+import type { ConfirmButton } from '@/types/modals';
 import axios from 'axios';
 import { computed, ref, watch } from 'vue';
 import TiposVehiculos from './TiposVehiculos.vue';
@@ -124,9 +124,9 @@ const saveCatalog = async () => {
     }
 };
 
-const catalogButtonConfirm = computed<buttonconfirmed>(() => ({
+const catalogConfirmButton = computed<ConfirmButton>(() => ({
     text: 'Guardar',
-    classname: 'bg-blue-600 text-white',
+    className: 'bg-blue-600 text-white',
     onClick: saveCatalog,
     disabled: catalogDescription.value.trim() === '' || catalogLoading.value,
 }));
@@ -224,11 +224,11 @@ const catalogButtonConfirm = computed<buttonconfirmed>(() => ({
 
     <BaseModal
         :show="catalogShow"
-        :modaltitle="catalogTitle"
+        :modal-title="catalogTitle"
         position="center"
-        z="z-[999]"
+        z-index-class="z-[999]"
         :loading="catalogLoading"
-        :buttonconfirm="catalogButtonConfirm"
+        :confirm-button="catalogConfirmButton"
         @close="catalogShow = false"
     >
         <div class="w-80 pb-2">

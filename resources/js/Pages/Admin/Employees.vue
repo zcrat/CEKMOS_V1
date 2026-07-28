@@ -76,14 +76,14 @@ const CraeteOptions=(row:Employee):DataColumn=>{
       @close="()=>{ ModalView=null}"
     />
     <BasicModal 
-      :modelValue="ModalView===0" 
+      :show="ModalView===0"
       @close="()=>{ModalView=null}"
-      :buttonconfirm="{
+      :confirm-button="{
         text:'Si, Eliminar',
         onClick:()=>{if(ModalView){
           ModalView+=1;
         }},
-        classname:'bg-red-600 font-bold text-white'}" >
+        className:'bg-red-600 font-bold text-white'}" >
         <h2 class="text-center text-lg">¿Realmente Deseas Eliminar al Trabajador?</h2>
     </BasicModal>
 </template>

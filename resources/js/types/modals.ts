@@ -1,6 +1,6 @@
-export interface buttonconfirmed{
+export interface ConfirmButton {
     text:string
-    classname?:string
+    className?: string
     disabled?:boolean
     onClick: (event: MouseEvent) => void
 }

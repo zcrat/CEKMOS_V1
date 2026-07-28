@@ -64,7 +64,7 @@ useEcho(
 </script>
 
 <template>
-    <AppLayout title="Recepciones Vehiculares" :loading="loading" messageLoading="Cargando Recepciones Vehiculares">
+    <AppLayout title="Recepciones Vehiculares" :loading="loading" loading-message="Cargando Recepciones Vehiculares">
         <template #header>
                 <Button text="Nueva" @click="ModalOrdenServicio?.Open(null)"  />
         </template>

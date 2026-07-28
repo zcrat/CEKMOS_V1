@@ -176,7 +176,7 @@ onBeforeUnmount(() => {
     <label for="" v-if="props.label">{{ props.label }}</label>
     <ComboboxRoot class="relative" v-model="optionselect" v-model:open="isOpen" :disabled="props.disabled">
       <ComboboxAnchor
-        :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen },{inputerror: props.errors && props.errors.length > 0},{'bg-gray-100 opacity-60 cursor-not-allowed': props.disabled}]"
+        :class="['inline-flex w-full relative border border-black rounded-md',{ inputfocusalways: isOpen },{inputerror: props.errors && props.errors.length > 0}]"
         >
         <ComboboxInput asChild>
           <div class="relative flex items-center w-full">
@@ -186,8 +186,9 @@ onBeforeUnmount(() => {
               <input
               ref="inputRef"
               :disabled="props.disabled"
-              :class="['w-full ps-2 pr-8 rounded border-none inputnotfocus',
-                          props.errors && props.errors.length > 0 ? 'ps-[2rem]' : ''
+              :class="['w-full ps-2 pr-8 truncate rounded border-none inputnotfocus',
+                        {'inputerror ps-[2rem]' : (props.errors && props.errors.length > 0)},
+                        {'cursor-not-allowed bg-gray-200 text-gray-500' : props.disabled }
                       ]"
               @input="onInputChange"
               :readonly="props.searchable === false"

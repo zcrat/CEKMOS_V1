@@ -4,7 +4,7 @@ import MultiOptionFilter from '@/components/Zcrat/Filters/MultiOptionFilter.vue'
 import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import BaseModal from '@/components/Zcrat/modals/BaseModal.vue';
-import type { buttonconfirmed } from '@/types/modals';
+import type { ConfirmButton } from '@/types/modals';
 import MyBasicToast from '@/utils/ToastNotificationBasic';
 import { useDebounce } from '@vueuse/core';
 import axios from 'axios';
@@ -104,9 +104,9 @@ const addConcepts = async () => {
     }
 };
 
-const buttonConfirm = computed<buttonconfirmed>(() => ({
+const confirmButton = computed<ConfirmButton>(() => ({
     text: saving.value ? 'Agregando...' : `Agregar (${selectedIds.value.length})`,
-    classname: 'bg-blue-700 text-white',
+    className: 'bg-blue-700 text-white',
     disabled: saving.value || selectedIds.value.length === 0,
     onClick: addConcepts,
 }));
@@ -127,12 +127,12 @@ watch(
 <template>
     <BaseModal
         :show="show"
-        modaltitle="Agregar conceptos"
-        modaldescription="Selecciona conceptos disponibles para el presupuesto"
+        modal-title="Agregar conceptos"
+        modal-description="Selecciona conceptos disponibles para el presupuesto"
         position="center"
-        z="z-[999]"
+        z-index-class="z-[999]"
         :loading="saving"
-        :buttonconfirm="buttonConfirm"
+        :confirm-button="confirmButton"
         @close="emit('close')"
     >
         <div class="flex min-h-[30rem] w-[min(70rem,calc(100vw-3rem))] flex-col">

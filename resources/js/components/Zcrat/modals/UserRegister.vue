@@ -5,7 +5,7 @@ import InputBasic from '../Inputs/form/InputBasic.vue'
 import BaseModal from '@/components/Zcrat/modals/BasicModal.vue'
 import { ref,reactive,computed, watch, watchEffect} from 'vue' 
 import {type FormUser, type option} from '@/types/generales'
-import {type buttonconfirmed} from '@/types/modals'
+import { type ConfirmButton } from '@/types/modals'
 import axios from 'axios'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
 import Loading from '../Elements/Loading.vue'
@@ -104,10 +104,10 @@ const Read = async () => {
     cargando.value=undefined
   }
 }
-const buttonconfirm=computed<buttonconfirmed>(()=>{ 
+const confirmButton=computed<ConfirmButton>(()=>{
   return {
     text:props.userid?'Guardar':'Crear Empleado',
-    classname:'bg-blue-600 text-white',
+    className:'bg-blue-600 text-white',
     onClick:Create,
     disabled:props.userid?
     Object.entries(UserForm)
@@ -123,11 +123,11 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
 <template>
 
   <BaseModal 
-    :modaltitle="(userid?'Editar':'Nuevo') +' Usuario Del Sitema'" 
+    :modal-title="(userid?'Editar':'Nuevo') +' Usuario Del Sitema'"
     :position="'center'" 
     @close="emit('close')" 
     :show="props.show" 
-    :buttonconfirm="buttonconfirm" >
+    :confirm-button="confirmButton" >
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2" v-if="cargando == undefined">
       <InputBasic id="name" label="Nombre" type="text" v-model="UserForm.name" :errors="ErrorUserForm['name'] ?? undefined"/>
       <InputBasic id="paterno" label="Paterno" type="text" v-model="UserForm.paterno" :errors="ErrorUserForm['paterno'] ?? undefined" />

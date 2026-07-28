@@ -18,7 +18,7 @@ import type {
     option,
     VehiculoForm,
 } from '@/types/generales';
-import type { buttonconfirmed } from '@/types/modals';
+import type { ConfirmButton } from '@/types/modals';
 import MyBasicToast from '@/utils/ToastNotificationBasic';
 import { sumarDiasSinDomingo } from '@/utils/functions/generales/fechas';
 import GetModulosDisponibles from '@/utils/functions/select/ModulosCortana';
@@ -294,13 +294,13 @@ const save = async () => {
     }
 };
 
-const buttonConfirm = computed<buttonconfirmed>(() => ({
+const confirmButton = computed<ConfirmButton>(() => ({
     text: saving.value
         ? 'Guardando...'
         : isEditing.value
             ? 'Guardar cambios'
             : 'Crear presupuesto',
-    classname: 'bg-blue-700 text-white',
+    className: 'bg-blue-700 text-white',
     disabled: saving.value
         || loading.value
         || (
@@ -317,8 +317,7 @@ const buttonConfirm = computed<buttonconfirmed>(() => ({
     onClick: save,
 }));
 
-watch(
-    () => [props.show, props.presupuestoId],
+watch(() => [props.show, props.presupuestoId],
     ([show]) => {
         if (!show) {
             orderDataController?.abort();
@@ -363,7 +362,8 @@ watch(empresa, (currentEmpresa) => {
     presupuesto.empresa_id = currentEmpresa
         ? Number(currentEmpresa.value)
         : null;
-});
+    cliente.value = null;
+}, { flush: 'sync' });
 
 watch(cliente, (currentClient) => {
     presupuesto.cliente_id = currentClient
@@ -384,13 +384,15 @@ onBeforeUnmount(() => orderDataController?.abort());
 <template>
     <BaseModal
         :show="show"
-        :modaltitle="isEditing ? 'Modificar presupuesto' : 'Nuevo presupuesto'"
-        :modaldescription="isEditing
+        :modal-title="isEditing ? 'Modificar presupuesto' : 'Nuevo presupuesto'"
+        :modal-description="isEditing
             ? 'Actualiza el presupuesto y administra sus conceptos'
             : 'Captura los datos del nuevo presupuesto'"
         position="center"
-        :loading="loading || saving || savingConcepts"
-        :buttonconfirm="buttonConfirm"
+        :loading="loading"
+        :saving="saving || savingConcepts"
+        :saving-message="saving ? 'Espere a que termine de guardarse': 'Espere a que termine de guardarse los conceptos' "
+        :confirm-button="confirmButton"
         @close="emit('close')"
     >
         <div class="flex w-[min(72rem,calc(100vw-3rem))] flex-col gap-4 pb-2">
@@ -406,7 +408,8 @@ onBeforeUnmount(() => orderDataController?.abort());
                     :disabled="isEditing"
                     :errors="validationErrors.orden_servicio"
                 />
-                <InputBasic
+
+                <InputBasic v-if="isEditing"
                     id="folio"
                     v-model="presupuesto.folio"
                     label="FOLIO"
@@ -421,6 +424,15 @@ onBeforeUnmount(() => orderDataController?.abort());
                     type="text"
                     placeholder="Automático o ingresar"
                     :errors="validationErrors.orden_seguimiento"
+                />
+                <Select
+                    id="moduloorden"
+                    v-model="presupuesto.modulo_orden"
+                    label="MÓDULO ORDEN"
+                    :canempty="true"
+                    :options="modulos"
+                    :disabled="isEditing"
+                    :errors="validationErrors.modulo_orden"
                 />
                 <Combobox
                     id="ubicacion"
@@ -514,15 +526,6 @@ onBeforeUnmount(() => orderDataController?.abort());
                     classDiv="w-full"
                     :disabled="empresa === null"
                     :errors="validationErrors.cliente_id"
-                />
-                <Select
-                    id="moduloorden"
-                    v-model="presupuesto.modulo_orden"
-                    label="MÓDULO ORDEN"
-                    :canempty="true"
-                    :options="modulos"
-                    :disabled="isEditing"
-                    :errors="validationErrors.modulo_orden"
                 />
             </div>
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { ConfirmButton } from '@/types/modals'
+import MyBasicToast from '@/utils/ToastNotificationBasic'
 import { computed } from 'vue'
-import type { buttonconfirmed } from '@/types/modals'
 import {
   DialogClose,
   DialogContent,
@@ -10,35 +11,44 @@ import {
   DialogRoot,
   DialogTitle,
 } from 'reka-ui'
-import MyBasicToast from '@/utils/ToastNotificationBasic';
+import Loading from '../Elements/Loading.vue'
 
 const props = withDefaults(defineProps<{
   show: boolean
   loading?: boolean
-  textLoading?: string
-  buttonconfirm?: buttonconfirmed
-  modaltitle?: string
-  modaldescription?: string
+  saving?: boolean
+  modalDescription?: string
+  confirmButton?: ConfirmButton
+  modalTitle?: string
+  savingMessage?: string
+  loadingMessage?: string
   position?: 'start' | 'center' | 'end'
-  z?: 'z-[50]' | 'z-[999]' 
+  zIndexClass?: 'z-[50]' | 'z-[999]'
 }>(), {
   position: 'start',
-  loading:false,
+  loading: false,
+  zIndexClass: 'z-[50]',
 })
 
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 function closeModal() {
-  if(props.loading){
-    if(props.textLoading){
-      MyBasicToast.warning(props.textLoading)
+  if (props.saving) {
+    if (props.savingMessage) {
+      MyBasicToast.warning(props.savingMessage)
     }
-  }else{
+  } else {
     emit('close')
   }
 }
 
-const classtitleposition = computed(() => ({
+function handleOpenChange(open: boolean) {
+  if (!open) {
+    closeModal()
+  }
+}
+
+const titlePositionClass = computed(() => ({
   start: 'text-left',
   center: 'text-center',
   end: 'text-right',
@@ -47,57 +57,62 @@ const classtitleposition = computed(() => ({
 
 <template>
   <DialogRoot
-  :open="show"
-  @update:open="() => closeModal()"
-  v-slot="{ close }"
->
-    <DialogPortal >
-      <DialogOverlay :class="'fixed inset-0 bg-black/40 '+z" />
-      <DialogContent 
-      :class="['fixed inset-0 flex items-center justify-center',z??'' ]" >
-        <div class=" relative max-w-screen w-fit m-2 px-4 bg-white rounded-xl shadow-xl max-h-[90vh] overflow-auto">
+    v-slot="{ close }"
+    :open="show"
+    @update:open="handleOpenChange"
+  >
+    <DialogPortal>
+      <DialogOverlay :class="['fixed inset-0 bg-black/40', zIndexClass]" />
+      <DialogContent
+        :class="['fixed inset-0 flex items-center justify-center', zIndexClass]"
+      >
+        <div class="relative m-2 max-h-[90vh] w-fit max-w-screen overflow-auto rounded-xl bg-white px-4 shadow-xl">
           <DialogDescription class="sr-only">
-            {{ modaldescription ?? modaltitle ?? 'Ventana de dialogo' }}
+            {{ modalDescription ?? modalTitle ?? 'Ventana de diálogo' }}
           </DialogDescription>
-          <div v-if="modaltitle" class="flex justify-between items-center pt-3 pb-3 sticky top-0 z-10 bg-white">
-          <DialogTitle
-          
-            :class="['text-xl font-semibold px-2', classtitleposition]"
+          <div
+            v-if="modalTitle"
+            class="sticky top-0 z-10 flex items-center justify-between bg-white py-3"
           >
-            {{ modaltitle }}
-          </DialogTitle>
-          <DialogClose
-              aria-label="Close"
+            <DialogTitle
+              :class="['px-2 text-xl font-semibold', titlePositionClass]"
+            >
+              {{ modalTitle }}
+            </DialogTitle>
+            <DialogClose
+              aria-label="Cerrar"
               @click="close"
             >
-            <font-awesome-icon icon="fa-solid fa-x" class="text-[1rem]"/>
-          </DialogClose>
+              <font-awesome-icon icon="fa-solid fa-x" class="text-[1rem]" />
+            </DialogClose>
           </div>
-          <div class="sm:px-4 overflow-auto">
+          <Loading
+            v-show="loading"
+            :text="loadingMessage ?? 'Cargando'"
+          />
+          <div v-show="!loading" class="overflow-auto sm:px-4">
             <slot />
           </div>
-          <div class="pt-2 pb-2 flex justify-end items-center gap-4 sticky bottom-0 z-10 bg-white ">
+          <div class="sticky bottom-0 z-10 flex items-center justify-end gap-4 bg-white py-2">
             <button
-              class="px-4 py-2 bg-[--color4] h-10 rounded-md"
+              class="h-10 rounded-md bg-[--color4] px-4 py-2"
               @click="close"
             >
               Cerrar
             </button>
             <slot name="footer" />
             <button
-              v-if="buttonconfirm"
+              v-if="confirmButton"
               :class="[
-                'px-4 py-2 rounded-md capitalize h-10',
-                buttonconfirm.classname ?? 'bg-[--micolor]',
-                buttonconfirm.disabled ? 'opacity-50' : ''
+                'h-10 rounded-md px-4 py-2 capitalize',
+                confirmButton.className ?? 'bg-[--micolor]',
+                confirmButton.disabled ? 'opacity-50' : '',
               ]"
-              :disabled="!!buttonconfirm.disabled"
-              @click="buttonconfirm.onClick"
+              :disabled="!!confirmButton.disabled"
+              @click="confirmButton.onClick"
             >
-              {{ buttonconfirm.text }}
+              {{ confirmButton.text }}
             </button>
-
-            
           </div>
         </div>
       </DialogContent>

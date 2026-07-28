@@ -4,7 +4,7 @@
 import BaseModal from '@/components/Zcrat/modals/BaseModal.vue'
 import { ref,reactive,computed,watch} from 'vue' 
 import {type Vehiculo as VehiculoProps, type VehiculoForm} from '@/types/generales'
-import {type buttonconfirmed} from '@/types/modals'
+import { type ConfirmButton } from '@/types/modals'
 import axios from 'axios';
 import MyBasicToast from '@/utils/ToastNotificationBasic'
 import Loading from '../Elements/Loading.vue'
@@ -30,10 +30,10 @@ const Vehiculo = reactive<VehiculoForm>({
   motor:null,
 });
 const loading = ref<string|null>(null);
-const buttonconfirm=computed<buttonconfirmed>(()=>{ 
+const confirmButton=computed<ConfirmButton>(()=>{
   return {
     text:'Guardar',
-    classname:'bg-blue-600 text-white',
+    className:'bg-blue-600 text-white',
     onClick:Save,
     disabled:(Vehiculo.placas == '' || Vehiculo.economico == '' || Vehiculo.vin == '' || Vehiculo.año == ''|| Vehiculo.tipo_id == null || Vehiculo.color == ''|| Vehiculo.modelo == null || Vehiculo.marca == null || Vehiculo.motor == null )
 }})
@@ -110,11 +110,11 @@ const Read = async () => {
 </script>
 
 <template>
- <BaseModal modaltitle="Nueva Economico" 
+ <BaseModal modal-title="Nueva Economico"
   :position="'center'" 
   :show="props.show" 
   @close="emit('close')" 
-  :buttonconfirm="buttonconfirm" 
+  :confirm-button="confirmButton"
   :loading="loading != null"
   >
     <VehiculoFields

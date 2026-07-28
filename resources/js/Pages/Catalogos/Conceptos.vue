@@ -109,7 +109,7 @@ const deleteConcepto = async (row: ConceptoPresupuesto) => {
 </script>
 
 <template>
-    <AppLayout title="Conceptos" description="Catálogo de conceptos" :loading="loading" messageLoading="Cargando conceptos">
+<AppLayout title="Conceptos" description="Catálogo de conceptos" :loading="loading" loading-message="Cargando conceptos">
         <template #header>
             <Button
                 v-if="can('crear_catalogo_conceptos')"

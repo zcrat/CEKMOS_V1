@@ -166,10 +166,10 @@ onMounted(()=>{
     <UserRegister :show="modalshow == 1" @close="()=>{modalshow=0}" :userid="iduser" />
     <ChangePermissionsUser :show="modalshow === 2"  :id="iduser"  @close="()=>{modalshow=0}"/>
     <ChangeModulosServicio :show="modalshow === 3"  :id="iduser"  @close="()=>{modalshow=0}"/>
-    <BasicModal :show="modalshow === 5 " :buttonconfirm="{text:'Si, Eliminar',onClick:()=>{ToggleActiveUser(),openconfirmation=false},classname:'bg-red-600 font-bold text-white'} " @close="()=>{modalshow=0}">
+    <BasicModal :show="modalshow === 5 " :confirm-button="{text:'Si, Eliminar',onClick:()=>{ToggleActiveUser(),openconfirmation=false},className:'bg-red-600 font-bold text-white'} " @close="()=>{modalshow=0}">
         <h2 class="text-center text-lg">¿Realmente Deseas Eliminar al Usuario?</h2>
     </BasicModal>
-    <BasicModal :show="modalshow === 4 " :buttonconfirm="{text:'Si, Restaurar',onClick:()=>{ToggleActiveUser(),openconfirmation=false},classname:'bg-green-600 font-bold text-white'} " @close="()=>{modalshow=0}">
+    <BasicModal :show="modalshow === 4 " :confirm-button="{text:'Si, Restaurar',onClick:()=>{ToggleActiveUser(),openconfirmation=false},className:'bg-green-600 font-bold text-white'} " @close="()=>{modalshow=0}">
         <h2 class="text-center text-lg">¿Realmente Deseas Restaurar al Usuario?</h2>
     </BasicModal>
 </template>

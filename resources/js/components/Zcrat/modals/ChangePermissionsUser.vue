@@ -80,7 +80,7 @@ watch(
 </script>
 
 <template>
-  <BaseModal modaltitle="Administrar Permisos Y Roles" :position="'center'" :show="props.show" @close="closeModal" >
+  <BaseModal modal-title="Administrar Permisos Y Roles" :position="'center'" :show="props.show" @close="closeModal" >
     <Loading v-if="loading" :text="accion"/>
     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
      <div class="p-2 flex flex-col w-full sm:w-[auto] gap-1 border-solid border-4 rounded border-blue-300">

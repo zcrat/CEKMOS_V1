@@ -8,7 +8,7 @@ import Create from '@/services/employee/create'
 import { ref,reactive,computed,watch} from 'vue' 
 import Subtitle from '@/components/Zcrat/Elements/Subtitle.vue';
 import {type FormEmployee, type option} from '@/types/generales'
-import {type buttonconfirmed} from '@/types/modals'
+import { type ConfirmButton } from '@/types/modals'
 import Select2 from '@/components/Zcrat/Elements/ZDSelect.vue';
 
 const props = defineProps<{show: boolean}>()
@@ -25,10 +25,10 @@ const Employee = reactive<FormEmployee>({
   regimen_fiscal:'',
   domicilio_fiscal:''
 });
-const buttonconfirm=computed<buttonconfirmed>(()=>{ 
+const confirmButton=computed<ConfirmButton>(()=>{
   return {
     text:'Crear Empleado',
-    classname:'bg-blue-600 text-white',
+    className:'bg-blue-600 text-white',
     onClick:()=>{
       Create(Employee).then((res)=>{
         if(res.status){
@@ -53,11 +53,11 @@ const buttonconfirm=computed<buttonconfirmed>(()=>{
 </script>
 
 <template>
- <BaseModal modaltitle="Nueva Empresa" 
+ <BaseModal modal-title="Nueva Empresa"
   :position="'center'" 
   :show="props.show" 
   @close="emit('close')" 
-  :buttonconfirm="buttonconfirm" >
+  :confirm-button="confirmButton" >
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2" >
       <InputBasic id="name" label="Nombre" type="text" v-model="Employee.name" />
       <InputBasic id="paterno" label="Paterno" type="text" v-model="Employee.paterno" />

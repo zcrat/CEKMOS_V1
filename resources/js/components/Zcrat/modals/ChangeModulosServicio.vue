@@ -72,7 +72,7 @@ watch(
 </script>
 
 <template>
-  <BaseModal modaltitle="Administrar Modulos Por Usuario" :position="'center'" :show="show" @close="closeModal">
+  <BaseModal modal-title="Administrar Modulos Por Usuario" :position="'center'" :show="show" @close="closeModal">
     <Loading v-if="loading" :text="accion"/>
      <div v-else class="p-2 gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full sm:w-[auto] border-solid border-4 rounded border-blue-300">
         <template v-for="modulo in allmodulos" :key="modulo.id">

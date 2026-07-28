@@ -2,7 +2,7 @@
 import ZDRemoteSelect from '@/components/Zcrat/Elements/ZDRemoteSelect.vue';
 import BaseModal from '@/components/Zcrat/modals/BaseModal.vue';
 import type { option } from '@/types/generales';
-import type { buttonconfirmed } from '@/types/modals';
+import type { ConfirmButton } from '@/types/modals';
 import MyBasicToast from '@/utils/ToastNotificationBasic';
 import axios from 'axios';
 import { computed, ref, watch } from 'vue';
@@ -57,9 +57,9 @@ const updateModule = async () => {
     }
 };
 
-const buttonConfirm = computed<buttonconfirmed>(() => ({
+const confirmButton = computed<ConfirmButton>(() => ({
     text: 'Cambiar módulo',
-    classname: 'bg-blue-700 text-white',
+    className: 'bg-blue-700 text-white',
     disabled: loading.value || selectedModule.value === null,
     onClick: updateModule,
 }));
@@ -68,12 +68,12 @@ const buttonConfirm = computed<buttonconfirmed>(() => ({
 <template>
     <BaseModal
         :show="show"
-        :loading="loading"
-        textLoading="Espera a que termine la operación"
-        modaltitle="Cambiar módulo"
-        modaldescription="La orden completa y todos sus presupuestos serán reasignados"
+        :saving="loading"
+        saving-message="Espera a que termine la operación"
+        modal-title="Cambiar módulo"
+        modal-description="La orden completa y todos sus presupuestos serán reasignados"
         position="center"
-        :buttonconfirm="buttonConfirm"
+        :confirm-button="confirmButton"
         @close="emit('close')"
     >
         <div class="flex w-[min(32rem,calc(100vw-3rem))] flex-col gap-4 pb-4">

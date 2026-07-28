@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BaseModal from '@/components/Zcrat/modals/BaseModal.vue';
-import type { buttonconfirmed } from '@/types/modals';
+import type { ConfirmButton } from '@/types/modals';
 import MyBasicToast from '@/utils/ToastNotificationBasic';
 import axios from 'axios';
 import { computed, ref, watch } from 'vue';
@@ -98,9 +98,9 @@ const importFile = async () => {
     }
 };
 
-const buttonConfirm = computed<buttonconfirmed>(() => ({
+const confirmButton = computed<ConfirmButton>(() => ({
     text: importing.value ? 'Enviando...' : 'Procesar archivo',
-    classname: 'bg-green-700 text-white',
+    className: 'bg-green-700 text-white',
     disabled: importing.value || selectedFile.value === null,
     onClick: importFile,
 }));
@@ -109,12 +109,12 @@ const buttonConfirm = computed<buttonconfirmed>(() => ({
 <template>
     <BaseModal
         :show="show"
-        :loading="importing"
-        textLoading="Espera a que el archivo sea enviado"
-        modaltitle="Importar conceptos de contratos"
-        modaldescription="Selecciona o arrastra un archivo Excel para procesarlo"
+        :saving="importing"
+        saving-message="Espera a que el archivo sea enviado"
+        modal-title="Importar conceptos de contratos"
+        modal-description="Selecciona o arrastra un archivo Excel para procesarlo"
         position="center"
-        :buttonconfirm="buttonConfirm"
+        :confirm-button="confirmButton"
         @close="emit('close')"
     >
         <div class="w-[min(90vw,38rem)] py-3">

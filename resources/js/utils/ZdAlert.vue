@@ -31,10 +31,10 @@ function handleClose(result: boolean) {
 
   <BaseModal
     :show="open"
-    :modaltitle="options.title ??'Atencion'" 
-    :z="'z-[999]'"
+    :modal-title="options.title ??'Atencion'"
+    z-index-class="z-[999]"
     @close="handleClose(false)"
-    :buttonconfirm="{
+    :confirm-button="{
       text: options.confirmButtonText || 'Aceptar',
       onClick: () => handleClose(true)
     }"
