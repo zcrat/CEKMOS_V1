@@ -48,7 +48,7 @@ class UsersController extends Controller
                 throw new \Exception('ID Necesario');   
             }
             $id=$request->id;
-            $user=User::withTrashed()->find($id);
+            $user=User::withTrashed()->with('taller')->find($id);
             if(!$user){throw new \Exception('Id Erroneo');   }
             $namearray=explode('-', $user->name);
             $datauser=[
@@ -57,6 +57,10 @@ class UsersController extends Controller
                 'materno'=>$namearray[2] ?? '',
                 'email'=>$user->email,
                 'username'=>$user->usuario,
+                'taller' => $user->taller ? [
+                    'value' => $user->taller->id,
+                    'label' => $user->taller->descripcion,
+                ] : null,
                 'deleted_at'=>$user->deleted_at,
             ];
             return response()->json(compact('datauser'));
@@ -240,6 +244,7 @@ class UsersController extends Controller
             'username' => ['required', 'string','unique:users,usuario', 'min:4'],
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'taller_id' => ['required', 'integer', 'exists:talleres,id'],
         ]);
         try {
             User::withTrashed()->create([
@@ -247,6 +252,7 @@ class UsersController extends Controller
                 'usuario' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'taller_id' => $request->taller_id,
             ]);
             $message='Creado Exitosamente';
             return response()->json(compact('message'));
@@ -265,12 +271,14 @@ class UsersController extends Controller
             'username' => ['required', 'string',Rule::unique('users', 'usuario')->ignore($request->id), 'min:4'],
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($request->id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'taller_id' => ['required', 'integer', 'exists:talleres,id'],
         ]);
         try {
             $user=User::withTrashed()->find($request->id);
             $user->name = $request->name .'-'.$request->paterno.'-'.$request->materno;
             $user->usuario = $request->username;
             $user->email = $request->email;
+            $user->taller_id = $request->taller_id;
 
             if($request->password){
                 $user->password = Hash::make($request->password);

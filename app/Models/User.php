@@ -15,11 +15,11 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasApiTokens;
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
 
     use HasProfilePhoto;
-
     use HasRoles;
     use Notifiable;
     use SoftDeletes;
@@ -35,6 +35,7 @@ class User extends Authenticatable
         'usuario',
         'email',
         'password',
+        'taller_id',
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s.v'; // Formato compatible con SQL Server
@@ -102,6 +103,21 @@ class User extends Authenticatable
     public function ordenes_servicio()
     {
         return $this->hasMany(OrdenesServicio::class, 'user_id');
+    }
+
+    public function ordenes_asignadas()
+    {
+        return $this->hasMany(OrdenesServicio::class, 'user_asignado');
+    }
+
+    public function taller()
+    {
+        return $this->belongsTo(Taller::class, 'taller_id');
+    }
+
+    public function subcontratos()
+    {
+        return $this->hasMany(Subcontrato::class, 'user_id');
     }
 
     public function conceptos_presupuestos()

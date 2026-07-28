@@ -29,9 +29,10 @@ export interface presupuestos{
   creacion:string;
   modulo_id:number;
   modulo:string;
+  user_asignado:number|null;
+  usuario_asignado:string;
   estatus_id:number;
   estatus:string;
-  acciones_estatus:AccionEstatusPresupuesto[];
 }
 export interface AccionEstatusPresupuesto {
   direccion:'next'|'back';
@@ -44,6 +45,14 @@ export interface RecepcionesVehiculares{
   seguimiento:string;
   ubicacion:string;
   empresa:string;
+  taller_id:number|null;
+  taller:string;
+  modulo_id:number;
+  modulo:string;
+  user_asignado:number|null;
+  usuario_asignado:string;
+  subcontratos_count:number;
+  tiene_subcontrato_activo:boolean;
   economico:string;
   placas:string;
   marca:string;
@@ -51,7 +60,13 @@ export interface RecepcionesVehiculares{
   folios:string[];
   creacion:string;
   estatus:string;
+  tiene_seguimiento:boolean;
   cambiar_archivos:boolean;
+}
+
+export interface AccionSeguimientoOrdenServicio {
+  clave:string;
+  descripcion:string;
 }
 
 export interface paginationprops {
@@ -199,6 +214,7 @@ export interface NuevoPresupuesto {
   username:string,
   password:string,
   password_confirmation:string,
+  taller_id:number|null,
  }
  export interface VehiculoForm {
   id?:number,

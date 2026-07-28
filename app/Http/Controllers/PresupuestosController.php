@@ -75,6 +75,7 @@ class PresupuestosController extends Controller
             ->with([
                 'orden_servicio.empresa',
                 'orden_servicio.modulo_ordenes_servicio',
+                'orden_servicio.usuario_asignado',
                 'orden_servicio.vehiculo',
                 'estatus',
             ]);
@@ -128,22 +129,9 @@ class PresupuestosController extends Controller
             ->paginate($itemsPerPage, ['*'], 'page', $currentPage);
 
         $items = $paginator->getCollection()
-            ->map(function (Presupuestos $presupuesto) use ($user) {
+            ->map(function (Presupuestos $presupuesto) {
                 $order = $presupuesto->orden_servicio;
                 $vehicle = $order?->vehiculo;
-                $statusActions = collect(
-                    FlujoEstatusPresupuesto::acciones(
-                        $presupuesto->estatus?->descripcion
-                    )
-                )
-                    ->filter(
-                        fn (array $action) => $user->can($action['permiso'])
-                    )
-                    ->map(fn (array $action, string $direction) => [
-                        'direccion' => $direction,
-                        'descripcion' => $action['descripcion'],
-                    ])
-                    ->values();
 
                 return [
                     'id' => $presupuesto->id,
@@ -157,9 +145,12 @@ class PresupuestosController extends Controller
                     'creacion' => $presupuesto->created_at?->format('d/m/Y H:i'),
                     'modulo_id' => $order?->modulo_orden_id,
                     'modulo' => $order?->modulo_ordenes_servicio?->descripcion ?? '',
+                    'user_asignado' => $order?->user_asignado,
+                    'usuario_asignado' => $order?->usuario_asignado
+                        ? str_replace('-', ' ', $order->usuario_asignado->name)
+                        : 'Sin asignar',
                     'estatus_id' => $presupuesto->estatus_id,
                     'estatus' => $presupuesto->estatus?->descripcion ?? '',
-                    'acciones_estatus' => $statusActions,
                 ];
             })
             ->values();
@@ -320,6 +311,12 @@ class PresupuestosController extends Controller
                     $validator->errors()->add('placas', 'las placas registradas en otro economico');
                 }
             }
+            if (! $user->taller_id) {
+                $validator->errors()->add(
+                    'taller_id',
+                    'El usuario debe tener un taller asignado.'
+                );
+            }
         });
 
         if ($validator->fails()) {
@@ -379,6 +376,7 @@ class PresupuestosController extends Controller
             $ordenservicio->vehiculo_id = $vehiculo->id;
             $ordenservicio->vehiculo_concepto_id = $request->vehiculo_concepto_id;
             $ordenservicio->user_id = $user->id;
+            $ordenservicio->taller_id = $user->taller_id;
             $ordenservicio->empresa_id = $request->empresa_id;
             $ordenservicio->cliente_id = $request->cliente_id;
             $ordenservicio->diagnostico = null;

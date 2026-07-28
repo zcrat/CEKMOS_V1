@@ -6,6 +6,7 @@ use App\Models\ModuloOrdenesServicio;
 use App\Models\OrdenesServicio;
 use App\Models\VehiculosConceptosDisponibles;
 use App\Services\AlcanceOrdenesServicio;
+use App\Services\AlcanceRecepcionesVehiculares;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -77,6 +78,9 @@ class OrdenesServicioController extends Controller
     ): void {
         abort_unless(
             AlcanceOrdenesServicio::puedeAccederOrden(
+                $request->user(),
+                $ordenServicio
+            ) || AlcanceRecepcionesVehiculares::puedeAccederOrden(
                 $request->user(),
                 $ordenServicio
             ),

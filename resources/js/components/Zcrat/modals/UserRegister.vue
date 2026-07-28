@@ -9,12 +9,13 @@ import { type ConfirmButton } from '@/types/modals'
 import axios from 'axios'
 import MyBasicToast from '@/utils/ToastNotificationBasic'
 import Loading from '../Elements/Loading.vue'
+import ZDRemoteSelect from '../Elements/ZDRemoteSelect.vue'
 
 const props = defineProps<{show: boolean, userid?:number|null}>()
 const emit = defineEmits<{
   (e: 'close'): void
 }>()
-const regimen_fiscal=ref<option|undefined>(undefined)
+const taller=ref<option|null>(null)
 const cargando=ref<string|undefined>(undefined)
 const UserForm = reactive<FormUser>({
   name:'',
@@ -24,6 +25,7 @@ const UserForm = reactive<FormUser>({
   password:'',
   password_confirmation:'',
   username:'',
+  taller_id:null,
   id:undefined
 });
 watch(() => props.userid, (val) => {
@@ -41,6 +43,8 @@ watchEffect(()=>{
     UserForm.password='';
     UserForm.password_confirmation='';
     UserForm.username='';
+    UserForm.taller_id=null;
+    taller.value=null;
   }
 })
 const ErrorUserForm = ref<Record<string, string[]>>({});
@@ -80,6 +84,8 @@ const Read = async () => {
     UserForm.materno=response.data.datauser.materno;
     UserForm.email=response.data.datauser.email;
     UserForm.username=response.data.datauser.username;
+    taller.value=response.data.datauser.taller;
+    UserForm.taller_id=response.data.datauser.taller?.value ?? null;
       
   } catch (error: any) {
       emit('close')
@@ -104,6 +110,11 @@ const Read = async () => {
     cargando.value=undefined
   }
 }
+watch(taller, (selectedTaller) => {
+  UserForm.taller_id = selectedTaller
+    ? Number(selectedTaller.value)
+    : null;
+});
 const confirmButton=computed<ConfirmButton>(()=>{
   return {
     text:props.userid?'Guardar':'Crear Empleado',
@@ -112,10 +123,10 @@ const confirmButton=computed<ConfirmButton>(()=>{
     disabled:props.userid?
     Object.entries(UserForm)
     .filter(([key]) => !['materno','password','password_confirmation'].includes(key))
-    .some(([_,value]) => value === null || value === '')
+    .some(([,value]) => value === null || value === '')
     :Object.entries(UserForm)
     .filter(([key]) => !['materno'].includes(key))
-    .some(([_,value]) => value === null || value === '')}})
+    .some(([,value]) => value === null || value === '')}})
 
 
 </script>
@@ -134,6 +145,14 @@ const confirmButton=computed<ConfirmButton>(()=>{
       <InputBasic id="materno" label="Materno" type="text" v-model="UserForm.materno" :errors="ErrorUserForm['materno'] ?? undefined" />
       <InputBasic id="correo" label="Correo" type="email" v-model="UserForm.email" :errors="ErrorUserForm['email'] ?? undefined" />
       <InputBasic id="usuario" label="Usuario" type="text" v-model="UserForm.username" :errors="ErrorUserForm['username'] ?? undefined" />
+      <ZDRemoteSelect
+        v-model="taller"
+        endpoint="select2.talleres"
+        label="Taller"
+        placeholder="Seleccionar taller"
+        classDiv="w-full"
+        :errors="ErrorUserForm['taller_id'] ?? undefined"
+      />
       <InputBasic id="contraseña" label="Contraseña" type="password" v-model="UserForm.password" :errors="ErrorUserForm['password'] ?? undefined" />
       <InputBasic id="password_confirmation" label="Confirmar Contraseña" type="password" v-model="UserForm.password_confirmation" />
    </div>

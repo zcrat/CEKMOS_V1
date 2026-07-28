@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Dropdown from '@/components/Zcrat/Elements/Dropdown.vue';
+import IconActions from '@/components/Zcrat/Elements/IconActions.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue';
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
 import empresasselect from '@/components/Zcrat/Filters/empresasselect.vue';
@@ -8,6 +9,7 @@ import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import Button from '@/components/Zcrat/Inputs/Button.vue';
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import CambiarModuloOrdenServicioModal from '@/components/Zcrat/modals/CambiarModuloOrdenServicioModal.vue';
+import AsignarUsuarioOrdenServicioModal from '@/components/Zcrat/modals/AsignarUsuarioOrdenServicioModal.vue';
 import PresupuestoModal from '@/components/Zcrat/modals/PresupuestoModal.vue';
 import { useAuth } from '@/composables/useAuth';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -15,9 +17,10 @@ import type { AccionEstatusPresupuesto, option, presupuestos } from '@/types/gen
 import type { OrderKeyProp } from '@/types/tablecomponent';
 import MyBasicToast from '@/utils/ToastNotificationBasic';
 import { ZdAlert } from '@/utils/ZdAlert';
+import { useAccionesPresupuesto } from '@/services/presupuesto/acciones';
 import { useDebounce } from '@vueuse/core';
 import axios from 'axios';
-import { computed, defineComponent, h, type PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
@@ -29,94 +32,26 @@ const debouncedSearch = useDebounce(search, 400);
 const estatus = ref<(number | string)[]>([]);
 const modulos = ref<(number | string)[]>([]);
 const empresa = ref<string | null>(null);
-const fechas = ref<any>();
+const fechas = ref<Date[] | null>(null);
 const orderBy = ref<OrderKeyProp | null>(null);
 const refreshKey = ref(0);
 const showCreate = ref(false);
 const showEdit = ref(false);
 const showModule = ref(false);
+const showUser = ref(false);
 const selectedPresupuestoId = ref<number | null>(null);
 const selectedOrdenServicioId = ref<number | null>(null);
 const selectedModule = ref<option | null>(null);
+const selectedUser = ref<option | null>(null);
 const prefacturasActive = false;
-const { can, canAny } = useAuth();
-const canManageStatus = computed(() =>
-    canAny([
-        'autorizar_presupuestos',
-        'aprobar_presupuestos',
-        'pagar_presupuestos',
-        'terminar_presupuestos',
-        'facturar_presupuestos',
-    ]),
-);
+const { can } = useAuth();
+const { accionesPorEstatus } = useAccionesPresupuesto();
 const canChangeModule = computed(() => can('cambiar_modulo_presupuestos'));
-
-const BudgetActions = defineComponent({
-    props: {
-        actions: {
-            type: Array as PropType<AccionEstatusPresupuesto[]>,
-            required: true,
-        },
-        onAction: {
-            type: Function as PropType<(action: AccionEstatusPresupuesto) => void>,
-            required: true,
-        },
-        canChangeModule: {
-            type: Boolean,
-            required: true,
-        },
-        onChangeModule: {
-            type: Function as PropType<() => void>,
-            required: true,
-        },
-    },
-    setup(componentProps) {
-        return () => {
-            const statusButtons = componentProps.actions.map((action) =>
-                h(Button, {
-                    key: action.direccion,
-                    text: action.descripcion,
-                    type: action.direccion,
-                    size: 'compact',
-                    classname: 'whitespace-nowrap',
-                    onClick: () => componentProps.onAction(action),
-                }),
-            );
-            const actionGroups = statusButtons.length > 0
-                ? [
-                      h(
-                          'div',
-                          { class: 'flex flex-col gap-1.5' },
-                          statusButtons,
-                      ),
-                  ]
-                : [];
-
-            if (componentProps.canChangeModule) {
-                actionGroups.push(
-                    h(Button, {
-                        key: 'change-module',
-                        icon: 'fa-solid fa-right-left',
-                        type: 'module',
-                        size: 'icon',
-                        title: 'Cambiar módulo',
-                        ariaLabel: 'Cambiar módulo de la orden',
-                        onClick: componentProps.onChangeModule,
-                    }),
-                );
-            }
-
-            return h(
-                'div',
-                { class: 'flex min-w-max flex-row items-center justify-center gap-2 whitespace-nowrap px-1' },
-                actionGroups.length > 0
-                    ? actionGroups
-                    : [h('span', { class: 'text-sm text-gray-500' }, 'Sin acciones disponibles')],
-            );
-        };
-    },
-});
-
+const canAssignUser = computed(
+    () =>
+        can('crear_ordenes_servicio')
+        || can('cambiar_modulo_presupuestos'),
+);
 const escapeHtml = (value: string | number | null) =>
     String(value ?? '')
         .replaceAll('&', '&amp;')
@@ -159,6 +94,17 @@ const openModule = (row: presupuestos) => {
         label: row.modulo,
     };
     showModule.value = true;
+};
+
+const openUser = (row: presupuestos) => {
+    selectedOrdenServicioId.value = row.orden_id;
+    selectedUser.value = row.user_asignado
+        ? {
+              value: row.user_asignado,
+              label: row.usuario_asignado,
+          }
+        : null;
+    showUser.value = true;
 };
 
 const refreshItems = () => {
@@ -212,6 +158,41 @@ const changeStatus = async (
         }
     }
 };
+
+const ActionPresupuestos = (row: presupuestos) => [
+    ...accionesPorEstatus(row.estatus).map((action) => ({
+        icon: action.direccion === 'next'
+            ? 'fa-solid fa-arrow-right'
+            : 'fa-solid fa-arrow-left',
+        title: action.descripcion,
+        onClick: () => changeStatus(row, action),
+        classname: action.direccion === 'next'
+            ? 'border-emerald-300 bg-emerald-50 text-emerald-700 hover:border-emerald-500 hover:bg-emerald-100'
+            : 'border-amber-300 bg-amber-50 text-amber-700 hover:border-amber-500 hover:bg-amber-100',
+    })),
+    ...(canChangeModule.value
+        ? [{
+              icon: 'fa-solid fa-right-left',
+              title: 'Cambiar módulo',
+              classname: 'border-blue-300 bg-blue-50 text-blue-700 hover:border-blue-500 hover:bg-blue-100',
+              onClick: () => openModule(row),
+          }]
+        : []),
+    ...(canAssignUser.value
+        ? [{
+              icon: 'fa-solid fa-user-gear',
+              title: row.user_asignado
+                  ? 'Cambiar usuario'
+                  : 'Asignar usuario',
+              classname: 'border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-500 hover:bg-gray-100',
+              onClick: () => openUser(row),
+          }]
+        : []),
+];
+
+const showActionsColumn = computed(
+    () => items.value.some((row) => ActionPresupuestos(row).length > 0),
+);
 </script>
 
 <template>
@@ -259,8 +240,9 @@ const changeStatus = async (
                     { title: 'Placas', classname: 'uppercase' },
                     { title: 'VIN', classname: 'uppercase' },
                     { title: 'Creación', classname: 'uppercase', CanOrder: { key: 'creacion', types: 'ambos' } },
+                    { title: 'Usuario asignado', classname: 'uppercase' },
                     { title: 'Estatus', classname: 'uppercase' },
-                    ...(canManageStatus || canChangeModule ? [{ title: 'Acciones', classname: 'uppercase' }] : []),
+                    ...(showActionsColumn ? [{ title: 'Acciones', classname: 'uppercase' }] : []),
                     { title: 'Opciones', classname: 'uppercase' },
                 ]"
                 :rows="
@@ -275,17 +257,16 @@ const changeStatus = async (
                             { element: escapeHtml(row.placas), classname: 'uppercase' },
                             { element: escapeHtml(row.vin), classname: 'uppercase' },
                             { element: escapeHtml(row.creacion), classname: 'whitespace-nowrap' },
+                            { element: escapeHtml(row.usuario_asignado), classname: 'normal-case' },
                             { element: escapeHtml(row.estatus), classname: 'normal-case' },
-                            ...(canManageStatus || canChangeModule
+                            ...(showActionsColumn
                                 ? [
                                       {
-                                          element: BudgetActions,
+                                          element: ActionPresupuestos(row).length > 0
+                                              ? IconActions
+                                              : '-',
                                           props: {
-                                              actions: row.acciones_estatus,
-                                              onAction: (action: AccionEstatusPresupuesto) =>
-                                                  changeStatus(row, action),
-                                              canChangeModule,
-                                              onChangeModule: () => openModule(row),
+                                              actions: ActionPresupuestos(row),
                                           },
                                       },
                                   ]
@@ -337,6 +318,13 @@ const changeStatus = async (
         :orden-servicio-id="selectedOrdenServicioId"
         :modulo-actual="selectedModule"
         @close="showModule = false"
+        @saved="refreshItems"
+    />
+    <AsignarUsuarioOrdenServicioModal
+        :show="showUser"
+        :orden-servicio-id="selectedOrdenServicioId"
+        :usuario-actual="selectedUser"
+        @close="showUser = false"
         @saved="refreshItems"
     />
 </template>

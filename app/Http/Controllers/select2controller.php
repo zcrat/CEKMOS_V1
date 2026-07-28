@@ -19,6 +19,7 @@ use App\Models\Vehiculos;
 use App\Models\VehiculosConceptos;
 use App\Models\VehiculosConceptosDisponibles;
 use App\Services\AlcanceOrdenesServicio;
+use App\Services\AlcanceRecepcionesVehiculares;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -310,7 +311,11 @@ class select2controller extends Controller
         $user = $request->user();
 
         abort_unless(
-            AlcanceOrdenesServicio::puedeAccederOrden($user, $order),
+            AlcanceOrdenesServicio::puedeAccederOrden($user, $order)
+                || AlcanceRecepcionesVehiculares::puedeAccederOrden(
+                    $user,
+                    $order
+                ),
             403
         );
 

@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Carbon\Traits\Timestamp;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class OrdenesServicio extends Model
 {
     use SoftDeletes;
+
     protected $table = 'ordenes_servicio';
+
     protected $fillable = [
         'orden_servicio',
         'orden_seguimiento',
@@ -17,6 +19,8 @@ class OrdenesServicio extends Model
         'vehiculo_id',
         'vehiculo_concepto_id',
         'user_id',
+        'user_asignado',
+        'taller_id',
         'empresa_id',
         'cliente_id',
         'estimacion',
@@ -26,74 +30,126 @@ class OrdenesServicio extends Model
         'telefono',
         'ubicacion_id',
     ];
+
     protected $casts = [
-        'estimacion' => 'datetime'
+        'estimacion' => 'datetime',
     ];
 
     public function modulo_ordenes_servicio()
     {
         return $this->belongsTo(ModuloOrdenesServicio::class, 'modulo_orden_id');
     }
+
     public function vehiculo()
     {
         return $this->belongsTo(Vehiculos::class, 'vehiculo_id');
     }
+
     public function vehiculo_concepto()
     {
         return $this->belongsTo(VehiculosConceptos::class, 'vehiculo_concepto_id');
     }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function usuario_asignado()
+    {
+        return $this->belongsTo(User::class, 'user_asignado');
+    }
+
+    public function taller()
+    {
+        return $this->belongsTo(Taller::class, 'taller_id');
+    }
+
+    public function subcontratos()
+    {
+        return $this->hasMany(Subcontrato::class, 'orden_servicio_id');
+    }
+
+    public function subcontrato_activo()
+    {
+        return $this->hasOne(Subcontrato::class, 'orden_servicio_id')
+            ->whereNull('fecha_fin')
+            ->latest('fecha_inicio');
+    }
+
     public function empresa()
     {
         return $this->belongsTo(Empresas::class, 'empresa_id');
     }
+
     public function cliente()
     {
         return $this->belongsTo(Clientes::class, 'cliente_id');
     }
-    public function entrada(){
-        return $this->hasOne(DatosEntrada::class,'orden_servicio_id');
+
+    public function entrada()
+    {
+        return $this->hasOne(DatosEntrada::class, 'orden_servicio_id');
     }
-    public function salida(){
-        return $this->hasOne(DatosSalida::class,'orden_servicio_id');
+
+    public function salida()
+    {
+        return $this->hasOne(DatosSalida::class, 'orden_servicio_id');
     }
-    public function presupuestos(){
-        return $this->hasMany(Presupuestos::class,'orden_servicio_id');
+
+    public function presupuestos()
+    {
+        return $this->hasMany(Presupuestos::class, 'orden_servicio_id');
     }
+
     public function responsables()
     {
-        return $this->hasOne(ResponsablesOrdenServicio::class,'orden_servicio_id');
+        return $this->hasOne(ResponsablesOrdenServicio::class, 'orden_servicio_id');
     }
+
     public function recepcion_vehicular()
     {
-        return $this->hasOne(RecepcionesVehiculares::class,'orden_servicio_id');
+        return $this->hasOne(RecepcionesVehiculares::class, 'orden_servicio_id');
     }
+
     public function inspeccion_vehicular()
     {
         return $this->hasOne(InspeccionVehicular::class, 'orden_servicio_id');
     }
-    public function pedidos_almacen(){
-        return $this->hasMany(PedidosOrdenesAlmacen::class,'orden_servicio_id');
+
+    public function pedidos_almacen()
+    {
+        return $this->hasMany(PedidosOrdenesAlmacen::class, 'orden_servicio_id');
     }
-    public function log_acciones(){
-        return $this->hasMany(LogAccionesOS::class,'orden_servicio_id');
+
+    public function log_acciones()
+    {
+        return $this->hasMany(LogAccionesOS::class, 'orden_servicio_id');
     }
-    public function vales_almacen(){
-        return $this->hasMany(ValesAlmacen::class,'orden_servicio_id');
+
+    public function vales_almacen()
+    {
+        return $this->hasMany(ValesAlmacen::class, 'orden_servicio_id');
     }
-    public function hoja_conceptos(){
-        return $this->hasMany(HojaConceptos::class,'orden_servicio_id');
+
+    public function hoja_conceptos()
+    {
+        return $this->hasMany(HojaConceptos::class, 'orden_servicio_id');
     }
-    public function ubicacion(){
-        return $this->belongsTo(Ubicaciones::class,'ubicacion_id');
+
+    public function ubicacion()
+    {
+        return $this->belongsTo(Ubicaciones::class, 'ubicacion_id');
     }
-    public function seguimiento(){
-        return $this->hasMany(SeguimientoUnidades::class,'orden_servicio_id');
+
+    public function seguimiento()
+    {
+        return $this->hasMany(SeguimientoUnidades::class, 'orden_servicio_id');
     }
-    public function last_seguimiento(){
-        return $this->hasOne(SeguimientoUnidades::class,'orden_servicio_id')->orderbydesc('id');
+
+    public function last_seguimiento()
+    {
+        return $this->hasOne(SeguimientoUnidades::class, 'orden_servicio_id')
+            ->latestOfMany();
     }
 }

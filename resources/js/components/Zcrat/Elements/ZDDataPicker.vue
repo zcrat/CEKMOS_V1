@@ -5,7 +5,7 @@ import { watch } from 'vue';
 import ZDListErrors from './ZDListErrors.vue';
 import ZDIconError from './ZDIconError.vue';
 
-const date = defineModel<Date | null>();
+const date = defineModel<Date | Date[] | null>();
 const props = withDefaults(defineProps<{
   label?: string
   clearable?:boolean

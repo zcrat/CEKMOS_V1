@@ -33,12 +33,37 @@ class asignarrolesypermisos extends Seeder
             'ver_recepciones_vehiculares',
             'administrar_caja',
             'crear_ordenes_servicio',
+            'iniciar_terminar_diagnostico',
+            'terminar_mano_obra',
+            'revisar_mano_obra',
+            'aprobar_denegar_mano_obra',
+            'entregar_unidad',
+            'reingresar_unidad',
+            'retroceder_seguimiento',
             'ver_catalogo_conceptos',
             'crear_catalogo_conceptos',
             'editar_catalogo_conceptos',
             'eliminar_catalogo_conceptos',
             'ver_importacion_conceptos',
         ];
+
+        Permission::query()
+            ->whereIn('name', [
+                'iniciar_diagnostico_seguimiento',
+                'terminar_diagnostico_seguimiento',
+                'terminar_mano_obra_seguimiento',
+                'aprobar_mano_obra_seguimiento',
+                'denegar_mano_obra_seguimiento',
+                'iniciar_terminar_seguimiento',
+                'revisar_mano_obra_seguimiento',
+                'aprobar_denegar_seguimiento',
+                'entregar_unidad_seguimiento',
+                'reingresar_unidad_seguimiento',
+                'retroceder_diagnostico_mano_obra',
+            ])
+            ->get()
+            ->each
+            ->delete();
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);

@@ -14,6 +14,7 @@ use App\Http\Controllers\PresupuestosController;
 use App\Http\Controllers\RecepcionVehicularController;
 use App\Http\Controllers\select2controller;
 use App\Http\Controllers\selectcontroller;
+use App\Http\Controllers\TallerSubcontratoController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\VehiculoController;
 use Illuminate\Http\Request;
@@ -102,12 +103,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
         Route::get('select2/presupuesto/ordenes-servicio', [select2controller::class, 'OrdenesServicioDisponibles'])->name('select2.presupuesto.ordenes-servicio');
         Route::get('select2/presupuesto/categorias-conceptos', [select2controller::class, 'CategoriasConceptosPorPresupuesto'])->name('select2.presupuesto.categorias-conceptos');
-        Route::get('select2/ordenes-servicio/modulos-cambio', [select2controller::class, 'ModulosCambioOrdenServicio'])
-        ->middleware('permission:cambiar_modulo_presupuestos')->name('select2.ordenes-servicio.modulos-cambio');
         Route::patch('presupuesto/{presupuesto}/estatus', [PresupuestosController::class, 'ActualizarEstatus'])->name('presupuesto.estatus.update');
-        Route::patch('ordenes-servicio/{ordenServicio}/modulo', [OrdenesServicioController::class, 'actualizarModulo'])
-            ->middleware('permission:cambiar_modulo_presupuestos')
-            ->name('ordenes-servicio.modulo.update');
         Route::post('presupuesto/{presupuesto}/conceptos', [PresupuestosController::class, 'agregarConceptos'])
             ->name('presupuesto.conceptos.agregar');
         Route::put('presupuesto/{presupuesto}/conceptos', [PresupuestosController::class, 'actualizarConceptos'])
@@ -121,14 +117,27 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/pdf/recepciones/vehiculares/{id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.cortana.recepcionvehicular');
         Route::get('/pdf/inspeccion/vehicular/{id}', [PdfController::class, 'InspeccionVehicular'])->name('pdf.cortana.inspeccion.vehicular');
         Route::get('/inspeccion/vehicular/{ordenServicio}', [InspeccionVehicularController::class, 'read'])->name('inspeccionvehicular.read');
+        Route::get('/ordenes-servicio/{ordenServicio}/subcontratos', [TallerSubcontratoController::class, 'historial'])
+            ->name('ordenes-servicio.subcontratos.index');
         Route::patch('/recepciones/vehiculares/toggle/files_upload', [RecepcionVehicularController::class, 'ToggleFilesRecepcionVehicular'])->name('recepcionvehicular.toggle.upload.files');
 
     });
-    Route::middleware(['permission:recepciones_vehiculares_crear'])->group(function () {
+    Route::middleware(['permission:crear_ordenes_servicio'])->group(function () {
         Route::post('/recepciones/vehiculares/update', [RecepcionVehicularController::class, 'Update'])->name('recepcionesvehiculares.update');
         Route::post('/recepciones/vehiculares/create', [RecepcionVehicularController::class, 'Create'])->name('recepcionesvehiculares.create');
         Route::post('/inspeccion/vehicular/save', [InspeccionVehicularController::class, 'save'])->name('inspeccionvehicular.save');
+        Route::patch('/ordenes-servicio/{ordenServicio}/taller', [TallerSubcontratoController::class, 'actualizarTaller'])
+            ->name('ordenes-servicio.taller.update');
+        Route::post('/ordenes-servicio/{ordenServicio}/subcontratos', [TallerSubcontratoController::class, 'iniciar'])
+            ->name('ordenes-servicio.subcontratos.store');
+        Route::patch('/subcontratos/{subcontrato}/finalizar', [TallerSubcontratoController::class, 'finalizar'])
+            ->name('subcontratos.finalizar');
     });
+    Route::delete('/ordenes-servicio/{ordenServicio}/seguimiento/ultimo', [RecepcionVehicularController::class, 'eliminarUltimoSeguimiento'])
+        ->middleware('permission:retroceder_seguimiento')
+        ->name('ordenes-servicio.seguimiento.destroy-last');
+    Route::patch('/ordenes-servicio/{ordenServicio}/seguimiento', [RecepcionVehicularController::class, 'actualizarSeguimiento'])
+        ->name('ordenes-servicio.seguimiento.update');
 
     Route::get('/get/permisos/user', [UsersController::class, 'GetPermisos'])->name('getpermisosuser');
     Route::get('/get/modulos/user', [UsersController::class, 'GetModulos'])->name('get.modulos.user');
@@ -143,6 +152,18 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/employees/create', [EmpleadosController::class, 'create'])->name('employees.create');
 
     Route::get('select2/empresas', [select2controller::class, 'Empresas'])->name('select2.empresas');
+    Route::get('select2/talleres', [TallerSubcontratoController::class, 'talleres'])->name('select2.talleres');
+    Route::get('/ordenes-servicio/usuarios-asignables', [TallerSubcontratoController::class, 'usuariosAsignables'])
+        ->middleware('permission:crear_ordenes_servicio|cambiar_modulo_presupuestos')
+        ->name('ordenes-servicio.usuarios-asignables');
+    Route::patch('/ordenes-servicio/{ordenServicio}/usuario-asignado', [TallerSubcontratoController::class, 'asignarUsuario'])
+        ->middleware('permission:crear_ordenes_servicio|cambiar_modulo_presupuestos')
+        ->name('ordenes-servicio.usuario-asignado.update');
+    Route::get('select2/ordenes-servicio/modulos-cambio', [select2controller::class, 'ModulosCambioOrdenServicio'])
+        ->middleware('permission:cambiar_modulo_presupuestos')->name('select2.ordenes-servicio.modulos-cambio');
+    Route::patch('ordenes-servicio/{ordenServicio}/modulo', [OrdenesServicioController::class, 'actualizarModulo'])
+        ->middleware('permission:cambiar_modulo_presupuestos')
+        ->name('ordenes-servicio.modulo.update');
     Route::get('select2/clientes', [select2controller::class, 'Clientes'])->name('select2.clientes');
     Route::get('select2/economicos', [select2controller::class, 'Economicos'])->name('select2.economico');
     Route::get('select2/vehiculos/conceptos/disponibles', [select2controller::class, 'VehiculosConceptosPorModulo'])->name('select2.vehiculos.conceptos.modulos');

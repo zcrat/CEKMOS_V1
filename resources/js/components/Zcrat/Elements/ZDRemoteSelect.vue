@@ -215,7 +215,7 @@ onBeforeUnmount(() => {
         :avoidCollisions="true"
         :collisionPadding="8"
         :sideOffset="4"
-        class="z-15 w-[var(--reka-combobox-trigger-width)] bg-white border-2 border-gray-500 rounded-md select2-dropdown">
+        class="z-55 w-[var(--reka-combobox-trigger-width)] bg-white border-2 border-gray-500 rounded-md select2-dropdown">
         <ComboboxViewport>
           <div v-if="loading" class="text-mauve8 text-xs font-medium text-center py-2">
             {{ loading_message }}

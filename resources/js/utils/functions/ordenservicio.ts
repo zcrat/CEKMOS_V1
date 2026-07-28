@@ -2,7 +2,6 @@ import axios from 'axios'
 import MyBasicToast from "@/utils/ToastNotificationBasic";
 import ZDCanvas from '@/components/Zcrat/Elements/ZDCanvas.vue';
 import { EconomicoForm} from '@/types/OrdenServicio';
-import { Ref } from 'vue';
 import { ZdAlert } from '../ZdAlert';
 import { ImagenUpload } from '@/components/Zcrat/modals/partes/ordenservicio/ImagenesEvidencias.vue';
   
@@ -150,7 +149,7 @@ export const ImageCanvas = async({Canvas,FileName}:{Canvas:InstanceType<typeof Z
     
   }
 export const ToggleUploadFiles = async({id,estatus}:{id:number,estatus:boolean})=>{
-    const confirm=await ZdAlert({ title:'Actualizacion de Archivos', text:estatus?'Cancelar que los usuarios cambien, eliminen y agregen archivos a la Recepcion Vehicular' : 'Permitir que los usuarios cambien, eliminen y agregen archivos a la Recepcion Vehicular'});
+    const confirm=await ZdAlert({ title:'Actualización de archivos', text:estatus?'Impedir que los usuarios cambien, eliminen o agreguen archivos a la recepción vehicular' : 'Permitir que los usuarios cambien, eliminen o agreguen archivos a la recepción vehicular'});
     if(!confirm){return}
     axios.patch(route('recepcionvehicular.toggle.upload.files'), { id })
     .then(response => {
