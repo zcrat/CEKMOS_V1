@@ -78,7 +78,7 @@ const logout = () => {
                 width="48"
             >
                 <template #trigger>
-                    <ButtonLink :title="IsRow ? '' : 'Ordenes'"  :active="route().current('presupuesto.vista')"><font-awesome-icon icon="fa-solid fa-table-list" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Ordenes</span></ButtonLink>
+                    <ButtonLink :title="IsRow ? '' : 'Cortana'"  :active="route().current('presupuesto.vista')"><font-awesome-icon icon="fa-solid fa-table-list" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Cortana</span></ButtonLink>
                 </template>
                 
                 <template #content>

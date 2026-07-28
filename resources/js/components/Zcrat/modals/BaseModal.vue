@@ -23,11 +23,11 @@ const props = withDefaults(defineProps<{
   savingMessage?: string
   loadingMessage?: string
   position?: 'start' | 'center' | 'end'
-  zIndexClass?: 'z-[50]' | 'z-[999]'
+  zIndexClass?: 'z-[50]' | 'z-[999]' | ''
 }>(), {
   position: 'start',
   loading: false,
-  zIndexClass: 'z-[50]',
+  zIndexClass: '',
 })
 
 const emit = defineEmits<{ (e: 'close'): void }>()

@@ -25,7 +25,6 @@
   import InventarioTemplate from './partes/ordenservicio/InventarioTemplate.vue';
   import PinturaTemplate from './partes/ordenservicio/PinturaTemplate.vue';
   import { ZdAlert } from '@/utils/ZdAlert';
-  import Loading from '../Elements/Loading.vue';
   import { CreateorUpdate } from '@/services/orden-servicio/crud';
   import VehiculoModal from './VehiculoModal.vue';
   import MyBasicToast from '@/utils/ToastNotificationBasic';
@@ -43,6 +42,7 @@
   const ValidationErrors = ref<ArrayAsociativo>()
   const ImagenesEvidencia = ref<File[]>([])
   const loading = ref<boolean>(false)
+  const saving = ref<boolean>(false)
   const DetallesGenerales = reactive<DetallesGeneralesBaseProps>({...DetallesGeneralesBase});
   const CondicionesInteriores=ref<CondicionesInterioresForm>(CondicionesInterioresBase)
   const CondicionesExteriores=ref<CondicionesExterioresForm>(CondicionesExterioresBase)
@@ -76,8 +76,8 @@
         !DetallesGenerales.descripcion_mo ||
         (!DetallesGenerales.id && (ImagenesEvidencia.value.length < 6  || !DetallesGenerales.tipo_id)) ||
         (DetallesGenerales.id && DetallesGenerales.cambiar_archivos && ((ImagenesEvidencia.value.length + ImagenesCargadas.value.length) < 6))  ||
-        Object.entries(CondicionesInteriores.value).some(([key,value]) => value == '') ||
-        Object.entries(CondicionesExteriores.value).some(([key,value]) => value == '')
+        Object.entries(CondicionesInteriores.value).some(([,value]) => value == '') ||
+        Object.entries(CondicionesExteriores.value).some(([,value]) => value == '')
       )
     }
   }) 
@@ -122,7 +122,7 @@
     ImagenesCanvas.value.firma_img = await ImageCanvas({Canvas:ImageFirmaEntrada.value,FileName:'firma.jpeg'});
     const confirm=await ZdAlert({});
     if(!confirm){return}
-    loading.value=true
+    saving.value=true
 
     const Form:OrdenServicioForm={
       id:DetallesGenerales.id,
@@ -166,12 +166,13 @@
       MyBasicToast.success(response.data.message??'Orden De Servicio Creada/Actualizada Con Exito')
       updateVisibility();
     }else if(response.code === 422){
+      MyBasicToast.error('Revise los datos ingresados')
       ValidationErrors.value=response.validationErrors ?? {};
     }else{
       MyBasicToast.error(response.data.message??'Error al crear/actualizar la Orden De Servicio' )
     }
     await new Promise(resolve => setTimeout(resolve, 1000));
-    loading.value=false
+    saving.value=false
   }   
   const updateVisibility = () => {
     show.value = false;
@@ -264,13 +265,11 @@
   :show="show && OpenModal === null" 
   @close="updateVisibility" 
   :confirm-button="confirmButton"
-  :saving="loading"
+  :saving="saving"
+  :loading="loading"
   :saving-message="DetallesGenerales.id ? 'Espere a que termine de actualizar' : 'Espere a que termine de Crear'"
   >
-   <template v-if="loading">
-    <Loading  text="Espere Un Momento"/>
-  </template>
-  <template  v-else>
+
     <Subtitle>Datos Generales</Subtitle>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2" >
       <InputBasic 
@@ -514,7 +513,5 @@
       :DeleteErrors="(key:string)=>{delete ValidationErrors?.[key]}" 
       :errors="Object.entries(ValidationErrors??{}).filter(([key]) => key.includes('imagenes_evidencia')).map((item)=>{return{Key:item[0],errors:item[1]}})"
     />
-  </template>
- 
   </BaseModal>
 </template>

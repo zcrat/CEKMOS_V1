@@ -73,7 +73,7 @@ const logout = () => {
                         :active="route().current('presupuesto.vista') || route().current('recepcionesvehiculares.vista')"
                         class="ms-2 gap-x-1 w-full text-white">
                         <font-awesome-icon icon="fa-solid fa-table-list" />
-                        <span>&nbsp;Ordenes</span></ButtonLink>
+                        <span>&nbsp;Cortana</span></ButtonLink>
                 </template>
                 
                 <template #content>
