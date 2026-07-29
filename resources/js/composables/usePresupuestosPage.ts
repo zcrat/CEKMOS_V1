@@ -13,6 +13,12 @@ interface IconAction {
     classname: string;
 }
 
+interface DropdownOption {
+    label: string;
+    onClick: () => void;
+    classname: string[];
+}
+
 export const escapeHtml = (value: string | number | null) =>
     String(value ?? '')
         .replaceAll('&', '&amp;')
@@ -20,6 +26,19 @@ export const escapeHtml = (value: string | number | null) =>
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
+
+const presupuestoDateFormatter = new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+});
+
+const formatDate = (value: string | null) => {
+    if (!value) return '-';
+
+    const date = new Date(value);
+
+    return Number.isNaN(date.getTime()) ? '-' : presupuestoDateFormatter.format(date);
+};
 
 export const usePresupuestosPage = (items: Ref<presupuestos[]>) => {
     const refreshKey = ref(0);
@@ -138,12 +157,25 @@ export const usePresupuestosPage = (items: Ref<presupuestos[]>) => {
             : []),
     ];
 
+    const opcionesPresupuesto = (row: presupuestos): DropdownOption[] => [
+        {
+            label: 'Modificar',
+            onClick: () => openEdit(row.id),
+            classname: ['hover:text-blue-700'],
+        },
+        {
+            label: 'Eliminar',
+            onClick: () => deletePresupuesto(row),
+            classname: ['hover:text-red-700'],
+        },
+    ];
+
     const showActionsColumn = computed(() => items.value.some((row) => accionesPresupuesto(row).length > 0));
 
     return {
         accionesPresupuesto,
-        deletePresupuesto,
-        openEdit,
+        formatDate,
+        opcionesPresupuesto,
         refreshItems,
         refreshKey,
         selectedModule,

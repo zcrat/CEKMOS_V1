@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DatosSalida extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'datos_salidas';
 
     public $timestamps = false;

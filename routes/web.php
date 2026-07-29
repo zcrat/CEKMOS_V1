@@ -180,6 +180,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('select/niveles/combustible', [selectcontroller::class, 'NivelesCombustible'])->name('select.niveles.combustible');
     Route::get('select/modulos/orden', [selectcontroller::class, 'ModulosDisponibles'])->name('select.modulos.disponibles.usuario');
     Route::get('select/estatus', [selectcontroller::class, 'EstatusIdsPerCategory'])->name('select.status');
+    Route::get('select/usuarios/asignados', [selectcontroller::class, 'UsuariosAsignados'])
+        ->middleware('permission:ver_ordenes_servicio_todos')
+        ->name('select.usuarios.asignados');
     Route::get('select/tipos', [selectcontroller::class, 'TiposIdsPerCategory'])->name('select.tipos');
     Route::get('select/tipos/vehiculos', [selectcontroller::class, 'TiposVehiculosGeneral'])->name('select.tipos.vehiculos');
 

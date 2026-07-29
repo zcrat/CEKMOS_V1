@@ -3,23 +3,26 @@ import Dropdown from '@/components/Zcrat/Elements/Dropdown.vue';
 import IconActions from '@/components/Zcrat/Elements/IconActions.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue';
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
-import empresasselect from '@/components/Zcrat/Filters/empresasselect.vue';
-import MultiOptionFilter from '@/components/Zcrat/Filters/MultiOptionFilter.vue';
+import EmpresasFilter from '@/components/Zcrat/Filters/EmpresasFilter.vue';
+import EstatusRecepcionesFilter from '@/components/Zcrat/Filters/EstatusRecepcionesFilter.vue';
+import ModulosOrdenServicioFilter from '@/components/Zcrat/Filters/ModulosOrdenServicioFilter.vue';
+import TalleresFilter from '@/components/Zcrat/Filters/TalleresFilter.vue';
+import UsuarioAsignadoFilter from '@/components/Zcrat/Filters/UsuarioAsignadoFilter.vue';
 import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import Button from '@/components/Zcrat/Inputs/Button.vue';
 import Search from '@/components/Zcrat/Inputs/Search.vue';
 import AsignarUsuarioOrdenServicioModal from '@/components/Zcrat/modals/AsignarUsuarioOrdenServicioModal.vue';
 import CambiarModuloOrdenServicioModal from '@/components/Zcrat/modals/CambiarModuloOrdenServicioModal.vue';
 import CambiarTallerOrdenServicioModal from '@/components/Zcrat/modals/CambiarTallerOrdenServicioModal.vue';
+import EntregaUnidadOrdenServicioModal from '@/components/Zcrat/modals/EntregaUnidadOrdenServicioModal.vue';
 import InspeccionVehicularModal from '@/components/Zcrat/modals/InspeccionVehicularModal.vue';
 import OrdenServicio from '@/components/Zcrat/modals/OrdenServicio.vue';
 import PDFDemo from '@/components/Zcrat/modals/PDFDemo.vue';
 import SubcontratosOrdenServicioModal from '@/components/Zcrat/modals/SubcontratosOrdenServicioModal.vue';
 import { useRecepcionVehicularPage } from '@/composables/useRecepcionVehicularPage';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { RecepcionesVehiculares } from '@/types/generales';
+import { option, RecepcionesVehiculares } from '@/types/generales';
 import { OrderKeyProp } from '@/types/tablecomponent';
-import { ToggleUploadFiles } from '@/utils/functions/ordenservicio';
 import { computed, ref } from 'vue';
 
 const currentPage = ref<number>(1);
@@ -27,23 +30,33 @@ const itemsPerPage = ref<number>(10);
 const totalItems = ref<number>(0);
 const items = ref<RecepcionesVehiculares[]>([]);
 const search = ref<string>('');
-const empresa = ref<string | null>(null);
-const estatus = ref<string[]>([]);
-const modulos = ref<string[]>([]);
+const empresa = ref<option | null>(null);
+const estatus = ref<(number | string)[]>([]);
+const modulos = ref<(number | string)[]>([]);
+const talleres = ref<(number | string)[]>([]);
+const usuarioAsignado = ref<option | null>(null);
+const fechas = ref<Date[] | null>(null);
 const loading = ref<boolean>(true);
 const message_empty = ref<string>('No hay recepciones vehiculares para mostrar');
-const statusParams = { categoria_id: 2 };
 const orderBy = ref<null | OrderKeyProp>(null);
 const ModalOrdenServicio = ref<InstanceType<typeof OrdenServicio> | null>(null);
 const pdf = ref<InstanceType<typeof PDFDemo> | null>(null);
 const inspeccionModal = ref<InstanceType<typeof InspeccionVehicularModal> | null>(null);
-const { accionesRecepcion, actionModal, closeAction, refreshKey, refreshOrders, selectedOrder, showActionsColumn } = useRecepcionVehicularPage(items);
+const { accionesRecepcion, actionModal, closeAction, formatDate, opcionesRecepcion, refreshKey, refreshOrders, selectedOrder, showActionsColumn } =
+    useRecepcionVehicularPage(items, {
+        openOrder: (id) => ModalOrdenServicio.value?.Open(id),
+        openPdf: (id) => pdf.value?.Open(id),
+        openInspection: (id) => inspeccionModal.value?.Open(id),
+    });
 
 const params = computed(() => ({
     search: search.value,
     estatus: estatus.value,
-    empresa: empresa.value,
+    empresa: empresa.value?.value ?? null,
     modulos: modulos.value,
+    talleres: talleres.value,
+    usuario_asignado: usuarioAsignado.value?.value ?? null,
+    fechas: fechas.value?.length === 2 ? fechas.value.map((date) => date.toISOString()) : null,
     refresh: refreshKey.value,
 }));
 </script>
@@ -57,12 +70,14 @@ const params = computed(() => ({
             <div class="flex flex-col gap-2 lg:flex-row">
                 <div class="flex flex-row gap-2">
                     <Search Classdiv="sm:w-[25rem] w-full" placeholder="Buscar Por Order De Servicio, PLacas o Economico" v-model="search" />
-                    <empresasselect v-model="empresa" :canNew="false" />
+                    <EmpresasFilter v-model="empresa" />
                 </div>
                 <div class="flex items-end justify-between gap-2 sm:justify-start">
-                    <MultiOptionFilter v-model:selectedIds="estatus" api="select.status" :params="statusParams" label="Estatus" />
-                    <MultiOptionFilter v-model:selectedIds="modulos" api="select.modulos.disponibles.usuario" label="Modulos" />
-                    <Datapicker />
+                    <EstatusRecepcionesFilter v-model="estatus" />
+                    <ModulosOrdenServicioFilter v-model="modulos" />
+                    <TalleresFilter v-model="talleres" />
+                    <UsuarioAsignadoFilter v-model="usuarioAsignado" />
+                    <Datapicker v-model="fechas" />
                 </div>
             </div>
             <Pagination
@@ -88,7 +103,10 @@ const params = computed(() => ({
                     { title: 'Taller' },
                     { title: 'Usuario asignado' },
                     { title: 'Vehiculo', subtittles: [{ title: 'Economico' }, { title: 'Placas' }, { title: 'Marca' }, { title: 'Modelo' }] },
-                    { title: 'Entrada' },
+                    {
+                        title: 'Fechas',
+                        subtittles: [{ title: 'Entrada' }, { title: 'Salida' }],
+                    },
                     { title: 'Estatus' },
                     { title: 'Subcontratos' },
                     ...(showActionsColumn ? [{ title: 'Acciones' }] : []),
@@ -109,7 +127,14 @@ const params = computed(() => ({
                                 { element: row.placas, classname: 'uppercase' },
                                 { element: row.marca, classname: 'uppercase' },
                                 { element: row.modelo, classname: 'uppercase' },
-                                { element: row.creacion, classname: 'uppercase' },
+                                {
+                                    element: formatDate(row.datos_entrada.fecha ?? row.creacion),
+                                    classname: 'whitespace-nowrap',
+                                },
+                                {
+                                    element: row.salida ? formatDate(row.salida) : 'En taller',
+                                    classname: 'whitespace-nowrap',
+                                },
                                 { element: row.estatus, classname: 'uppercase' },
                                 {
                                     element: row.tiene_subcontrato_activo ? 'Activo' : row.subcontratos_count > 0 ? row.subcontratos_count : '-',
@@ -129,36 +154,7 @@ const params = computed(() => ({
                                     element: Dropdown,
                                     props: {
                                         triggerText: 'Opciones',
-                                        options: [
-                                            {
-                                                label: 'Editar Recepcion',
-                                                onClick: () => {
-                                                    ModalOrdenServicio?.Open(row.id);
-                                                },
-                                                classname: ['hover:text-gray-800'],
-                                            },
-                                            {
-                                                label: 'Ver PDF',
-                                                onClick: () => {
-                                                    pdf?.Open(row.id);
-                                                },
-                                                classname: ['hover:text-gray-800'],
-                                            },
-                                            {
-                                                label: 'Capturar / editar inspección',
-                                                onClick: () => {
-                                                    inspeccionModal?.Open(row.id);
-                                                },
-                                                classname: ['hover:text-gray-800'],
-                                            },
-                                            {
-                                                label: (row.cambiar_archivos ? 'Desactivar ' : 'Activar ') + 'Cambios en los Archivos',
-                                                onClick: () => {
-                                                    ToggleUploadFiles({ id: row.rv_id, estatus: row.cambiar_archivos });
-                                                },
-                                                classname: ['hover:text-gray-800'],
-                                            },
-                                        ].filter(Boolean),
+                                        options: opcionesRecepcion(row),
                                         contentClasses: {
                                             bg: 'bg-gray-300',
                                         },
@@ -211,6 +207,14 @@ const params = computed(() => ({
                   }
                 : null
         "
+        @close="closeAction"
+        @saved="refreshOrders"
+    />
+    <EntregaUnidadOrdenServicioModal
+        :show="actionModal === 'entrega'"
+        :orden-servicio-id="selectedOrder?.id ?? null"
+        :orden="selectedOrder?.orden ?? ''"
+        :datos-entrada="selectedOrder?.datos_entrada ?? null"
         @close="closeAction"
         @saved="refreshOrders"
     />

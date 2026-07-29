@@ -6,7 +6,6 @@ use App\Models\Archivos;
 use App\Models\Clientes;
 use App\Models\CondicionesPinturaRV;
 use App\Models\DatosEntrada;
-use App\Models\DatosSalida;
 use App\Models\Empresas;
 use App\Models\Estatus;
 use App\Models\ExterioresRV;
@@ -105,14 +104,6 @@ class OrdenesDemoSeeder extends Seeder
                     'fecha' => Carbon::now(),
                     'estimacion' => Carbon::now()->addDays(2),
                     'kilometraje' => 10000 + ($i * 123),
-                    'gasolina' => $nivelComb,
-                    'orden_servicio_id' => $os->id,
-                ]);
-
-                // Salida
-                DatosSalida::create([
-                    'fecha' => Carbon::now()->addDays(1),
-                    'kilometraje' => 10100 + ($i * 123),
                     'gasolina' => $nivelComb,
                     'orden_servicio_id' => $os->id,
                 ]);

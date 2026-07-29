@@ -3,8 +3,10 @@ import Dropdown from '@/components/Zcrat/Elements/Dropdown.vue';
 import IconActions from '@/components/Zcrat/Elements/IconActions.vue';
 import Table from '@/components/Zcrat/Elements/Table.vue';
 import Datapicker from '@/components/Zcrat/Elements/ZDDataPicker.vue';
-import empresasselect from '@/components/Zcrat/Filters/empresasselect.vue';
-import MultiOptionFilter from '@/components/Zcrat/Filters/MultiOptionFilter.vue';
+import EmpresasFilter from '@/components/Zcrat/Filters/EmpresasFilter.vue';
+import EstatusPresupuestosFilter from '@/components/Zcrat/Filters/EstatusPresupuestosFilter.vue';
+import ModulosOrdenServicioFilter from '@/components/Zcrat/Filters/ModulosOrdenServicioFilter.vue';
+import UsuarioAsignadoFilter from '@/components/Zcrat/Filters/UsuarioAsignadoFilter.vue';
 import Pagination from '@/components/Zcrat/Filters/pagination.vue';
 import Button from '@/components/Zcrat/Inputs/Button.vue';
 import Search from '@/components/Zcrat/Inputs/Search.vue';
@@ -13,7 +15,7 @@ import CambiarModuloOrdenServicioModal from '@/components/Zcrat/modals/CambiarMo
 import PresupuestoModal from '@/components/Zcrat/modals/PresupuestoModal.vue';
 import { escapeHtml, usePresupuestosPage } from '@/composables/usePresupuestosPage';
 import AppLayout from '@/layouts/AppLayout.vue';
-import type { presupuestos } from '@/types/generales';
+import type { option, presupuestos } from '@/types/generales';
 import type { OrderKeyProp } from '@/types/tablecomponent';
 import { useDebounce } from '@vueuse/core';
 import { computed, ref } from 'vue';
@@ -27,15 +29,16 @@ const search = ref('');
 const debouncedSearch = useDebounce(search, 400);
 const estatus = ref<(number | string)[]>([]);
 const modulos = ref<(number | string)[]>([]);
-const empresa = ref<string | null>(null);
+const usuarioAsignado = ref<option | null>(null);
+const empresa = ref<option | null>(null);
 const fechas = ref<Date[] | null>(null);
 const orderBy = ref<OrderKeyProp | null>(null);
 const prefacturasActive = false;
 
 const {
     accionesPresupuesto,
-    deletePresupuesto,
-    openEdit,
+    formatDate,
+    opcionesPresupuesto,
     refreshItems,
     refreshKey,
     selectedModule,
@@ -53,7 +56,8 @@ const params = computed(() => ({
     search: debouncedSearch.value,
     estatus: estatus.value,
     modulos: modulos.value,
-    empresa_id: empresa.value || null,
+    usuario_asignado: usuarioAsignado.value?.value ?? null,
+    empresa_id: empresa.value?.value ?? null,
     fechas: fechas.value?.length === 2 ? fechas.value.map((date) => date.toISOString()) : null,
     orderBy: orderBy.value,
 }));
@@ -63,7 +67,8 @@ const hasFilters = computed(
         debouncedSearch.value.trim() !== '' ||
         estatus.value.length > 0 ||
         modulos.value.length > 0 ||
-        Boolean(empresa.value) ||
+        usuarioAsignado.value !== null ||
+        empresa.value !== null ||
         Boolean(fechas.value?.length),
 );
 
@@ -84,9 +89,10 @@ const emptyMessage = computed(() =>
             <div class="flex w-full flex-col gap-3">
                 <div class="flex w-full flex-wrap items-end gap-2">
                     <Search v-model="search" Classdiv="w-full sm:w-[30rem]" placeholder="Buscar por folio, placas, económico u orden de servicio" />
-                    <empresasselect v-model="empresa" :can-new="false" />
-                    <MultiOptionFilter v-model:selectedIds="estatus" api="select.status" :params="{ categoria_id: 2 }" label="Estatus" />
-                    <MultiOptionFilter v-model:selectedIds="modulos" api="select.modulos.disponibles.usuario" label="Módulos" />
+                    <EmpresasFilter v-model="empresa" />
+                    <EstatusPresupuestosFilter v-model="estatus" />
+                    <ModulosOrdenServicioFilter v-model="modulos" />
+                    <UsuarioAsignadoFilter v-model="usuarioAsignado" />
                     <Datapicker v-model="fechas" label="Fecha de creación" />
                 </div>
 
@@ -133,7 +139,7 @@ const emptyMessage = computed(() =>
                             { element: escapeHtml(row.economico), classname: 'uppercase' },
                             { element: escapeHtml(row.placas), classname: 'uppercase' },
                             { element: escapeHtml(row.vin), classname: 'uppercase' },
-                            { element: escapeHtml(row.creacion), classname: 'whitespace-nowrap' },
+                            { element: formatDate(row.creacion), classname: 'whitespace-nowrap' },
                             { element: escapeHtml(row.usuario_asignado), classname: 'normal-case' },
                             { element: escapeHtml(row.estatus), classname: 'normal-case' },
                             ...(showActionsColumn
@@ -150,18 +156,7 @@ const emptyMessage = computed(() =>
                                 element: Dropdown,
                                 props: {
                                     triggerText: 'Opciones',
-                                    options: [
-                                        {
-                                            label: 'Modificar',
-                                            onClick: () => openEdit(row.id),
-                                            classname: ['hover:text-blue-700'],
-                                        },
-                                        {
-                                            label: 'Eliminar',
-                                            onClick: () => deletePresupuesto(row),
-                                            classname: ['hover:text-red-700'],
-                                        },
-                                    ],
+                                    options: opcionesPresupuesto(row),
                                     contentClasses: { bg: 'bg-white' },
                                 },
                             },

@@ -55,6 +55,13 @@ class PresupuestosController extends Controller
             'modulos' => ['nullable', 'array'],
             'modulos.*' => ['integer', 'exists:modulo_ordenes_servicios,id'],
             'empresa_id' => ['nullable', 'integer', 'exists:empresas,id'],
+            'usuario_asignado' => [
+                'nullable',
+                Rule::when(
+                    $request->input('usuario_asignado') !== 'sin_usuario',
+                    ['integer', 'exists:users,id']
+                ),
+            ],
             'fechas' => ['nullable', 'array', 'size:2'],
             'fechas.*' => ['date'],
             'orderBy.key' => ['nullable', Rule::in(['folio', 'orden', 'empresa', 'creacion'])],
@@ -106,6 +113,21 @@ class PresupuestosController extends Controller
 
         if (isset($validated['empresa_id'])) {
             $query->where('orden.empresa_id', $validated['empresa_id']);
+        }
+
+        if (isset($validated['usuario_asignado'])) {
+            abort_unless(
+                $user->can('ver_ordenes_servicio_todos'),
+                403
+            );
+            if ($validated['usuario_asignado'] === 'sin_usuario') {
+                $query->whereNull('orden.user_asignado');
+            } else {
+                $query->where(
+                    'orden.user_asignado',
+                    $validated['usuario_asignado']
+                );
+            }
         }
 
         if (isset($validated['fechas'])) {

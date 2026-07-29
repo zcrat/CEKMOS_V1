@@ -3,11 +3,12 @@ import { useAccionesSeguimiento } from '@/services/orden-servicio/acciones';
 import type { AccionSeguimientoOrdenServicio, RecepcionesVehiculares } from '@/types/generales';
 import MyBasicToast from '@/utils/ToastNotificationBasic';
 import { ZdAlert } from '@/utils/ZdAlert';
+import { ToggleUploadFiles } from '@/utils/functions/ordenservicio';
 import { useEcho } from '@laravel/echo-vue';
 import axios from 'axios';
 import { computed, ref, type Ref } from 'vue';
 
-type ActionModal = 'taller' | 'modulo' | 'subcontratos' | 'usuario';
+type ActionModal = 'taller' | 'modulo' | 'subcontratos' | 'usuario' | 'entrega';
 
 interface IconAction {
     icon?: string;
@@ -15,6 +16,18 @@ interface IconAction {
     title: string;
     onClick: () => void;
     classname: string;
+}
+
+interface DropdownOption {
+    label: string;
+    onClick: () => void;
+    classname: string[];
+}
+
+interface ReceptionOptionHandlers {
+    openOrder: (id: number) => void;
+    openPdf: (id: number) => void;
+    openInspection: (id: number) => void;
 }
 
 interface DataUpdateWebSocket extends Record<string, unknown> {
@@ -34,7 +47,20 @@ const statusActionIcons: Record<string, string> = {
     reiniciar_diagnostico: 'fa-solid fa-stethoscope',
 };
 
-export const useRecepcionVehicularPage = (items: Ref<RecepcionesVehiculares[]>) => {
+const receptionDateFormatter = new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+});
+
+const formatDate = (value: string | null) => {
+    if (!value) return '-';
+
+    const date = new Date(value);
+
+    return Number.isNaN(date.getTime()) ? '-' : receptionDateFormatter.format(date);
+};
+
+export const useRecepcionVehicularPage = (items: Ref<RecepcionesVehiculares[]>, optionHandlers: ReceptionOptionHandlers) => {
     const selectedOrder = ref<RecepcionesVehiculares | null>(null);
     const actionModal = ref<ActionModal | null>(null);
     const refreshKey = ref(0);
@@ -116,7 +142,7 @@ export const useRecepcionVehicularPage = (items: Ref<RecepcionesVehiculares[]>) 
         ...accionesPorEstatus(row.estatus).map((action) => ({
             icon: statusActionIcons[action.clave] ?? 'fa-solid fa-forward-step',
             title: action.descripcion,
-            onClick: () => changeStatus(row, action),
+            onClick: () => (action.clave === 'entregar_unidad' ? openAction('entrega', row) : changeStatus(row, action)),
             classname: action.clave.includes('denegar')
                 ? 'border-red-300 bg-red-50 text-red-700 hover:border-red-500 hover:bg-red-100'
                 : 'border-green-300 bg-green-50 text-green-700 hover:border-green-500 hover:bg-green-100',
@@ -155,6 +181,29 @@ export const useRecepcionVehicularPage = (items: Ref<RecepcionesVehiculares[]>) 
             : []),
     ];
 
+    const opcionesRecepcion = (row: RecepcionesVehiculares): DropdownOption[] => [
+        {
+            label: 'Editar Recepción',
+            onClick: () => optionHandlers.openOrder(row.id),
+            classname: ['hover:text-gray-800'],
+        },
+        {
+            label: 'Ver PDF',
+            onClick: () => optionHandlers.openPdf(row.id),
+            classname: ['hover:text-gray-800'],
+        },
+        {
+            label: 'Capturar / editar inspección',
+            onClick: () => optionHandlers.openInspection(row.id),
+            classname: ['hover:text-gray-800'],
+        },
+        {
+            label: `${row.cambiar_archivos ? 'Desactivar' : 'Activar'} cambios en los archivos`,
+            onClick: () => ToggleUploadFiles({ id: row.rv_id, estatus: row.cambiar_archivos }),
+            classname: ['hover:text-gray-800'],
+        },
+    ];
+
     const showActionsColumn = computed(() => items.value.some((row) => accionesRecepcion(row).length > 0));
 
     useEcho('ordenes_servicio', '.update', (data: DataUpdateWebSocket) => {
@@ -169,6 +218,8 @@ export const useRecepcionVehicularPage = (items: Ref<RecepcionesVehiculares[]>) 
         accionesRecepcion,
         actionModal,
         closeAction,
+        formatDate,
+        opcionesRecepcion,
         refreshKey,
         refreshOrders,
         selectedOrder,

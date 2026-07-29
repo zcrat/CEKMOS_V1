@@ -6,6 +6,7 @@ use App\Events\OrdenServicioEvents;
 use App\Models\Archivos;
 use App\Models\CondicionesPinturaRV;
 use App\Models\DatosEntrada;
+use App\Models\DatosSalida;
 use App\Models\Estatus;
 use App\Models\ExterioresRV;
 use App\Models\InterioresRV;
@@ -54,6 +55,8 @@ class RecepcionVehicularController extends Controller
                 'empresa',
                 'ubicacion',
                 'recepcion_vehicular',
+                'entrada.nivel_combustible',
+                'salida',
                 'taller',
                 'modulo_ordenes_servicio',
                 'usuario_asignado',
@@ -66,6 +69,102 @@ class RecepcionVehicularController extends Controller
         AlcanceRecepcionesVehiculares::aplicar($query, $user);
         if ($request->filled('modulos')) {
             $query->whereIn('modulo_orden_id', $request->input('modulos', []));
+        }
+
+        if ($request->filled('empresa')) {
+            $query->where('empresa_id', $request->input('empresa'));
+        }
+
+        if ($request->filled('usuario_asignado')) {
+            abort_unless(
+                $user->can('ver_ordenes_servicio_todos'),
+                403
+            );
+            $usuarioAsignado = $request->input('usuario_asignado');
+            if ($usuarioAsignado === 'sin_usuario') {
+                $query->whereNull('user_asignado');
+            } else {
+                $request->validate([
+                    'usuario_asignado' => [
+                        'integer',
+                        'exists:users,id',
+                    ],
+                ]);
+                $query->where('user_asignado', $usuarioAsignado);
+            }
+        }
+
+        if ($request->filled('talleres')) {
+            $query->whereIn(
+                'taller_id',
+                collect($request->input('talleres', []))
+                    ->filter(fn ($taller) => is_numeric($taller))
+                    ->map(fn ($taller) => (int) $taller)
+            );
+        }
+
+        $estatusSeleccionados = collect($request->input('estatus', []));
+        $incluirSinSeguimiento = $estatusSeleccionados->contains('sin_seguimiento');
+        $estatusIds = $estatusSeleccionados
+            ->filter(fn ($estatus) => is_numeric($estatus))
+            ->map(fn ($estatus) => (int) $estatus)
+            ->values();
+
+        if ($estatusSeleccionados->isNotEmpty()) {
+            $query->where(function ($estatusQuery) use (
+                $estatusIds,
+                $incluirSinSeguimiento
+            ) {
+                if ($estatusIds->isNotEmpty()) {
+                    $estatusQuery->whereHas(
+                        'last_seguimiento',
+                        fn ($seguimientoQuery) => $seguimientoQuery
+                            ->whereIn('estatus_id', $estatusIds)
+                    );
+                }
+
+                if ($incluirSinSeguimiento) {
+                    $method = $estatusIds->isNotEmpty()
+                        ? 'orWhereDoesntHave'
+                        : 'whereDoesntHave';
+                    $estatusQuery->{$method}('last_seguimiento');
+                }
+            });
+        }
+
+        if (
+            is_array($request->input('fechas')) &&
+            count($request->input('fechas')) === 2
+        ) {
+            $fechaInicio = Carbon::parse($request->input('fechas.0'))
+                ->startOfDay();
+            $fechaFin = Carbon::parse($request->input('fechas.1'))
+                ->endOfDay();
+            $estatusUnidadEntregadaId = Estatus::query()
+                ->where('categoria_id', 12)
+                ->where('descripcion', 'Unidad Entregada al Cliente')
+                ->value('id');
+            $incluyeUnidadEntregada = $estatusSeleccionados->isEmpty() ||
+                $estatusIds->contains($estatusUnidadEntregadaId);
+            $soloUnidadEntregada = $incluyeUnidadEntregada &&
+                $estatusSeleccionados->count() === 1 &&
+                $estatusIds->count() === 1;
+            $filtrarFecha = fn ($fechaQuery) => $fechaQuery->whereBetween(
+                'fecha',
+                [$fechaInicio, $fechaFin]
+            );
+
+            if ($soloUnidadEntregada) {
+                $query->whereHas('salida', $filtrarFecha);
+            } elseif ($incluyeUnidadEntregada) {
+                $query->where(function ($fechaQuery) use ($filtrarFecha) {
+                    $fechaQuery
+                        ->whereHas('entrada', $filtrarFecha)
+                        ->orWhereHas('salida', $filtrarFecha);
+                });
+            } else {
+                $query->whereHas('entrada', $filtrarFecha);
+            }
         }
 
         $query = $query->paginate($itemsPerPage, ['*'], 'page', $currentPage);
@@ -96,6 +195,12 @@ class RecepcionVehicularController extends Controller
                 'modelo' => optional($item->vehiculo->modelo)->descripcion ?? null,
                 'folios' => $item->folios ?? [], // ajusta según tu relación
                 'creacion' => $item->created_at,
+                'salida' => $item->salida?->fecha,
+                'datos_entrada' => [
+                    'fecha' => $item->entrada?->fecha,
+                    'kilometraje' => $item->entrada?->kilometraje,
+                    'gasolina' => $item->entrada?->nivel_combustible?->descripcion,
+                ],
                 'estatus' => $estatus ?? 'Sin diagnóstico',
                 'tiene_seguimiento' => $item->last_seguimiento !== null,
                 'cambiar_archivos' => $item->recepcion_vehicular->cambiar_archivos ?? false,
@@ -122,6 +227,18 @@ class RecepcionVehicularController extends Controller
 
         $validated = $request->validate([
             'accion' => ['required', 'string', 'max:50'],
+            'kilometraje' => [
+                Rule::requiredIf($request->input('accion') === 'entregar_unidad'),
+                'nullable',
+                'integer',
+                'min:0',
+            ],
+            'gasolina' => [
+                Rule::requiredIf($request->input('accion') === 'entregar_unidad'),
+                'nullable',
+                'integer',
+                'exists:niveles_combustible,id',
+            ],
         ]);
 
         $seguimiento = DB::transaction(function () use (
@@ -157,6 +274,57 @@ class RecepcionVehicularController extends Controller
                 403,
                 'No tienes permiso para realizar esta acción de seguimiento.'
             );
+
+            if ($validated['accion'] === 'entregar_unidad') {
+                $kilometrajeEntrada = DatosEntrada::query()
+                    ->where('orden_servicio_id', $ordenServicio->id)
+                    ->value('kilometraje');
+
+                if (
+                    $kilometrajeEntrada === null ||
+                    $validated['kilometraje'] < $kilometrajeEntrada
+                ) {
+                    throw ValidationException::withMessages([
+                        'kilometraje' => $kilometrajeEntrada === null
+                            ? 'La orden no tiene un kilometraje de entrada registrado.'
+                            : "El kilometraje de salida debe ser igual o mayor a {$kilometrajeEntrada}.",
+                    ]);
+                }
+
+                $salidaActiva = DatosSalida::query()
+                    ->where('orden_servicio_id', $ordenServicio->id)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($salidaActiva) {
+                    throw ValidationException::withMessages([
+                        'accion' => 'La orden ya tiene datos de salida activos.',
+                    ]);
+                }
+
+                DatosSalida::create([
+                    'fecha' => now(),
+                    'kilometraje' => $validated['kilometraje'],
+                    'gasolina' => $validated['gasolina'],
+                    'orden_servicio_id' => $ordenServicio->id,
+                ]);
+            }
+
+            if ($validated['accion'] === 'reingresar_unidad') {
+                $salida = DatosSalida::query()
+                    ->where('orden_servicio_id', $ordenServicio->id)
+                    ->latest('id')
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $salida) {
+                    throw ValidationException::withMessages([
+                        'accion' => 'La orden no tiene datos de salida activos.',
+                    ]);
+                }
+
+                $salida->delete();
+            }
 
             $estatusDestino = Estatus::query()
                 ->where('categoria_id', 12)

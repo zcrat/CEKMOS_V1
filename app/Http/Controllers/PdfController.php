@@ -182,9 +182,11 @@ class PdfController extends Controller
                 'kilometraje'=>$ordenservicio->entrada->kilometraje,
             ],
             'salida'=>[
-                'fecha'=>Carbon::parse($ordenservicio->salida->fecha)->format('d/m/Y'),
-                'gasolina'=>$ordenservicio->salida->nivel_combustible->descripcion,
-                'kilometraje'=>$ordenservicio->salida->kilometraje,
+                'fecha'=>$ordenservicio->salida
+                    ? Carbon::parse($ordenservicio->salida->fecha)->format('d/m/Y')
+                    : '',
+                'gasolina'=>$ordenservicio->salida?->nivel_combustible?->descripcion ?? '',
+                'kilometraje'=>$ordenservicio->salida?->kilometraje ?? '',
             ],
             'vehiculo'=>[
                 'anio'=>$ordenservicio->vehiculo->año,

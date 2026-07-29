@@ -59,6 +59,12 @@ export interface RecepcionesVehiculares{
   modelo:string;
   folios:string[];
   creacion:string;
+  salida:string|null;
+  datos_entrada:{
+    fecha:string|null;
+    kilometraje:number|null;
+    gasolina:string|null;
+  };
   estatus:string;
   tiene_seguimiento:boolean;
   cambiar_archivos:boolean;
