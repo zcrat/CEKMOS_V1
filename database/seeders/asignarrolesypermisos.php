@@ -45,6 +45,9 @@ class asignarrolesypermisos extends Seeder
             'editar_catalogo_conceptos',
             'eliminar_catalogo_conceptos',
             'ver_importacion_conceptos',
+            'crear.vales.almacen',
+            'editar.vales.almacen',
+            'eliminar.vales.almacen',
         ];
 
         Permission::query()

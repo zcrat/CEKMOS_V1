@@ -25,6 +25,7 @@ class Categorias extends Seeder
             ['descripcion' => 'Inspeccion Vehicular'],
             ['descripcion' => 'Recepcion Vehicular'],
             ['descripcion' => 'Seguimiento Ordenes Servicio'],
+            ['descripcion' => 'Vales De Almacen'],
         ];
         foreach ($categorias as $data) {
             CategoriasModel::create($data);

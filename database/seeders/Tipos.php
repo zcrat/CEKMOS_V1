@@ -72,6 +72,8 @@ class Tipos extends Seeder
             ['descripcion' => 'Sub-Contratados', 'categoria_id' => 9],
             ['descripcion' => 'Otros', 'categoria_id' => 9],
             ['descripcion' => 'Files Evidencias', 'categoria_id' => 4],
+            ['descripcion' => 'Almacen', 'categoria_id' => 13],
+            ['descripcion' => 'Subcontrato', 'categoria_id' => 13],
             
         ];
         foreach ($usuarios_taller as $data) {

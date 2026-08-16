@@ -14,8 +14,12 @@ class ValesAlmacen extends Model
         'motor',
         'user_id',
         'orden_servicio_id',
+        'tipo',
+        'status',
     ];
     protected $casts=[
+        'tipo' => 'integer',
+        'status' => 'integer',
     ];
 
     public function orden_servicio(){
@@ -26,5 +30,15 @@ class ValesAlmacen extends Model
     }
     public function conceptos(){
         return $this->hasMany(ConceptosPerValeAlmacen::class,'vale_almacen_id');
+    }
+
+    public function tipoRegistro()
+    {
+        return $this->belongsTo(Tipos::class, 'tipo');
+    }
+
+    public function estatusRegistro()
+    {
+        return $this->belongsTo(Estatus::class, 'status');
     }
 }
