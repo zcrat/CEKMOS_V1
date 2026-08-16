@@ -16,6 +16,7 @@ use App\Http\Controllers\select2controller;
 use App\Http\Controllers\selectcontroller;
 use App\Http\Controllers\TallerSubcontratoController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\ValesAlmacenController;
 use App\Http\Controllers\VehiculoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -116,6 +117,19 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/recepciones/vehiculares/read/one', [RecepcionVehicularController::class, 'ReadOne'])->name('recepcionvehicular.read');
         Route::get('/pdf/recepciones/vehiculares/{id}', [PdfController::class, 'RecepcionVehicular'])->name('pdf.cortana.recepcionvehicular');
         Route::get('/pdf/inspeccion/vehicular/{id}', [PdfController::class, 'InspeccionVehicular'])->name('pdf.cortana.inspeccion.vehicular');
+        Route::get('/ordenes-servicio/{ordenServicio}/vales-almacen', [ValesAlmacenController::class, 'index'])
+            ->name('vales-almacen.index');
+        Route::post('/ordenes-servicio/{ordenServicio}/vales-almacen', [ValesAlmacenController::class, 'store'])
+            ->middleware('permission:crear.vales.almacen')
+            ->name('vales-almacen.store');
+        Route::put('/vales-almacen/{vale}', [ValesAlmacenController::class, 'update'])
+            ->middleware('permission:editar.vales.almacen')
+            ->name('vales-almacen.update');
+        Route::delete('/vales-almacen/{vale}', [ValesAlmacenController::class, 'destroy'])
+            ->middleware('permission:eliminar.vales.almacen')
+            ->name('vales-almacen.destroy');
+        Route::get('/pdf/vales-almacen/{id}', [PdfController::class, 'ValeAlmacen'])
+            ->name('pdf.cortana.vale-almacen');
         Route::get('/inspeccion/vehicular/{ordenServicio}', [InspeccionVehicularController::class, 'read'])->name('inspeccionvehicular.read');
         Route::get('/ordenes-servicio/{ordenServicio}/subcontratos', [TallerSubcontratoController::class, 'historial'])
             ->name('ordenes-servicio.subcontratos.index');
