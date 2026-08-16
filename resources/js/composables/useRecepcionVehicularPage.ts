@@ -28,6 +28,7 @@ interface ReceptionOptionHandlers {
     openOrder: (id: number) => void;
     openPdf: (id: number) => void;
     openInspection: (id: number) => void;
+    openWarehouseVouchers: (order: RecepcionesVehiculares) => void;
 }
 
 interface DataUpdateWebSocket extends Record<string, unknown> {
@@ -195,6 +196,11 @@ export const useRecepcionVehicularPage = (items: Ref<RecepcionesVehiculares[]>, 
         {
             label: 'Capturar / editar inspección',
             onClick: () => optionHandlers.openInspection(row.id),
+            classname: ['hover:text-gray-800'],
+        },
+        {
+            label: 'Vales de almacén',
+            onClick: () => optionHandlers.openWarehouseVouchers(row),
             classname: ['hover:text-gray-800'],
         },
         {

@@ -19,6 +19,7 @@ import InspeccionVehicularModal from '@/components/Zcrat/modals/InspeccionVehicu
 import OrdenServicio from '@/components/Zcrat/modals/OrdenServicio.vue';
 import PDFDemo from '@/components/Zcrat/modals/PDFDemo.vue';
 import SubcontratosOrdenServicioModal from '@/components/Zcrat/modals/SubcontratosOrdenServicioModal.vue';
+import ValesAlmacenModal from '@/components/Zcrat/modals/ValesAlmacenModal.vue';
 import { useRecepcionVehicularPage } from '@/composables/useRecepcionVehicularPage';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { option, RecepcionesVehiculares } from '@/types/generales';
@@ -42,11 +43,13 @@ const orderBy = ref<null | OrderKeyProp>(null);
 const ModalOrdenServicio = ref<InstanceType<typeof OrdenServicio> | null>(null);
 const pdf = ref<InstanceType<typeof PDFDemo> | null>(null);
 const inspeccionModal = ref<InstanceType<typeof InspeccionVehicularModal> | null>(null);
+const valesAlmacenModal = ref<InstanceType<typeof ValesAlmacenModal> | null>(null);
 const { accionesRecepcion, actionModal, closeAction, formatDate, opcionesRecepcion, refreshKey, refreshOrders, selectedOrder, showActionsColumn } =
     useRecepcionVehicularPage(items, {
         openOrder: (id) => ModalOrdenServicio.value?.Open(id),
         openPdf: (id) => pdf.value?.Open(id),
         openInspection: (id) => inspeccionModal.value?.Open(id),
+        openWarehouseVouchers: (order) => valesAlmacenModal.value?.Open(order),
     });
 
 const params = computed(() => ({
@@ -175,6 +178,7 @@ const params = computed(() => ({
     <OrdenServicio ref="ModalOrdenServicio" />
     <InspeccionVehicularModal ref="inspeccionModal" />
     <PDFDemo ref="pdf" />
+    <ValesAlmacenModal ref="valesAlmacenModal" />
     <CambiarTallerOrdenServicioModal
         :show="actionModal === 'taller'"
         :orden-servicio-id="selectedOrder?.id ?? null"

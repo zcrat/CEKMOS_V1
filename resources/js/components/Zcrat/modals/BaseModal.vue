@@ -24,8 +24,12 @@ const props = withDefaults(defineProps<{
   loadingMessage?: string
   position?: 'start' | 'center' | 'end'
   zIndexClass?: 'z-[50]' | 'z-[999]' | ''
+  classslot?: string
+  modalClass?: string
 }>(), {
   position: 'start',
+  classslot: "overflow-auto sm:px-4",
+  modalClass: 'w-fit max-w-screen',
   loading: false,
   zIndexClass: '',
 })
@@ -66,7 +70,7 @@ const titlePositionClass = computed(() => ({
       <DialogContent
         :class="['fixed inset-0 flex items-center justify-center', zIndexClass]"
       >
-        <div class="relative m-2 max-h-[90vh] w-fit max-w-screen overflow-auto rounded-xl bg-white px-4 shadow-xl">
+        <div :class="['relative m-2 max-h-[90vh] overflow-auto rounded-xl bg-white px-4 shadow-xl max-w-[100vw]', modalClass]">
           <DialogDescription class="sr-only">
             {{ modalDescription ?? modalTitle ?? 'Ventana de diálogo' }}
           </DialogDescription>
@@ -90,7 +94,7 @@ const titlePositionClass = computed(() => ({
             v-show="loading"
             :text="loadingMessage ?? 'Cargando'"
           />
-          <div v-show="!loading" class="overflow-auto sm:px-4">
+          <div v-show="!loading" :class=classslot>
             <slot />
           </div>
           <div class="sticky bottom-0 z-10 flex items-center justify-end gap-4 bg-white py-2">
