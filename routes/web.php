@@ -17,6 +17,7 @@ use App\Http\Controllers\selectcontroller;
 use App\Http\Controllers\TallerSubcontratoController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ValesAlmacenController;
+use App\Http\Controllers\ValesSeguimientoController;
 use App\Http\Controllers\VehiculoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -50,13 +51,16 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::middleware(['permission:editar_catalogo_conceptos'])->group(function () {
         Route::get('/catalogos/conceptos/{costo}', [ConceptosPresupuestosController::class, 'show'])
+            ->whereNumber('costo')
             ->name('catalogos.conceptos.show');
         Route::put('/catalogos/conceptos/{costo}', [ConceptosPresupuestosController::class, 'update'])
+            ->whereNumber('costo')
             ->name('catalogos.conceptos.update');
     });
 
     Route::middleware(['permission:eliminar_catalogo_conceptos'])->group(function () {
         Route::delete('/catalogos/conceptos/{costo}', [ConceptosPresupuestosController::class, 'destroy'])
+            ->whereNumber('costo')
             ->name('catalogos.conceptos.destroy');
     });
 
@@ -111,6 +115,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             ->name('presupuesto.conceptos.update');
         Route::post('presupuesto/{presupuesto}/conceptos/crear', [PresupuestosController::class, 'crearConcepto'])->middleware('permission:crear_catalogo_conceptos')->name('presupuesto.conceptos.crear');
     });
+    Route::get('/vales/seguimiento/{tipo}', [ValesSeguimientoController::class, 'view'])
+        ->whereIn('tipo', ['almacen', 'subcontratos'])
+        ->name('vales.seguimiento.view');
+    Route::get('/vales/seguimiento/read', [ValesSeguimientoController::class, 'index'])
+        ->name('vales.seguimiento.index');
+
     Route::middleware(['permission:ver_recepciones_vehiculares'])->group(function () {
         Route::get('/recepciones/vehiculares', [RecepcionVehicularController::class, 'view'])->name('recepcionesvehiculares.vista');
         Route::get('/recepciones/vehiculares/read', [RecepcionVehicularController::class, 'Read'])->name('recepcionesvehiculares.read');
@@ -122,12 +132,24 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::post('/ordenes-servicio/{ordenServicio}/vales-almacen', [ValesAlmacenController::class, 'store'])
             ->middleware('permission:crear.vales.almacen')
             ->name('vales-almacen.store');
+        Route::get('/vales-almacen/{vale}', [ValesAlmacenController::class, 'show'])
+            ->middleware('permission:editar.vales.almacen')
+            ->name('vales-almacen.show');
         Route::put('/vales-almacen/{vale}', [ValesAlmacenController::class, 'update'])
             ->middleware('permission:editar.vales.almacen')
             ->name('vales-almacen.update');
         Route::delete('/vales-almacen/{vale}', [ValesAlmacenController::class, 'destroy'])
             ->middleware('permission:eliminar.vales.almacen')
             ->name('vales-almacen.destroy');
+        Route::patch('/vales-almacen/{vale}/estatus', [ValesSeguimientoController::class, 'advance'])
+            ->middleware('permission:editar.vales.almacen')
+            ->name('vales-almacen.estatus.advance');
+        Route::get('/vales-almacen/{vale}/entregas', [ValesSeguimientoController::class, 'deliveries'])
+            ->middleware('permission:editar.vales.almacen')
+            ->name('vales-almacen.entregas.index');
+        Route::patch('/vales-almacen/{vale}/entregas', [ValesSeguimientoController::class, 'storeDeliveries'])
+            ->middleware('permission:editar.vales.almacen')
+            ->name('vales-almacen.entregas.store');
         Route::get('/pdf/vales-almacen/{id}', [PdfController::class, 'ValeAlmacen'])
             ->name('pdf.cortana.vale-almacen');
         Route::get('/inspeccion/vehicular/{ordenServicio}', [InspeccionVehicularController::class, 'read'])->name('inspeccionvehicular.read');
@@ -250,3 +272,11 @@ Route::get('/test-browser', function () {
 Route::get('/pdf/recepcion-demo', function () {
     return app(PdfController::class)->RecepcionVehicular(11, true);
 })->name('pdf.recepcion.demo');
+
+Route::get('/.well-known/appspecific/com.chrome.devtools.json', function () {
+    return response()->noContent();
+})->withoutMiddleware('web');
+
+Route::fallback(function () {
+    abort(404);
+});
