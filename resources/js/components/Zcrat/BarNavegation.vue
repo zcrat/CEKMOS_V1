@@ -78,7 +78,7 @@ const logout = () => {
                 width="48"
             >
                 <template #trigger>
-                    <ButtonLink :title="IsRow ? '' : 'Cortana'"  :active="route().current('presupuesto.vista')"><font-awesome-icon icon="fa-solid fa-table-list" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Cortana</span></ButtonLink>
+                    <ButtonLink :title="IsRow ? '' : 'Cortana'"  :active="route().current('presupuesto.vista') || route().current('recepcionesvehiculares.vista')"><font-awesome-icon icon="fa-solid fa-table-list" :class="IsRow?'':'sm:text-[1.3rem]'"/><span :class="IsRow?'':'sm:hidden'">&nbsp;Cortana</span></ButtonLink>
                 </template>
                 
                 <template #content>
@@ -93,6 +93,23 @@ const logout = () => {
                         :href="route('recepcionesvehiculares.vista')"
                     >
                     <font-awesome-icon icon="fa-solid fa-truck-pickup" :class="IsRow?'':'sm:text-[1.3rem]'"/> Recepciones Vehiculares
+                    </DropdownLink>
+                </template>
+            </Dropdown>
+            <Dropdown v-if="canAny(['ver.vales.almacen', 'ver.vales.subcontratos'])" :align="IsRow?'right':'left-up'" width="48">
+                <template #trigger>
+                    <ButtonLink :title="IsRow ? '' : 'Vales'" :active="route().current('vales.seguimiento.*')">
+                        <font-awesome-icon icon="fa-solid fa-file" :class="IsRow?'':'sm:text-[1.3rem]'"/>
+                        <span :class="IsRow?'':'sm:hidden'">&nbsp;Vales</span>
+                    </ButtonLink>
+                </template>
+
+                <template #content>
+                    <DropdownLink v-if="can('ver.vales.almacen')" :href="route('vales.seguimiento.view', { tipo: 'almacen' })">
+                        Almacén
+                    </DropdownLink>
+                    <DropdownLink v-if="can('ver.vales.subcontratos')" :href="route('vales.seguimiento.view', { tipo: 'subcontratos' })">
+                        Subcontratos
                     </DropdownLink>
                 </template>
             </Dropdown>

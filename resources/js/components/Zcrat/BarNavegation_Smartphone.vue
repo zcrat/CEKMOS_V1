@@ -91,6 +91,32 @@ const logout = () => {
                     </DropdownLink>
                 </template>
             </Dropdown>
+            <Dropdown
+                v-if="canAny(['ver.vales.almacen', 'ver.vales.subcontratos'])"
+                :align="'left-up'"
+                width="48"
+                classtrigger="w-full"
+                classcontent="w-full"
+            >
+                <template #trigger>
+                    <ButtonLink
+                        :active="route().current('vales.seguimiento.*')"
+                        class="ms-2 gap-x-1 w-full text-white"
+                    >
+                        <font-awesome-icon icon="fa-solid fa-file" />
+                        <span>&nbsp;Vales</span>
+                    </ButtonLink>
+                </template>
+
+                <template #content>
+                    <DropdownLink v-if="can('ver.vales.almacen')" :href="route('vales.seguimiento.view', { tipo: 'almacen' })">
+                        Almacén
+                    </DropdownLink>
+                    <DropdownLink v-if="can('ver.vales.subcontratos')" :href="route('vales.seguimiento.view', { tipo: 'subcontratos' })">
+                        Subcontratos
+                    </DropdownLink>
+                </template>
+            </Dropdown>
             <Dropdown  
                 v-if="canAny(['administrar_caja'])" 
                 :align="'left-up'" 

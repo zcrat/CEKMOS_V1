@@ -45,6 +45,8 @@ class asignarrolesypermisos extends Seeder
             'editar_catalogo_conceptos',
             'eliminar_catalogo_conceptos',
             'ver_importacion_conceptos',
+            'ver.vales.almacen',
+            'ver.vales.subcontratos',
             'crear.vales.almacen',
             'editar.vales.almacen',
             'eliminar.vales.almacen',
