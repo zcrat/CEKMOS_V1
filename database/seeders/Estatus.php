@@ -49,7 +49,10 @@ class Estatus extends Seeder
             ['descripcion' => 'Unidad Reingresada al Taller', 'categoria_id' => 12],
             ['descripcion' => 'Sin Entregar', 'categoria_id' => 13],
             ['descripcion' => 'Entregado', 'categoria_id' => 13],
-            ['descripcion' => 'Terminado', 'categoria_id' => 13],
+            ['descripcion' => 'Confirmado', 'categoria_id' => 13],
+            ['descripcion' => 'Pedido Entregado', 'categoria_id' => 13],
+            ['descripcion' => 'Trabajo Enviado', 'categoria_id' => 13],
+            ['descripcion' => 'Trabajo Autorizado', 'categoria_id' => 13],
         ];
         foreach ($estatus as $data) {
             EstatusModel::create($data);
