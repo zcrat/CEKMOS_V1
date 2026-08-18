@@ -24,8 +24,16 @@ interface ConceptoValeAlmacen {
     descripcion: string;
 }
 
-interface ValeAlmacen {
+interface ValeAlmacenSummary {
     id: number;
+    status: number;
+    estatus: string;
+    tipo: number;
+    tipo_descripcion: string;
+    siguiente_estatus: string | null;
+}
+
+interface ValeAlmacen extends ValeAlmacenSummary {
     folio: string;
     destino: string;
     motor: string;
@@ -42,6 +50,8 @@ const canDelete = can('eliminar.vales.almacen');
 
 const show = ref(false);
 const loading = ref(false);
+const loadingDetail = ref(false);
+const advancing = ref(false);
 const deleting = ref(false);
 const formSaving = ref(false);
 const iframeLoading = ref(false);
@@ -49,16 +59,21 @@ const iframeVersion = ref(0);
 const idVisualizacion = ref<number | null>(null);
 const editingVale = ref<ValeAlmacen | null>(null);
 const orden = ref<OrdenValeAlmacen | null>(null);
-const vales = ref<ValeAlmacen[]>([]);
+const vales = ref<ValeAlmacenSummary[]>([]);
 const loadError = ref('');
 
 const title = computed(() => `Vales de almacén para ${orden.value?.economico || orden.value?.numero || ''}`);
 const selectedVale = computed(() => vales.value.find((vale) => vale.id === idVisualizacion.value) ?? null);
 const canEditSelected = computed(() => canEdit && selectedVale.value?.estatus === 'Sin Entregar');
-const selectedPdfUrl = computed(() => (selectedVale.value ? `${selectedVale.value.pdf_url}?v=${iframeVersion.value}` : ''));
-const busy = computed(() => deleting.value || formSaving.value);
+const selectedPdfUrl = computed(() =>
+    selectedVale.value ? `${route('pdf.cortana.vale-almacen', selectedVale.value.id)}?v=${iframeVersion.value}` : '',
+);
+const busy = computed(() => deleting.value || formSaving.value || loadingDetail.value || advancing.value);
+const canAdvanceSelected = computed(() => canEdit && Boolean(selectedVale.value?.siguiente_estatus));
 
-const selectVale = (vale: ValeAlmacen, forceReload = false) => {
+const formatFolio = (id: number) => `${String(id).padStart(5, '0')}-01`;
+
+const selectVale = (vale: ValeAlmacenSummary, forceReload = false) => {
     if (!forceReload && idVisualizacion.value === vale.id) return;
 
     editingVale.value = null;
@@ -115,10 +130,24 @@ const openCreate = () => {
     idVisualizacion.value = null;
 };
 
-const openEdit = () => {
+const openEdit = async () => {
     if (!canEditSelected.value || !selectedVale.value) return;
-    editingVale.value = selectedVale.value;
-    idVisualizacion.value = null;
+
+    loadingDetail.value = true;
+
+    try {
+        const { data } = await axios.get(route('vales-almacen.show', selectedVale.value.id));
+        editingVale.value = data.vale;
+        idVisualizacion.value = null;
+    } catch (error) {
+        MyBasicToast.error(
+            axios.isAxiosError(error)
+                ? (error.response?.data?.message ?? 'No fue posible cargar la información del vale.')
+                : 'No fue posible cargar la información del vale.',
+        );
+    } finally {
+        loadingDetail.value = false;
+    }
 };
 
 const cancelForm = () => {
@@ -134,15 +163,45 @@ const cancelForm = () => {
 
 const handleValeSaved = (vale: ValeAlmacen) => {
     const index = vales.value.findIndex((item) => item.id === vale.id);
+    const summary: ValeAlmacenSummary = {
+        id: vale.id,
+        status: vale.status,
+        estatus: vale.estatus,
+        tipo: vale.tipo,
+        tipo_descripcion: vale.tipo_descripcion,
+        siguiente_estatus: vale.siguiente_estatus,
+    };
 
     if (index === -1) {
-        vales.value.unshift(vale);
+        vales.value.unshift(summary);
     } else {
-        vales.value.splice(index, 1, vale);
+        vales.value.splice(index, 1, summary);
     }
 
     editingVale.value = null;
-    selectVale(vale, true);
+    selectVale(summary, true);
+};
+
+const advanceSelectedVale = async () => {
+    if (!canAdvanceSelected.value || !selectedVale.value) return;
+
+    advancing.value = true;
+
+    try {
+        const { data } = await axios.patch(route('vales-almacen.estatus.advance', selectedVale.value.id));
+        const index = vales.value.findIndex((vale) => vale.id === data.vale.id);
+
+        if (index !== -1) vales.value.splice(index, 1, data.vale);
+        MyBasicToast.success(data.message);
+    } catch (error) {
+        MyBasicToast.error(
+            axios.isAxiosError(error)
+                ? (error.response?.data?.message ?? 'No fue posible avanzar el estatus del vale.')
+                : 'No fue posible avanzar el estatus del vale.',
+        );
+    } finally {
+        advancing.value = false;
+    }
 };
 
 const deleteSelectedVale = async () => {
@@ -150,7 +209,7 @@ const deleteSelectedVale = async () => {
 
     const vale = selectedVale.value;
     const confirmed = await ZdAlert({
-        title: `Eliminar vale ${vale.folio}`,
+        title: `Eliminar vale ${formatFolio(vale.id)}`,
         text: 'Esta acción eliminará el vale y todos sus conceptos. ¿Deseas continuar?',
         confirmButtonText: 'Eliminar vale',
     });
@@ -182,11 +241,11 @@ defineExpose({ Open });
 <template>
     <BaseModal
         :show="show"
-        :loading="loading"
+        :loading="loading || loadingDetail"
         :saving="busy"
         :modal-title="title"
         modal-description="Consulta y administración de vales de almacén"
-        loading-message="Cargando vales de almacén"
+        :loading-message="loadingDetail ? 'Cargando información del vale' : 'Cargando vales de almacén'"
         saving-message="Se está procesando el vale"
         modal-class="!w-[calc(100vw-1rem)] !max-w-[96rem]"
         classslot="w-full !overflow-hidden !px-0"
@@ -210,7 +269,7 @@ defineExpose({ Open });
                     icon="fa-solid fa-file"
                     :type="idVisualizacion === vale.id || editingVale?.id === vale.id ? 'delete' : 'secondary'"
                     :disabled="busy"
-                    :title="`Folio ${vale.folio} · ${vale.estatus} · ${vale.fecha}`"
+                    :title="`Folio ${formatFolio(vale.id)} · ${vale.estatus}`"
                     class="flex-none"
                     @click="selectVale(vale)"
                 />
@@ -243,6 +302,13 @@ defineExpose({ Open });
         </div>
 
         <template #footer>
+            <Button
+                v-if="canAdvanceSelected && selectedVale"
+                type="next"
+                :text="`Marcar como ${selectedVale.siguiente_estatus}`"
+                :disabled="busy"
+                @click="advanceSelectedVale"
+            />
             <Button
                 v-if="canDelete && selectedVale"
                 type="delete"

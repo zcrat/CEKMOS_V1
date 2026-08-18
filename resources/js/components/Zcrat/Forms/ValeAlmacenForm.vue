@@ -20,6 +20,10 @@ interface ConceptoForm {
 
 interface ValeAlmacenGuardado {
     id: number;
+    status: number;
+    tipo: number;
+    tipo_descripcion: string;
+    siguiente_estatus: string | null;
     folio: string;
     destino: string;
     motor: string;

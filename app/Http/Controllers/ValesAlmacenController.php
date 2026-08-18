@@ -9,6 +9,7 @@ use App\Models\Tipos;
 use App\Models\ValesAlmacen;
 use App\Services\AlcanceRecepcionesVehiculares;
 use App\Services\ValeAlmacenPdfService;
+use App\Services\ValeAlmacenWorkflowService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,17 +20,20 @@ class ValesAlmacenController extends Controller
 
     private const ESTATUS_SIN_ENTREGAR = 'Sin Entregar';
 
-    public function __construct(private readonly ValeAlmacenPdfService $valeAlmacenPdf) {}
+    public function __construct(
+        private readonly ValeAlmacenPdfService $valeAlmacenPdf,
+        private readonly ValeAlmacenWorkflowService $workflow
+    ) {}
 
     public function index(Request $request, OrdenesServicio $ordenServicio): JsonResponse
     {
         $this->authorizeOrder($request, $ordenServicio);
 
         $ordenServicio->load([
-            'vehiculo.modelo.marca',
             'vehiculo.modelo.motor',
             'vales_almacen' => fn ($query) => $query
-                ->with(['estatusRegistro', 'conceptos.concepto'])
+                ->select(['id', 'orden_servicio_id', 'tipo', 'status'])
+                ->with(['tipoRegistro:id,descripcion', 'estatusRegistro:id,descripcion'])
                 ->latest('id'),
         ]);
 
@@ -42,8 +46,26 @@ class ValesAlmacenController extends Controller
                 'motor' => $ordenServicio->vehiculo?->modelo?->motor?->descripcion ?? '',
             ],
             'vales' => $ordenServicio->vales_almacen
-                ->map(fn (ValesAlmacen $vale) => $this->serializeVale($vale))
+                ->map(fn (ValesAlmacen $vale) => $this->serializeValeSummary($vale))
                 ->values(),
+        ]);
+    }
+
+    public function show(Request $request, ValesAlmacen $vale): JsonResponse
+    {
+        $this->authorizeVale($request, $vale);
+        $vale->loadMissing('estatusRegistro');
+
+        abort_unless(
+            $vale->estatusRegistro?->descripcion === self::ESTATUS_SIN_ENTREGAR,
+            409,
+            'Sólo se pueden editar vales con estatus Sin Entregar.'
+        );
+
+        $vale->load('conceptos.concepto');
+
+        return response()->json([
+            'vale' => $this->serializeVale($vale),
         ]);
     }
 
@@ -77,7 +99,7 @@ class ValesAlmacenController extends Controller
         });
 
         $this->valeAlmacenPdf->generate($vale);
-        $vale->load(['estatusRegistro', 'conceptos.concepto']);
+        $vale->load(['tipoRegistro', 'estatusRegistro', 'conceptos.concepto']);
 
         return response()->json([
             'message' => 'Vale de almacén creado correctamente.',
@@ -108,7 +130,7 @@ class ValesAlmacenController extends Controller
         });
 
         $this->valeAlmacenPdf->generate($vale);
-        $vale->load(['estatusRegistro', 'conceptos.concepto']);
+        $vale->load(['tipoRegistro', 'estatusRegistro', 'conceptos.concepto']);
 
         return response()->json([
             'message' => 'Vale de almacén actualizado correctamente.',
@@ -185,6 +207,10 @@ class ValesAlmacenController extends Controller
     {
         return [
             'id' => $vale->id,
+            'status' => (int) $vale->status,
+            'tipo' => (int) $vale->tipo,
+            'tipo_descripcion' => $vale->tipoRegistro?->descripcion ?? '',
+            'siguiente_estatus' => $this->workflow->siguiente($vale),
             'folio' => str_pad((string) $vale->id, 5, '0', STR_PAD_LEFT).'-01',
             'destino' => $vale->destino,
             'motor' => $vale->motor,
@@ -196,6 +222,18 @@ class ValesAlmacenController extends Controller
                 'cantidad' => (float) $detalle->cantidad,
                 'descripcion' => $detalle->concepto?->descripcion ?? '',
             ])->values(),
+        ];
+    }
+
+    private function serializeValeSummary(ValesAlmacen $vale): array
+    {
+        return [
+            'id' => $vale->id,
+            'status' => (int) $vale->status,
+            'estatus' => $vale->estatusRegistro?->descripcion ?? '',
+            'tipo' => (int) $vale->tipo,
+            'tipo_descripcion' => $vale->tipoRegistro?->descripcion ?? '',
+            'siguiente_estatus' => $this->workflow->siguiente($vale),
         ];
     }
 
