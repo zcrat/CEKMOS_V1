@@ -12,10 +12,12 @@ class ConceptosPerValeAlmacen extends Model
         'vale_almacen_id',
         'concepto_id',
         'cantidad',
+        'fecha_entrega',
     ];
 
     protected $casts = [
         'cantidad' => 'decimal:2',
+        'fecha_entrega' => 'datetime',
     ];
 
     public function concepto()
