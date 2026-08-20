@@ -54,6 +54,7 @@ const loadingDetail = ref(false);
 const advancing = ref(false);
 const deleting = ref(false);
 const formSaving = ref(false);
+const valeAlmacenForm = ref<{ save: () => Promise<void> } | null>(null);
 const iframeLoading = ref(false);
 const iframeVersion = ref(0);
 const idVisualizacion = ref<number | null>(null);
@@ -247,7 +248,7 @@ defineExpose({ Open });
         modal-description="Consulta y administración de vales de almacén"
         :loading-message="loadingDetail ? 'Cargando información del vale' : 'Cargando vales de almacén'"
         saving-message="Se está procesando el vale"
-        modal-class="!w-[calc(100vw-1rem)] !max-w-[96rem]"
+        modal-class="!w-[calc(100vw-1rem)] !max-w-[70rem]"
         classslot="w-full !overflow-hidden !px-0"
         @close="close"
     >
@@ -277,6 +278,7 @@ defineExpose({ Open });
 
             <ValeAlmacenForm
                 v-if="idVisualizacion === null && orden && (canCreate || editingVale)"
+                ref="valeAlmacenForm"
                 v-model:saving="formSaving"
                 :orden="orden"
                 :vale="editingVale"
@@ -302,6 +304,16 @@ defineExpose({ Open });
         </div>
 
         <template #footer>
+            <template v-if="idVisualizacion === null && orden && (canCreate || editingVale)">
+                <Button type="secondary" text="Cancelar" :disabled="busy" @click="cancelForm" />
+                <Button
+                    type="save"
+                    :text="editingVale ? 'Guardar cambios' : 'Guardar y generar PDF'"
+                    icon="fa-solid fa-floppy-disk"
+                    :disabled="busy"
+                    @click="valeAlmacenForm?.save()"
+                />
+            </template>
             <Button
                 v-if="canAdvanceSelected && selectedVale"
                 type="next"

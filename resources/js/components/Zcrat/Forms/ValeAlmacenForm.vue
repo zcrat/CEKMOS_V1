@@ -107,6 +107,8 @@ const save = async () => {
         saving.value = false;
     }
 };
+
+defineExpose({ save });
 </script>
 
 <template>
@@ -192,15 +194,6 @@ const save = async () => {
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2 border-t pt-3">
-                <Button type="secondary" text="Cancelar" :disabled="saving" @click.prevent="emit('cancel')" />
-                <Button
-                    type="save"
-                    :text="isEditing ? 'Guardar cambios' : 'Guardar y generar PDF'"
-                    icon="fa-solid fa-floppy-disk"
-                    :disabled="saving"
-                />
-            </div>
         </div>
     </form>
 </template>
