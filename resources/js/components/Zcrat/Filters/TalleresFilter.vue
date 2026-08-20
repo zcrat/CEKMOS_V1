@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import MultiOptionFilter from '@/components/Zcrat/Filters/MultiOptionFilter.vue';
 
-const talleres = defineModel<(number | string)[]>({ default: [] });
+const talleres = defineModel<(number | string)[]>({ default: () => [] });
 </script>
 
 <template>

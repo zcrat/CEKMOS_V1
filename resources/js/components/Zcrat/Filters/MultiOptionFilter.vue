@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Checkbox from '@/components/Zcrat/Inputs/form/CheckboxFilter.vue'
-import Poper from '@/components/Zcrat/Elements/poper.vue'
+import ZDPopover from '@/components/Zcrat/Elements/ZDPopover.vue'
 import Search from '@/components/Zcrat/Inputs/Search.vue'
 import { type option } from '@/types/generales'
 import getMultiOptionFilter from '@/utils/functions/select/MultiOptionFilter'
@@ -13,7 +13,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const selectedIds = defineModel<(number | string)[]>('selectedIds', { default: [] })
+const selectedIds = defineModel<(number | string)[]>('selectedIds', { required:true })
 
 const options = ref<option[]>([])
 const search = ref<string>('')
@@ -241,5 +241,5 @@ const poperChildren = computed(() => [
 </script>
 
 <template>
-  <Poper :father="label" :classname="''" :children="poperChildren" />
+  <ZDPopover :father="label" :classname="''" :children="poperChildren" />
 </template>
