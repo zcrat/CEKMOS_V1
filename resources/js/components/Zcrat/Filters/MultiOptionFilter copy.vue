@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, defineComponent, h, ref, watch } from 'vue'
-import Poper from '@/components/Zcrat/Elements/poper.vue'
+import ZDPopover from '@/components/Zcrat/Elements/ZDPopover.vue'
 import Checkbox from '@/components/Zcrat/Inputs/form/CheckboxFilter.vue'
 import Search from '@/components/Zcrat/Inputs/Search.vue'
 import { type option } from '@/types/generales'
@@ -163,7 +163,7 @@ const poperChildren = computed(() => [
 </script>
 
 <template>
-  <Poper
+  <ZDPopover
     :father="label"
     :classname="''"
     :children="poperChildren"
