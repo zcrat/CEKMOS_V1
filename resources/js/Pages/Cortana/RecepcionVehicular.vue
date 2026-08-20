@@ -70,18 +70,14 @@ const params = computed(() => ({
             <Button text="Nueva" @click="ModalOrdenServicio?.Open(null)" />
         </template>
         <template #filtering>
-            <div class="flex flex-col gap-2 lg:flex-row">
-                <div class="flex flex-row gap-2">
+            <div class="flex flex-wrap flex-row gap-2 items-end">
                     <Search Classdiv="sm:w-[25rem] w-full" placeholder="Buscar Por Order De Servicio, PLacas o Economico" v-model="search" />
                     <EmpresasFilter v-model="empresa" />
-                </div>
-                <div class="flex items-end justify-between gap-2 sm:justify-start">
                     <EstatusRecepcionesFilter v-model="estatus" />
                     <ModulosOrdenServicioFilter v-model="modulos" />
                     <TalleresFilter v-model="talleres" />
                     <UsuarioAsignadoFilter v-model="usuarioAsignado" />
                     <Datapicker v-model="fechas" />
-                </div>
             </div>
             <Pagination
                 api="recepcionesvehiculares.read"

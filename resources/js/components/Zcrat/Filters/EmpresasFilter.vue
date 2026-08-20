@@ -6,7 +6,7 @@ const empresa = defineModel<option | null>({ default: null });
 </script>
 
 <template>
-    <div class="min-w-[12rem]">
+    <div class="sm:min-w-[12rem] w-full sm:w-auto">
         <ZDRemoteSelect v-model="empresa" endpoint="select2.empresas" label="Empresa" placeholder="Seleccionar empresa" class-div="w-full" />
     </div>
 </template>

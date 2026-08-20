@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<{
   }) 
 </script>
 <template>
-    <div :class="['h-full flex flex-col',props.class??'w-[13rem]']">
+    <div :class="['flex flex-col',props.class??'w-[13rem]']">
       <label for="" v-if="props.label"><ZDIconError :errors="props.errors" hidden-absolute/> {{props.label }}</label>
       <div :class="['border-gray-500 border rounded-md',props.errors && props.errors.length > 0 ? 'inputerror':'', disabled ? 'bg-gray-100 opacity-60 cursor-not-allowed' : '']">
         <VueDatePicker 
